@@ -3,9 +3,38 @@ Theoretical Physics Computational Group Project (University of Glasgow, TP3 Grou
 
 Group members:
   Stephen Brown,
+  
   Fergus Hayes,
+  
   Lassi Heikkilä,
+  
   Wenbo Liu,
+  
   Dan Richardson
   
+  
 Plan:
+
+Solve case A analytically
+
+Solve case A numerically (first with MATLAB stuff that was written for the P309H Numerical Methods course)
+
+Compare results
+
+Write C++ program which is able to numerically calculate electric fields and electrostatic potentials given some starting conditions.
+
+Write C++ program that converts a .png file into a usable form for the C++ program to calculate with.
+
+Solve case A again numerically, this time using the C++ program.
+
+Compare results again.
+
+Convert starting conditions for case C into usable form for program.
+
+Run the program, examine results.
+
+Test program for other cases (B,D,E,F)
+
+Test program with arbitrary starting conditions.
+
+Create a GUI to use with the C++ program.
