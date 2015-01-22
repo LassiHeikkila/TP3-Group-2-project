@@ -11,7 +11,7 @@ infinitely long cylinder placed between two infinite
 plates of respective voltage -V and +V.
 We solve for the two dimensional case.
 
-Function is called as
+program is called as
 ./exe d dx h dy r iterations
 d - plate separation
 h - plate height
