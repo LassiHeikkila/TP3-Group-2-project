@@ -1,5 +1,3 @@
-```cpp
-//
 #include <iostream>
 #include <cstdlib>
 #include <cmath>
@@ -136,4 +134,3 @@ for (j=0; j<=nx-1; j++)
 }
 
 }
-```
