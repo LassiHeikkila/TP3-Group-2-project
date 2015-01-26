@@ -20,6 +20,9 @@ if (!image){
         return 0;
 }
 int locate[800][600];
+
+/*the line 'int locate[800][600]= {0}' would also initialise this matrix to zero, avoiding the for loop*/
+
 for(int q=0;q<600;q++){
         for(int p=0;p<800;p++){
                 locate[p][q]=0; // assigns the matrix 'locate' to have all elements equal to zero
