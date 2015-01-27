@@ -119,9 +119,9 @@ int main(int argc, char* argv[])
 
     // Loop through final potential matrix, writing data to file.
     // Simulataneously build and write out E-field matrix.
-    for (j=0; j<=599; j++)
+    for (int j=0; j<=599; j++)
     {
-        for (i=0; i<=799; i++)
+        for (int i=0; i<=799; i++)
         {
             // Write potential to file:
             ofstream file(("potential.dat").c_str(), ios::out | ios::app);
