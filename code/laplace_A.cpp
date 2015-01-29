@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <cmath>
+#include <fstream>
 
 /****************************************************************
 * laplace.cpp 22/1/15                                           *
@@ -20,12 +21,15 @@
 *                                                               *
 * TO DO:                                                        *
 *  - functionalise code                                         *
-*  - have plate voltage V and W specified as CLIs               *
+*  - have plate voltage V (and others, W say) specified as CLIs *
 *  - define some error tolerance for the relaxation method      *
-*  - write bash scipt to run program with CLI                   *
-*  - write gnuplot script to plot potential, equipotential      *
-*     lines and E field                                         *
+*  - adaptive step-sizing                                       *
+*  - check fstream is correct                  *
+*  - call gnuplot to plot potential, equipotential lines and    *
+*     electric field                                         *
 *  - fix dynamic memory allocation                              *
+*  - need for two step-sizes dx,dy?                             *
+*  - plot analytic solution for potential                       *
 ****************************************************************/
 
 int main(int argc, char *argv[])
@@ -37,7 +41,7 @@ float dx=atof(argv[2]);         //x step-size
 float h=atof(argv[3]);          //supposed plate height
 float dy=atof(argv[4]);         //y step-size
 float r = atof(argv[5]);        //radius
-int iterations = atoi(argv[6]); //number of iterations
+int loops = atoi(argv[6]); //number of iterations
 
 /*
 validate input
@@ -45,7 +49,7 @@ check dimensions, step-sizes and iterations are positive
 and that step-size does not exceed dimensions
 and that the cylinder fits in between the plates
 */
-if (d < 0 || dx < 0 || h < 0 || dy < 0 || dx > d || dy > h || r >= d || r >= h || iterations < 1)
+if (d < 0 || dx < 0 || h < 0 || dy < 0 || dx > d || dy > h || r >= d || r >= h || loops < 1)
 {
  std::cout << "Invalid input. Exiting momentarily."<< std::endl;
  exit(EXIT_FAILURE);
@@ -81,12 +85,16 @@ for (i=0; i<=nx; i++)
 {
  for (j=0; j<=ny; j++)
  {
-  u[i][j]=V-((float)2/nx)*V*i;
+  if (j==0 || j == nx) { u[i][j] = V-((float)2*V*i/nx); }       //linear potential at top and bottom boundaries
+  else if (i==0) { u[i][j]=V; }                                 //plate is at V
+  else if (i==ny){ u[i][j]=-V; }                               //plate is at -V
+  else { u[i][j] = 0; }                                         //all else 0
  }
 }
 
 //iterate to find potential, looping over x and y
-for (count=0; count < iterations; count++)
+//ignore boundaries as they are constant
+for (count=0; count < loops; count++)
 {
  for (i=1; i<=nx-1; i++)
  {
@@ -110,16 +118,17 @@ for (j=0; j<=ny; j++)
 {
  for (i=0; i<=nx; i++)
  {
-  //print out x, y, u
-  std::cout << i*dx << "\t" << j*dy << "\t" << u[i][j] << '\n';
+  //print out x, y, u to file
+  std::ofstream file ("potential_A.dat", std::ios::out | std::ios::app);
+  file << i*dx << "\t" << j*dy << "\t" << u[i][j] << std::endl;
  }
- std::cout << std::endl;
 }
 
 float x_grad[nx][ny];   //matrices to hold gradient of potential
 float y_grad[nx][ny];
 
 //find gradient of electrostatic potential in x and y directions
+//loop n-1 times as derivative is calculated as difference between adjacent points
 for (j=0; j<=ny-1; j++)
 {
  for (i=0; i<=nx-1; i++)
@@ -127,10 +136,10 @@ for (j=0; j<=ny-1; j++)
   x_grad[i][j] = (u[i+1][j]-u[i][j])/dx;        //approximate gradients
   y_grad[i][j] = (u[i][j+1]-u[i][j])/dy;
 
-  //print out x, y, -du/dx, -du/dy in tabular form (components of E field)
-  std::cout << i*dx << "\t" << j*dy << "\t" << -x_grad[i][j] << "\t" << -y_grad[i][j] << '\n';
+  //print out x, y, -du/dx, -du/dy in tabular form (components of E field) to file
+  std::ofstream file ("field_A.dat", std::ios::out | std::ios::app);
+  file << i*dx << "\t" << j*dy << "\t" << -x_grad[i][j] << "\t" << -y_grad[i][j] << std::endl;
  }
- std::cout << std::endl;
 }
 
 }
