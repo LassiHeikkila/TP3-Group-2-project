@@ -90,7 +90,7 @@ for (count=0; count < iterations; count++)
 {
  for (i=1; i<=nx-1; i++)
  {
-  for (j=1 j<=ny-1; j++)
+  for (j=1; j<=ny-1; j++)
   {
    //if point in circle
    if ((((i*dx)-(0.5*d))*((i*dx)-(0.5*d)))+(((j*dy)-(0.5*h))*((j*dy)-(0.5*h))) < r*r)
