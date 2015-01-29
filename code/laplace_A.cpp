@@ -120,9 +120,9 @@ float x_grad[nx][ny];   //matrices to hold gradient of potential
 float y_grad[nx][ny];
 
 //find gradient of electrostatic potential in x and y directions
-for (j=0; j<=nx-1; j++)
+for (j=0; j<=ny-1; j++)
 {
- for (i=0; i<=ny-1; i++)
+ for (i=0; i<=nx-1; i++)
  {
   x_grad[i][j] = (u[i+1][j]-u[i][j])/dx;        //approximate gradients
   y_grad[i][j] = (u[i][j+1]-u[i][j])/dy;
