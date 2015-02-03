@@ -6,6 +6,8 @@
 
 // By Lassi Heikkilä
 
+// HAVE TO INCLUDE stdio.h
+
 {
 // Remember to add \n after each line
   FILE* gnuplotpipe = popen ("gnuplot -persistent", "w"); // popen a file called gnuplotpipe in write mode to run gnuplot
