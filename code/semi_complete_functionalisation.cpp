@@ -57,7 +57,7 @@ void Laplace::SetArraySize(int dim_x, int dim_y)
 }
 
 void Laplace::InitializePotential(float V) // Works!, 
-// initializes array to a linearly decreasing potential from one plate at +V to the other at -V
+// initializes array to a line at +V, another line at -V and the edges as a linearly decreasing voltage from +V to -V.
 {
   for ( unsigned int i = 0 ; i < array.size() ; i++ )
     {
@@ -145,7 +145,7 @@ void Laplace::OutputPotential(float dx, float dy)
     }
   else
     {
-      std::cout << "I couldn't open potential.dat, so I will exit the program now." << std::endl;
+      std::cout << "I couldn't open 'potential.dat', so I will exit the program now." << std::endl;
       exit(EXIT_FAILURE);
     }
 }
