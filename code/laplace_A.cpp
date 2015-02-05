@@ -85,9 +85,9 @@ for (i=0; i<=nx; i++)
 {
  for (j=0; j<=ny; j++)
  {
-  if (j==0 || j == nx) { u[i][j] = V-((float)2*V*i/nx); }       //linear potential at top and bottom boundaries
+  if (j==0 || j == ny) { u[i][j] = V-((float)2*V*i/nx); }       //linear potential at top and bottom boundaries
   else if (i==0) { u[i][j]=V; }                                 //plate is at V
-  else if (i==ny){ u[i][j]=-V; }                               //plate is at -V
+  else if (i==nx){ u[i][j]=-V; }                               //plate is at -V
   else { u[i][j] = 0; }                                         //all else 0
  }
 }
