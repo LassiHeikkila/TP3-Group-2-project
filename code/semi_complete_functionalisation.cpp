@@ -63,7 +63,10 @@ void Laplace::InitializePotential(float V) // Works!,
     {
       for ( unsigned int j = 0 ; j < array[i].size() ; j++ )
 	{
-	  array[i][j] = V * ( 1 - ( (float) 2 * i / ( array.size() - 1 ) ));
+	  if (j==0 || j==array[i].size()) { array[i][j] = V*(1-((float) 2*i/(array.size()-1))); }     //linear potential at top and bottom boundaries
+  	  else if (i==0) { array[i][j]=V; }                                         		      //plate is at V
+  	  else if (i==array.size()){ array[i][j]=-V; }                              		      //plate is at -V
+  	  else { array[i][j] = 0; }                                                 		      //all else 0
 	}
     }
 }
