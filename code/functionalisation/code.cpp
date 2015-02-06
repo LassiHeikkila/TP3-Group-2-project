@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
     {
       for ( unsigned int i = 1 ; i < d-1 ; i++ )
 	{
-	  for ( unsigned int j = 1 ; j-1 < h ; j++ )
+	  for ( unsigned int j = 1 ; j-1 < h ; j++ )   /*why loop until j-1 < h?*/
 	    {
 	      if ( pixels.array[i][j] == 1 )
 		{
