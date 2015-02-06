@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
 		}
 	      else 
 		{
-		  u.array[i][j] = u.array[i][j] = 0.25 * (u.array[i-1][j] + u.array[i+1][j] + u.array[i][j-1] + u.array[i][j+1]);
+		  u.array[i][j] = 0.25 * (u.array[i-1][j] + u.array[i+1][j] + u.array[i][j-1] + u.array[i][j+1]);
 		}
 	    }
 	}
