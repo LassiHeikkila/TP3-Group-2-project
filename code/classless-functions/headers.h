@@ -1,4 +1,6 @@
 #include <iostream>
+#include <iomanip>	// setprecision()
+#include <time.h>	// clock_t, clock()
 #include <fstream>
 #include <string>
 #include <cstdlib>
