@@ -92,8 +92,8 @@ array_data * fdm(char* image, float* potentials, int iterations)
     }
 
     // Create 2D arrays for grad:
-    x_grad = new float[sysdat.columns][sysdat.rows];
-    y_grad = new float[sysdat.columns][sysdat.rows];
+    x_grad = new float*[sysdat.columns][sysdat.rows];
+    y_grad = new float*[sysdat.columns][sysdat.rows];
 
     for (int j = 0; j <= (sysdat.rows - 1); j++)
     {
