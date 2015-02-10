@@ -47,7 +47,7 @@ array_data * fdm(char* image, float* potentials, int iterations)
                     {
                         u[i][j] = 0.5*(u[i+1][j]+u[i][j+1]);
                     }
-                    else if (j = rows - 1)
+                    else if (j = sysdat.rows - 1)
                     {
                         u[i][j] = 0.5*(u[i+1][j]+u[i][j-1]);
                     }
@@ -57,13 +57,13 @@ array_data * fdm(char* image, float* potentials, int iterations)
                     }
                 }
                 // Right edge and corners:
-                else if (i = (columns - 1))
+                else if (i = sysdat.columns - 1)
                 {
                     if (j = 0)
                     {
                         u[i][j] = 0.5*(u[i-1][j]+u[i][j+1]);
                     }
-                    else if (j = rows - 1)
+                    else if (j = sysdat.rows - 1)
                     {
                         u[i][j] = 0.5*(u[i-1][j]+u[i][j-1]);
                     }
@@ -78,7 +78,7 @@ array_data * fdm(char* image, float* potentials, int iterations)
                     u[i][j]=(1/3.0)*(u[i-1][j]+u[i+1][j]+u[i][j+1]);
                 }
                 // Bottom edge:
-                else if (j = (rows - 1))
+                else if (j = (sysdat.rows - 1))
                 {
                     u[i][j]=(1/3.0)*(u[i-1][j]+u[i+1][j]+u[i][j-1]);
                 }
