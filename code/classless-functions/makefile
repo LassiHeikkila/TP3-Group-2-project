@@ -10,5 +10,5 @@ default: estatics
 estatics: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
-%.o: %.c $(DEPS)
+%.o: %.cpp $(DEPS)
 	$(CC) -c $@ $< $(CFLAGS) $(LIBS)
