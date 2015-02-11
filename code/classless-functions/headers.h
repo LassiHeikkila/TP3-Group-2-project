@@ -1,10 +1,12 @@
 #include <iostream>
-#include <iomanip>	// setprecision()
-#include <time.h>	// clock_t, clock()
+#include <iomanip>
+#include <time.h>
 #include <fstream>
 #include <string>
 #include <cstdlib>
 #include "bitmap_image.hpp"
+
+using namespace std;
 
 // struct to hold values and bool mask
 // for arbitrary systems. Mask is used
@@ -13,9 +15,14 @@ struct array_data {
 	int rows;
 	int columns;
 
-  float ** values;
-  bool ** mask;
-  
-  float ** xgrad;
-  float ** ygrad;
+    float ** values;
+    bool ** mask;
+    
+    float ** xgrad;
+    float ** ygrad;
 };
+
+array_data * fdm(char*, float*, int);
+void plot(int, string, string);
+array_data * locations(char*, float, float, float, float);
+void data_out(array_data**, double, int);
