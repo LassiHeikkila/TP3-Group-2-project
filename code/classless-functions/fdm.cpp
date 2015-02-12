@@ -8,25 +8,33 @@
 
 #include "headers.h"
 
-array_data * fdm(char* image, float* potentials, int iterations)
+array_data * fdm(char* image, float* potentials, float rel_par, int iterations, float desiredconv)
 {
     // Use locations() to build initial array with boundaries:
     array_data * sysdat;
     sysdat = locations(image, potentials[0], potentials[1], potentials[2], potentials[3]);
 
+    float conv = 0;
+    int convcount = 0, count = 0;
+    int pixels = sysdat->rows * sysdat->columns;
+
+    bool lock_avg = 0;
+
     float**u = sysdat -> values;
-//    bool**bound_mask = sysdat -> mask;
+    float**pu = sysdat -> prev_values;
 
-//    float**x_grad = sysdat -> xgrad;
-//    float**y_grad = sysdat -> ygrad;
-
-    // Loop through desired iteration count:
-    for (int count = 0; count < iterations; count++)
+    // Loop until either desired convergence or maximum
+    // iterations are achieved:
+    while ( convcount < pixels && count < iterations )
+//    for (int count = 0; count < iterations; count++)
     {
+        convcount = 0;
+
         if (count % 500 == 0)
         {
             cout << "Iteration " << count << ".\n";
         }
+
         // Loop through x coordinates 
         for (int i = 0; i < sysdat->columns; i++)
         {
@@ -36,6 +44,7 @@ array_data * fdm(char* image, float* potentials, int iterations)
                 // Test if point is boundary value. If so, ignore:
                 if (sysdat->mask[i][j])
                 {
+                    convcount++;
                     continue;
                 }
 
@@ -51,15 +60,15 @@ array_data * fdm(char* image, float* potentials, int iterations)
                 {
                     if (j == 0)
                     {
-                        u[i][j] = 0.5*(u[i+1][j]+u[i][j+1]);
+                        u[i][j] = (1-rel_par)*pu[i][j] + rel_par*0.5*(u[i+1][j]+u[i][j+1]);
                     }
                     else if (j == sysdat->rows - 1)
                     {
-                        u[i][j] = 0.5*(u[i+1][j]+u[i][j-1]);
+                        u[i][j] = (1-rel_par)*pu[i][j] + rel_par*0.5*(u[i+1][j]+u[i][j-1]);
                     }
                     else
                     {
-                        u[i][j]=(1/3.0)*(u[i+1][j]+u[i][j+1]+u[i][j-1]);
+                        u[i][j]=(1-rel_par)*pu[i][j] + rel_par*(1/3.0)*(u[i+1][j]+u[i][j+1]+u[i][j-1]);
                     }
                 }
                 // Right edge and corners:
@@ -67,39 +76,52 @@ array_data * fdm(char* image, float* potentials, int iterations)
                 {
                     if (j == 0)
                     {
-                        u[i][j] = 0.5*(u[i-1][j]+u[i][j+1]);
+                        u[i][j] = (1-rel_par)*pu[i][j] + rel_par*0.5*(u[i-1][j]+u[i][j+1]);
                     }
                     else if (j == sysdat->rows - 1)
                     {
-                        u[i][j] = 0.5*(u[i-1][j]+u[i][j-1]);
+                        u[i][j] = (1-rel_par)*pu[i][j] + rel_par*0.5*(u[i-1][j]+u[i][j-1]);
                     }
                     else
                     {
-                        u[i][j]=(1/3.0)*(u[i-1][j]+u[i][j+1]+u[i][j-1]);
+                        u[i][j] = (1-rel_par)*pu[i][j] + rel_par*(1/3.0)*(u[i-1][j]+u[i][j+1]+u[i][j-1]);
                     }
                 }
                 // Top edge:
                 else if (j == 0)
                 {
-                    u[i][j]=(1/3.0)*(u[i-1][j]+u[i+1][j]+u[i][j+1]);
+                    u[i][j] = (1-rel_par)*pu[i][j] + rel_par*(1/3.0)*(u[i-1][j]+u[i+1][j]+u[i][j+1]);
                 }
                 // Bottom edge:
                 else if (j == (sysdat->rows - 1))
                 {
-                    u[i][j]=(1/3.0)*(u[i-1][j]+u[i+1][j]+u[i][j-1]);
+                    u[i][j] = (1-rel_par)*pu[i][j] + rel_par*(1/3.0)*(u[i-1][j]+u[i+1][j]+u[i][j-1]);
                 }
                 // Rest of area:
                 else
                 {
-                    u[i][j]=0.25*(u[i+1][j]+u[i][j+1]+u[i-1][j]+u[i][j-1]);
+                    u[i][j]=(1-rel_par)*pu[i][j] + rel_par*0.25*(u[i+1][j]+u[i][j+1]+u[i-1][j]+u[i][j-1]);
                 }
+
+                // Find absolute value of convergence:
+                conv = abs(pu[i][j] - u[i][j]);
+
+                if (conv < desiredconv)
+                {
+//                    sysdat->mask[i][j] = 1;
+                    convcount++;
+                }
+
+                pu[i][j] = u[i][j];
             }
         }
+
+        count++;
     }
 
     // Create 2D arrays for grad:
-    sysdat->xgrad = new float*[sysdat->columns];//[sysdat->rows];
-    sysdat->ygrad = new float*[sysdat->columns];//[sysdat->rows];
+    sysdat->xgrad = new float*[sysdat->columns];
+    sysdat->ygrad = new float*[sysdat->columns];
 
     for (int i = 0; i < (sysdat->columns - 1); i++)
     {
@@ -108,7 +130,6 @@ array_data * fdm(char* image, float* potentials, int iterations)
 
         for (int j = 0; j < (sysdat->rows - 1); j++)
         {
-//            cout << "Finding grads at (" << i << "," << j << ").\n";
             // Approximation of gradients:
             sysdat->xgrad[i][j] = -1*(u[i+1][j]-u[i][j]);
             sysdat->ygrad[i][j] = -1*(u[i][j+1]-u[i][j]);
