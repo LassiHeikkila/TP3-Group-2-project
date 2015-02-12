@@ -1,4 +1,5 @@
-//function output analytic solution of laplace equation in polar co-ordinates
+//function outputs analytical solution of laplace equation in polar co-ordinates
+//for the electrostatic system A
 
 #include <iostream>
 #include <cmath>
