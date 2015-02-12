@@ -1,0 +1,382 @@
+
+%report.tex
+
+%specify class of document
+\documentclass{article}
+
+%specify packages used 
+\usepackage{graphicx}                  %use package for diagram 
+\usepackage{listings}                  %use package for c++ code in appendix
+\usepackage{colour}                    %use package for code listings
+\usepackage[utf8]{inputenc}            %use package for colours in code
+%\usepackage{url}                       %use package to display urls properly
+\usepackage{amsmath}                   %use package for implies symbol
+\usepackage{bm}			       %use package for bolds in math mode
+\usepackage{hyperref}                  %use package for hyperlinks
+%\usepackage[nottoc,numbib]{tocbibind}  %use package to include references in toc
+\usepackage{algpseudocode}             %use package for pseudocode
+\usepackage{algorithm}                 %use package for pseudocode
+%\usepackage{array}                     %use package for centering table contents
+%\usepackage{caption}		        %use package for multiple figures
+%\usepackage{subcaption}                %use package for multiple figures
+\usepackage{fullpage}                  %use package for full page size
+
+%set style of bibliography
+\bibliographystyle{unsrt}
+
+%define colours for code listings
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+%define a style for the listings
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+
+%set style of listing to that defined above
+\lstset{style=mystyle}
+
+%set style of footnotes
+\renewcommand{\thefootnote}{\roman{footnote}}
+
+%define command shortcuts
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+
+%declare hyperbolic secant
+\DeclareMathOperator{\sech}{sech}
+
+%define algorithm command
+\algdef{SE}[DOWHILE]{Do}{doWhile}{\algorithmicdo}[1]{\algorithmicwhile\ #1}
+
+%start of document
+\begin{document}
+
+%display title, my details and current date
+\title{On the analytical and numerical solutions of Laplace's equation for two electrostatic configurations}
+\author{S. Brown, F. Hayes, L. Heikkil{\"a}, W. Liu, D. Richardson\\
+	School of Physics and Astronomy,\\
+	University of Glasgow,\\
+	Glasgow, United Kingdom}
+\date{\today}
+\maketitle
+
+%start of abstract
+\begin{abstract}
+
+The behaviour of the electric field under the presence and influence of solid
+conducting objects was studied and modelled. The Laplace equation---namely
+$\nabla ^2 \phi = 0$---was solved to find the electrostatic potential $\phi$,
+and hence the electric field, for two different configurations of
+electrostatic systems. 
+
+The first system had an analytical solution but both systems were solved
+numerically using finite difference methods to approximate the Laplace equation.
+
+\end{abstract} % end of abstract
+
+%add contents
+\tableofcontents
+
+\newpage
+
+%start of introduction
+\section{Introduction}
+
+Gauss' Law may used to express the relation between the \emph{divergence} of the
+electric field, represented by \textbf{E}, and the \emph{charge density} $\rho$,
+where $\epsilon_0$ is the \emph{permittivity of free space}:
+
+\be
+\nabla \cdot \bm{E} = \frac{\rho}{\epsilon_0}
+\ee
+
+Alternatively (c.f. the Divergence Theorem), it can be expressed in its
+integral form, as:
+
+\be
+\oint \limits_S \bm{E} \cdot d\bm{A} = \frac{Q}{\epsilon_0}
+\ee
+
+where the integral is taken over a closed surface, $S$.
+
+In the absence of charge, this reduces to the statement the electric field
+is \emph{solenoidal}.
+
+One can also relate the \emph{curl} of the electric field to the time
+derivative of the magnetic field, denoted \textbf{B}:
+
+\be
+\nabla \times \bm{E} = - \frac{\partial \bm{B}}{\partial t}
+\ee
+
+When the \textbf{E} and \textbf{B} fields (specifically magnetic) have reached
+a steady-state, in other words unchanging with time, after some initial disturbance,
+this equation reduces to the statement that the electric field is \emph{irrotational}.
+A consequence of irrotationality is that the electric field may then be written as negative
+the gradient of some scalar potential, $\phi$ say. Mathematically:
+
+\be
+\bm{E} = -\nabla \phi
+\ee
+
+This scalar potential is called the \emph{electrostatic potential}.
+One then has Laplace's equation:
+
+\be
+\nabla^2 \phi = 0
+\ee
+
+where
+$\nabla^2 \equiv \frac{\partial^2}{\partial x^2}+\frac{\partial^2}{\partial y^2}+\frac{\partial^2}{\partial z^2}$ 
+is the \emph{Laplacian operator}.
+
+\newpage
+
+%start of section
+\section{Finite Difference Schemes}
+Often differential equations, such as the Laplace equation, cannot be solved
+analytically, and their solution must be numerically approximated.
+
+To numerically approximate the solution to a differential equation it is
+necessary to approximate derivatives. Finite difference schemes do this
+by using explicit differencing to step the function from one value to the
+next in small increments of some variable. The smaller the increment used,
+the more accurate the solution, but the longer and more computationally
+intensive the process.
+
+Suppose one wishes to approximate the first derivative of a function $f(t)$, say,
+with respect to the variable $t$. The simplest way to do this is to discretise the
+derivative and write
+
+\be
+\frac{df}{dt} \approx \frac{f(t+\Delta t) - f(t)}{\Delta t}
+\ee
+
+where $f(t+\Delta t)$ and $f(t)$ are two values of $f$, evaluated at two points
+a distance $\Delta t$ apart.
+
+To approximate the second derivative of a function, one writes
+
+\be
+\frac{d^2 f}{dt^2} \approx \frac{f(t)' - f(t-h)'}{\Delta t} \\
+= \frac{\frac{f(t +\Delta t) - f(t)}{\Delta t} - \frac{f(t) - f(t -\Delta t)}{\Delta t}}{\Delta t} \\
+= \frac{f(t +\Delta t) - 2f(t) + f(t-\Delta t)}{\Delta t ^2}
+\ee
+
+We wish to discretise the following equation:
+
+\be
+\frac{\partial^2 \phi}{\partial x^2}+\frac{\partial^2 \phi}{\partial y^2} = 0
+\ee
+
+One can approximate this partial differential equation as:
+
+\be
+\frac{u_{j+1,k}-2u_{j,k}+u_{j-1,k}}{\Delta x^2} = - \frac{u_{j,k+1}-2u_{j,k}+u_{j,k-1}}{\Delta y^2}
+\ee
+
+where $j$ and $k$ index the $x$ and $y$ directions respectively.
+
+If we use the same step-size $\Delta=\Delta x=\Delta y$ in both $x$ and $y$ directions this
+reduces to:
+
+\be
+u_{j,k}= \frac{1}{4}(u_{j-1,k}+u_{j+1,k}+u_{j,k-1}+u_{j,k+1})
+\ee
+
+In other words, the value of the potential at each point is the average of
+the four surrounding points.
+
+\newpage
+
+%start of section
+\section{System A}
+
+Suppose one has a perfectly uniform electric field, between two infinite planes
+at potentials $V$ and $-V$, a distance $2d$ apart. Suppose one then places an
+infinitely long perfectly conducting cylinder into the centre of the field,
+at ground potential. We wish to find the resulting form of the electrostatic
+potential, and hence the electric field, surrounding the cylinder.
+
+\subsection{Analytic Solution}
+First, one realises that the three-dimensional problem can be reduced to an entirely
+equivalent one in two dimensions due to the translation symmetry of the system along
+the length of the cylinder. So, we consider a cross-section of the system and introduce
+a polar co-ordinate system, with origin centred on the centre of the cylinder.
+
+Laplace's equation in polar co-ordinates is: 
+
+\be
+\frac{\partial^2 \phi}{\partial r^2}+\frac{1}{r}\frac{\partial \phi}{\partial r}+\frac{1}{r^2}\frac{\partial^2 \phi}{\partial \theta^2}
+= \frac{1}{r}\frac{\partial}{\partial r}(r \frac{\partial \phi}{\partial r}) + \frac{1}{r^2}\frac{\partial ^2 \phi}{\partial \theta^2}
+= 0
+\ee
+
+We employ separation of variables and posit a solution of the form
+$\phi = f(r)g(\theta)$ for two unknown functions $f$ and $g$. Upon substitution,
+one finds that:
+
+\be
+\frac{r}{f(r)}\frac{d}{dr}(r \frac{df(r)}{dr}) =- \frac{1}{g(\theta)}\frac{d^2 g(\theta)}{d\theta^2}
+\ee
+
+Since this is true for arbitrary values of $r$ and $\theta$, we set:
+
+\be
+\frac{r}{f(r)}\frac{d}{dr}(r \frac{df(r)}{dr}) =- \frac{1}{g(\theta)}\frac{d^2 g(\theta)}{d\theta^2}=k^2
+\ee
+
+for some constant $k$.
+
+This gives two second order partial differential equations:
+
+\be
+r\frac{d}{dr}(r \frac{df(r)}{dr}) = k^2 f(r) \qquad
+\frac{d^2 g(\theta)}{d\theta^2}=-k^2 g(\theta)
+\ee
+
+For the case $k=0$, these equations have solutions
+$f(r)=\alpha \ln(r) + \beta$ and $g(\theta) = \gamma \theta + \delta$.
+For non-zero $k$, they have solutions
+
+\be
+f(r)=\alpha_k r^k + \beta_k r^{-k}
+\qquad
+g(\theta)= \gamma_k \sin(k\theta)+\delta_k \cos(k\theta)
+\ee
+
+With the sanity requirement that $g(\theta)=g(\theta + 2\pi)$, we have that $k$ is
+an integer. Hence, by the principle of superposition and the linearity of differentiation,
+the general solution to the Laplace equation in polar co-ordinates is a sum of
+these terms:
+
+\be
+\phi(r,\theta)
+= f(r)g(\theta)
+= (\alpha \ln(r) + \beta)(\gamma\theta + \delta) + \sum_{n=1}^{\infty}(\alpha_n r^n+\beta_n r^{-n})(\gamma_n \sin(n\theta) + \delta_n \cos(n\theta))
+\ee
+
+For a particular solution to the system considered here one must impose boundary
+conditions.
+
+By considering the geometry of the system, we expect a solution that is symmetric
+about $\theta=0$. This implies that $\gamma = 0$ and $\gamma_n=0$ $\forall n$ as
+$\sin()$ is anti-symmetric about the origin (c.f. odd).
+
+Additionally, the potential is finite as $r \rightarrow \infty$, implying that
+$\alpha$ and $\alpha_n$ are both zero. We now have:
+
+\be
+\phi(r,\theta)=\beta + \sum_{n=1}^{\infty}(\frac{\beta_n}{r^n} \cos(n\theta))
+\ee
+
+where the $\beta$'s have absorbed other constants.
+
+In particular, as $r \rightarrow \infty$, we require
+$\phi=-\frac{V}{d}x=-\frac{V}{d}r\cos(\theta)$. Since the infinite sum vanishes,
+$\beta=-\frac{V}{d}r\cos(\theta)$.
+
+We now have
+
+\be
+\phi(r,\theta)=-\frac{V}{d}r\cos(\theta) + \sum_{n=1}^{\infty}(\frac{\beta_n}{r^n} \cos(n\theta))
+              =(\frac{\beta_1}{r}-\frac{V}{d}r)\cos(\theta) + \sum_{n=2}^{\infty}(\frac{\beta_n}{r^n} \cos(n\theta))
+\ee
+
+We require $\phi=0$ at $r=a$ so that $\beta_1=\frac{Va^2}{d}$ and $\beta_{n \geq 2}=0$
+
+Thus, the final form for the electrostatic potential is, for a cylinder of radius $a$:
+
+\be
+\phi(x,y)=
+\begin{cases} \qquad 0, & \quad r \leq a \\
+\frac{V}{d}(\frac{a^2}{r}-r)\cos(\theta), & \quad r > a
+\end{cases}
+\ee
+
+\subsection{Numerical Solution}
+
+The algorithm employed to find the potential for System A was
+
+\begin{algorithm}
+\begin{algorithmic}[]
+\Procedure{Finite Difference Method}{}
+\State declare variables:
+\State $V \gets$ potential on plates
+\State $\delta \gets$ position step-size
+\State $d \gets$ distance between plates
+\State $h \gets$ height of plates
+\State $r \gets$ radius of cylinder
+\State specify initial system:
+\For {$j=1$ to $\frac{d}{\delta}$}
+   \For {$k=1$ to $\frac{d}{\delta}$}
+      \State $u_{j, k} \gets V-\frac{2Vj\delta}{d}$
+   \EndFor
+\EndFor
+\State find solution:
+\For {$j=2$ to $\frac{d}{\delta}-1$}
+   \For {$k=2$ to $\frac{h}{\delta}-1$}
+      \If {$(j \delta-\frac{1}{2} d)^2+(k \delta-\frac{1}{2} h)^2<r^2$}
+         \State $u_{j, k} \gets 0$
+      \Else
+         \State $u_{j,k} \gets \frac{1}{4}(u_{j-1,k}+u_{j+1,k}+u_{j,k-1}+u_{j,k+1})$
+      \EndIf
+   \EndFor
+\EndFor
+\State plot solution
+\State find electric field:
+\For {$j=1$ to $\frac{d}{\delta}-1$}
+   \For {$k=1$ to $\frac{h}{\delta}-1$}
+      \State $x\_grad_{j, k} \gets \frac{u_{j+1,k}-u_{j,k}}{dx}$
+      \State $y\_grad_{j,k} \gets \frac{u_{j,k+1}-u_{j,k}}{dy}$
+   \EndFor
+\EndFor
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\newpage
+
+%start of section
+\section{System B}
+
+\subsection{Numerical Solution}
+
+\newpage
+
+%start of section
+\section{Conclusion}
+
+\newpage
+
+%include BibTex bibliography
+\bibliography{buffon}
+
+\newpage
+
+%start of appendix
+\appendix
+\section{Appendices}
+\subsection{Code} \label{app:code}
+This is the algorithm implemented in C++:
+%\lstinputlisting[language=C++]{/home/danr/}
+
+\end{document} %end of document
