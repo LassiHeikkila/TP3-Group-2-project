@@ -12,9 +12,10 @@ using namespace std;
 // for arbitrary systems. Mask is used
 // to ignore boundary elements:
 struct array_data {
-	int rows;
-	int columns;
-
+    int rows;
+    int columns;
+    
+    float ** prev_values;
     float ** values;
     bool ** mask;
     
@@ -22,7 +23,7 @@ struct array_data {
     float ** ygrad;
 };
 
-array_data * fdm(char*, float*, int);
+array_data * fdm(char*, float*, float, int, float);
 void plot(int, string, string);
 array_data * locations(char*, float, float, float, float);
 void data_out(array_data**, double, int);
