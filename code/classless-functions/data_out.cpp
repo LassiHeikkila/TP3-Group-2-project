@@ -27,6 +27,10 @@ void data_out(array_data**u, double time_elapsed, int iterations)
             // Write potential to file:
             potential << setw(10) << i << "\t" << setw(10) << j << "\t" << setw(10) << (*u) -> values[i][j] << endl;
 
+            if (i == (*u)->columns - 1 || j == (*u)->rows - 1)
+            {
+                continue;
+            }
             //print out x, y, -du/dx, -du/dy in tabular form (components of E field)
             field << setw(10) << i << "\t" << setw(10) << j << "\t" << setw(10) << (*u) -> xgrad[i][j] << "\t" << setw(10) << (*u) -> ygrad[i][j] << endl;
         }
