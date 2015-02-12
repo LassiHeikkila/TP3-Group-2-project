@@ -18,8 +18,6 @@ array_data * fdm(char* image, float* potentials, float rel_par, int iterations, 
     int convcount = 0, count = 0;
     int pixels = sysdat->rows * sysdat->columns;
 
-    bool lock_avg = 0;
-
     float**u = sysdat -> values;
     float**pu = sysdat -> prev_values;
 
@@ -119,6 +117,8 @@ array_data * fdm(char* image, float* potentials, float rel_par, int iterations, 
         count++;
     }
 
+    // Pass iterations required to struct:
+    sysdat->req_its = count;
     // Create 2D arrays for grad:
     sysdat->xgrad = new float*[sysdat->columns];
     sysdat->ygrad = new float*[sysdat->columns];
@@ -136,6 +136,5 @@ array_data * fdm(char* image, float* potentials, float rel_par, int iterations, 
         }
 
     }
-    cout << "GRAD FINISHED.\n";
     return sysdat;
 }
