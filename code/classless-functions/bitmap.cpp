@@ -22,6 +22,7 @@ array_data * locations(char* file, float p_black, float p_red, float p_green, fl
 
     unsigned char red,green,blue;
     ar -> values = new float*[width];
+    ar -> prev_values = new float*[width];
 
     // Declare boolean mask:
     ar -> mask = new bool*[width];
@@ -29,6 +30,7 @@ array_data * locations(char* file, float p_black, float p_red, float p_green, fl
     for (int p = 0; p < width; p++)
     {
         ar -> values[p] = new float[height];
+        ar -> prev_values[p] = new float[height];
         ar -> mask[p] = new bool[height];
 
         for (int q = 0; q < height; q++)
@@ -47,25 +49,33 @@ array_data * locations(char* file, float p_black, float p_red, float p_green, fl
             if(red < 10 && blue < 10 && green < 10)
             {
                 ar -> values[p][q] = p_black;
+                ar -> prev_values[p][q] = p_black;
                 ar -> mask[p][q] = 1;
+                continue;
             }
             // Red pixels:
             if(red > blue && red > green)
             {
                 ar -> values[p][q] = p_red;
+                ar -> prev_values[p][q] = p_red;
                 ar -> mask[p][q] = 1;
+                continue;
             }
             // Green pixels:
             if(green > blue && green > red)
             {
                 ar -> values[p][q] = p_green;
+                ar -> prev_values[p][q] = p_green;
                 ar -> mask[p][q] = 1;
+                continue;
             }
             // Blue pixels:
             if(blue > red && blue > green)
             {
                 ar -> values[p][q] = p_blue;
+                ar -> prev_values[p][q] = p_blue;
                 ar -> mask[p][q] = 1;
+                continue;
             }
             else
             {
