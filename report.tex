@@ -12,7 +12,6 @@
 \usepackage{amsmath}                   %use package for implies symbol
 \usepackage{bm}			       %use package for bolds in math mode
 \usepackage{hyperref}                  %use package for hyperlinks
-%\usepackage[nottoc,numbib]{tocbibind}  %use package to include references in toc
 \usepackage{algpseudocode}             %use package for pseudocode
 \usepackage{algorithm}                 %use package for pseudocode
 %\usepackage{array}                     %use package for centering table contents
@@ -59,9 +58,6 @@
 \newcommand{\be}{\begin{equation}}
 \newcommand{\ee}{\end{equation}}
 
-%declare hyperbolic secant
-\DeclareMathOperator{\sech}{sech}
-
 %define algorithm command
 \algdef{SE}[DOWHILE]{Do}{doWhile}{\algorithmicdo}[1]{\algorithmicwhile\ #1}
 
@@ -69,7 +65,7 @@
 \begin{document}
 
 %display title, my details and current date
-\title{On the analytical and numerical solutions of Laplace's equation for two electrostatic configurations}
+\title{On the analytical and numerical solutions of Laplace's equation for different electrostatic configurations}
 \author{S. Brown, F. Hayes, L. Heikkil{\"a}, W. Liu, D. Richardson\\
 	School of Physics and Astronomy,\\
 	University of Glasgow,\\
@@ -86,18 +82,14 @@ $\nabla ^2 \phi = 0$---was solved to find the electrostatic potential $\phi$,
 and hence the electric field, for two different configurations of
 electrostatic systems. 
 
-The first system had an analytical solution but both systems were solved
-numerically using finite difference methods to approximate the Laplace equation.
+The first system was analytically solved and both systems were solved numerically
+using finite difference methods to approximate the Laplace equation.
 
 \end{abstract} % end of abstract
 
-%add contents
-\tableofcontents
-
-\newpage
-
 %start of introduction
 \section{Introduction}
+\subsection{Laplace's Equation}
 
 Gauss' Law may used to express the relation between the \emph{divergence} of the
 electric field, represented by \textbf{E}, and the \emph{charge density} $\rho$,
@@ -137,7 +129,7 @@ the gradient of some scalar potential, $\phi$ say. Mathematically:
 \ee
 
 This scalar potential is called the \emph{electrostatic potential}.
-One then has Laplace's equation:
+One then has \emph{Laplace's equation}:
 
 \be
 \nabla^2 \phi = 0
@@ -147,10 +139,7 @@ where
 $\nabla^2 \equiv \frac{\partial^2}{\partial x^2}+\frac{\partial^2}{\partial y^2}+\frac{\partial^2}{\partial z^2}$ 
 is the \emph{Laplacian operator}.
 
-\newpage
-
-%start of section
-\section{Finite Difference Schemes}
+\subsection{Finite Difference Schemes}
 Often differential equations, such as the Laplace equation, cannot be solved
 analytically, and their solution must be numerically approximated.
 
@@ -203,8 +192,6 @@ u_{j,k}= \frac{1}{4}(u_{j-1,k}+u_{j+1,k}+u_{j,k-1}+u_{j,k+1})
 
 In other words, the value of the potential at each point is the average of
 the four surrounding points.
-
-\newpage
 
 %start of section
 \section{System A}
@@ -352,30 +339,29 @@ The algorithm employed to find the potential for System A was
 \end{algorithmic}
 \end{algorithm}
 
-\newpage
+\subsection{Comparison of Analytical and Numerical Solution}
 
 %start of section
 \section{System B}
-
+The second system considered was implants in 
 \subsection{Numerical Solution}
 
-\newpage
+%start of section
+\section{Other Electrostatic Conifgurations}
 
 %start of section
 \section{Conclusion}
 
-\newpage
+\subsection{Further Work}
 
 %include BibTex bibliography
-\bibliography{buffon}
-
-\newpage
+\bibliography{report}
 
 %start of appendix
 \appendix
 \section{Appendices}
 \subsection{Code} \label{app:code}
 This is the algorithm implemented in C++:
-%\lstinputlisting[language=C++]{/home/danr/}
+%\lstinputlisting[language=C++]{}
 
 \end{document} %end of document
