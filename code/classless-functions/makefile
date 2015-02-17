@@ -3,7 +3,7 @@ CFLAGS = -g -Wall
 LIBS = -lm
 
 DEPS = headers.h bitmap_image.hpp
-OBJ = bitmap.o dataout.o fdm.o gnuplot.o main.o 
+OBJ = bitmap.o data_out.o fdm.o plot.o main.o 
 
 default: estatics
 
