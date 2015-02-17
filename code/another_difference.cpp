@@ -14,15 +14,15 @@
 
 int main(int argc, char *argv[])
 {
-	int columns = atof(argv[1]); // tell program how many rows image/grid has
-	int rows = atof(argv[2]); // tell program how many columns image/grid has
+	int columns = atof(argv[1]); // tell program how many columns image/grid has
+	int rows = atof(argv[2]); // tell program how many rows image/grid has
 
 	// make a grid of size specified by command line arguments
-	std::vector< std::vector <float> > grid;
+	std::vector< std::vector <double> > grid;
 
 	for ( int i = 0 ; i < columns ; i ++ )
 	{
-		grid.push_back(std::vector<float>());
+		grid.push_back(std::vector<double>());
 	}
 
 	for (int i = 0; i < columns; i++)
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 		//	std::string::size_type sz;
 			int column = stoi(x);
 			int row = stoi(y);
-			float potential = stof(value);
+			float potential = stod(value);
 
 			grid[column][row] = potential;
 
@@ -75,9 +75,9 @@ int h = columns/2; //approximate infinite plate as being half this height
 int R = 25; //radius of cylinder
 int V = 1; //voltage at plate
 
-float r; //radial co-ordinate
-float theta; //angular co-ordinate
-float phi = 0; //potential
+double r; //radial co-ordinate
+double theta; //angular co-ordinate
+double phi = 0; //potential
 
 std::ofstream output;
 output.open("data/difference.dat");
