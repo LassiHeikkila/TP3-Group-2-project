@@ -1,3 +1,7 @@
+// Compile this with the '-std=c++11' flag. Otherwise stoi and stof may not work.
+
+
+
 #include <iostream>
 //#include <iomanip>
 #include <fstream>
