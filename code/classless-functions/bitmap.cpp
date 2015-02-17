@@ -1,6 +1,6 @@
 #include "headers.h"
 
-array_data * locations(char* file, float p_black, float p_red, float p_green, float p_blue)
+array_data * locations(char* file, double p_black, double p_red, double p_green, double p_blue)
 {
     // Opens specified bitmap image:
     bitmap_image image(file);
@@ -21,16 +21,16 @@ array_data * locations(char* file, float p_black, float p_red, float p_green, fl
     ar -> columns = width;
 
     unsigned char red,green,blue;
-    ar -> values = new float*[width];
-    ar -> prev_values = new float*[width];
+    ar -> values = new double*[width];
+    ar -> prev_values = new double*[width];
 
     // Declare boolean mask:
     ar -> mask = new bool*[width];
 
     for (int p = 0; p < width; p++)
     {
-        ar -> values[p] = new float[height];
-        ar -> prev_values[p] = new float[height];
+        ar -> values[p] = new double[height];
+        ar -> prev_values[p] = new double[height];
         ar -> mask[p] = new bool[height];
 
         for (int q = 0; q < height; q++)

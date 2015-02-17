@@ -3,12 +3,15 @@ CFLAGS = -g -Wall
 LIBS = -lm
 
 DEPS = headers.h bitmap_image.hpp
-OBJ = bitmap.o data_out.o fdm.o plot.o main.o 
+OBJ = bitmap.o dataout.o fdm.o gnuplot.o main.o 
 
 default: estatics
 
 estatics: $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+	@echo "Linking object files..."
+	@$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+	@echo "Done!"
 
 %.o: %.cpp $(DEPS)
-	$(CC) -c $@ $< $(CFLAGS) $(LIBS)
+	@echo "Compiling $@..."
+	@$(CC) $(CFLAGS) -c $< -o $@ $(LIBS)

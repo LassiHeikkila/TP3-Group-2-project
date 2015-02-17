@@ -3,23 +3,23 @@
 //                                                                                                    //
 // Keeping syntax just in case - will delete before final save...                                     //
 // -----                                                                                              //
-// std::any_of(std::begin(potentials), std::end(potentials), [&](float i){return i == u[i][j];}) == 1 //
+// std::any_of(std::begin(potentials), std::end(potentials), [&](double i){return i == u[i][j];}) == 1 //
 // #include <algorithm>    // std::any_of()                                                           //
 
 #include "headers.h"
 
-array_data * fdm(char* image, float* potentials, float rel_par, int iterations, float desiredconv)
+array_data * fdm(char* image, double* potentials, double rel_par, int iterations, double desiredconv)
 {
     // Use locations() to build initial array with boundaries:
     array_data * sysdat;
     sysdat = locations(image, potentials[0], potentials[1], potentials[2], potentials[3]);
 
-    float conv = 0;
+    double conv = 0;
     int convcount = 0, count = 0;
     int pixels = sysdat->rows * sysdat->columns;
 
-    float**u = sysdat -> values;
-    float**pu = sysdat -> prev_values;
+    double**u = sysdat -> values;
+    double**pu = sysdat -> prev_values;
 
     // Loop until either desired convergence or maximum
     // iterations are achieved:
@@ -28,9 +28,9 @@ array_data * fdm(char* image, float* potentials, float rel_par, int iterations, 
     {
         convcount = 0;
 
-        if (count % 500 == 0)
+        if (count % 50 == 0)
         {
-            cout << "Iteration " << count << ".\n";
+            cout << "\rIteration " << count << "." << std::flush;
         }
 
         // Loop through x coordinates 
@@ -113,20 +113,22 @@ array_data * fdm(char* image, float* potentials, float rel_par, int iterations, 
                 pu[i][j] = u[i][j];
             }
         }
-
+        
         count++;
     }
+
+    cout << endl;
 
     // Pass iterations required to struct:
     sysdat->req_its = count;
     // Create 2D arrays for grad:
-    sysdat->xgrad = new float*[sysdat->columns];
-    sysdat->ygrad = new float*[sysdat->columns];
+    sysdat->xgrad = new double*[sysdat->columns];
+    sysdat->ygrad = new double*[sysdat->columns];
 
     for (int i = 0; i < (sysdat->columns - 1); i++)
     {
-        sysdat->xgrad[i] = new float[sysdat->rows];
-        sysdat->ygrad[i] = new float[sysdat->rows];
+        sysdat->xgrad[i] = new double[sysdat->rows];
+        sysdat->ygrad[i] = new double[sysdat->rows];
 
         for (int j = 0; j < (sysdat->rows - 1); j++)
         {

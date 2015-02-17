@@ -4,6 +4,7 @@ void data_out(array_data**u, double time_elapsed)
 {
     cout << "Solving time: " << time_elapsed << endl;
     cout << "Iterations: " << (*u)->req_its << endl;
+    cout << "Writing data files...\n";
     
     // Append N against elapsed time to file:
     ofstream runtime("data/runtime.dat", ios::out | ios::app);
@@ -38,5 +39,5 @@ void data_out(array_data**u, double time_elapsed)
     potential.close();
     field.close();
 
-    cout << "Files written...\n";
+    cout << "Files written.\n";
 }

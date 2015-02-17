@@ -2,35 +2,33 @@
 
 int main(int argc, char *argv[])
 {
-	// Declare potential array:
-	float potentials[4];
+    // Declare potential array:
+    double potentials[4];
 
-	// Assign command line args to corresponding boundary potential
-	// array:
+    // Assign command line args to corresponding boundary potential
+    // array:
     potentials[0] = atof(argv[2]), potentials[1] = atof(argv[3]);
     potentials[2] = atof(argv[4]), potentials[3] = atof(argv[5]);
 
     // Final command line argument is iteration count:
     int iterations=atoi(argv[6]);
-    float relaxation = atof(argv[7]);
-    float convergence = atof(argv[8]);
-
+    double relaxation = atof(argv[7]);
+    double convergence = atof(argv[8]);
+    
     // Store current CPU time:
-	clock_t tm;
-	tm = clock();
+    clock_t tm;
+    tm = clock();
 
     // Run solver:
     array_data * data = fdm(argv[1], potentials, relaxation, iterations, convergence);
 
-	// Calculate elapsed CPU time:
-	tm = clock() - tm;
-	// Convert to seconds:
-	double runtime = double(tm) / CLOCKS_PER_SEC;
+    // Calculate elapsed CPU time:
+    tm = clock() - tm;
+    // Convert to seconds:
+    double runtime = double(tm) / CLOCKS_PER_SEC;
 
     // Output data to files:
-    data_out(&data, runtime, iterations);
-
-    cout << "Data DONE.\n";
+    data_out(&data, runtime);
 
     // Clean up memory:
     delete data -> prev_values;
@@ -40,10 +38,12 @@ int main(int argc, char *argv[])
     delete data -> ygrad;
     delete data;
 
+    cout << "Plotting data...\n";
     // Plot potential:
     plot(0,"pngcairo","png");
     // Plot E-field:
     plot(1,"pngcairo","png");
+    cout << "Done!\n";
 
-	return 0;
+    return 0;
 }

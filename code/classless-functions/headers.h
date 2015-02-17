@@ -16,15 +16,15 @@ struct array_data {
 	int columns;
 	int req_its;
 
-	float ** prev_values;
-    float ** values;
+	double ** prev_values;
+    double ** values;
     bool ** mask;
     
-    float ** xgrad;
-    float ** ygrad;
+    double ** xgrad;
+    double ** ygrad;
 };
 
-array_data * fdm(char*, float*, float, int, float);
+array_data * fdm(char*, double*, double, int, double);
 void plot(int, string, string);
-array_data * locations(char*, float, float, float, float);
+array_data * locations(char*, double, double, double, double);
 void data_out(array_data**, double);
