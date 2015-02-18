@@ -1,0 +1,170 @@
+\documentclass{beamer}
+\mode<presentation>
+
+\usepackage{graphicx}                  %use package for diagram 
+%\usepackage{listings}                  %use package for c++ code in appendix
+%\usepackage{colour}                    %use package for code listings
+%\usepackage[utf8]{inputenc}            %use package for colours in code
+%\usepackage{url}                       %use package to display urls properly
+\usepackage{amsmath}                   %use package for implies symbol
+\usepackage{amsfonts}		       %use package for numbet sets
+\usepackage{bm}                        %use package for bolds in math mode
+%\usepackage{hyperref}                  %use package for hyperlinks
+\usepackage{algpseudocode}             %use package for pseudocode
+\usepackage{algorithm}                 %use package for pseudocode
+%\usepackage{array}                     %use package for centering table contents
+%\usepackage{caption}                   %use package for multiple figures
+%\usepackage{subcaption}                %use package for multiple figures
+\usepackage{tikz}                      %use package for diagram drawings
+
+%define colours for code listings
+%\definecolor{codegreen}{rgb}{0,0.6,0}
+%\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+%\definecolor{codepurple}{rgb}{0.58,0,0.82}
+%\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+%define a style for the listings
+%\lstdefinestyle{mystyle}{
+%    backgroundcolor=\color{backcolour},
+%    commentstyle=\color{codegreen},
+%    keywordstyle=\color{magenta},
+%    numberstyle=\tiny\color{codegray},
+%    stringstyle=\color{codepurple},
+%    basicstyle=\footnotesize,
+%    breakatwhitespace=false,
+%    breaklines=true,
+%    captionpos=b,
+%    keepspaces=true,
+%    numbers=left,
+%    numbersep=5pt,
+%    showspaces=false,
+%    showstringspaces=false,
+%    showtabs=false,
+%    tabsize=2
+%}
+
+%set style of listing to that defined above
+%\lstset{style=mystyle}
+
+%set style of footnotes
+%\renewcommand{\thefootnote}{\roman{footnote}}
+
+%define command shortcuts
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+
+\title{Numerical solutions of Laplace's equation}
+\author{S. Brown, F. Hayes, L. Heikkil{\"a}, W. Liu, D. Richardson\\
+        School of Physics and Astronomy,\\
+        University of Glasgow,\\
+        Glasgow, United Kingdom}
+\date{\today}
+
+\AtBeginSection[] %layout page at start of new section
+{
+  \begin{frame}<beamer>
+    \frametitle{Layout}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}
+}
+
+\begin{document} %start of document
+
+\begin{frame} 
+\titlepage
+\end{frame}
+
+\section{Introduction}
+
+\begin{frame}{System A}
+
+\begin{figure}[h!]
+\begin{center}
+\begin{tikzpicture}
+\draw (0,0) node[below] {$x = -d$} -- (0,5) node[above] {$\phi = V$}; 
+\draw (10,0) node[below] {$x = d$} -- (10,5) node[above] {$\phi = -V$}; 
+\draw (5,2.5) circle (1cm) node[below] {$\phi=0$};
+\draw[dashed] (5,2.5) -- (5.6,3.3) node[pos=0.5,above left] {$R$};
+\end{tikzpicture}
+\end{center}
+\caption{Cross-sectional diagram of System A}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{System C}
+\begin{figure}[h!]
+\begin{center}
+\begin{tikzpicture}
+\draw (0,0) -- (10,0) node[right] {$\phi = V$}; 
+\draw (0,5) -- (10,5) node[pos=0.25, above] {GND} node[pos=0.5, above] {GND} node[pos=0.75,above] {GND}; 
+\draw (2,5) rectangle (3,4.75);
+\draw (4.5,5) rectangle (5.5,4.75);
+\draw (7,5) rectangle (8,4.75);
+\end{tikzpicture}
+\end{center}
+\caption{Cross-sectional diagram of System B}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Maxwell's equations}
+We have
+\be
+\nabla \cdot \bm{E} = \frac{Q}{\epsilon_0} \qquad \nabla \times \bm{E} = -\frac{\partial \bm{B}}{\partial t}
+\ee
+
+$\bm{B}$ is unchanging $\implies$ $\bm{E}$ is irrotational $\implies \bm{E} = -\nabla \phi$
+
+$Q=0$ around cylinder $\implies \bm{E}$ is solenoidal $\implies \nabla^2 \phi = 0$.
+
+This is Laplace's equation.
+\end{frame}
+
+\section{Analytical Solution}
+
+\begin{frame}{General Solution}
+Wish to solve $\nabla ^2 \phi = 0$
+
+General solution in polar co-ordinates:
+\begin{multline}
+\phi(r, \theta) = (\alpha_0 \ln(r) + \beta_0)(\gamma_0\theta + \delta_0) + 
+\\
+                + \sum_{n=1}^{\infty}(\alpha_n r^n+\beta_n r^{-n})(\gamma_n \sin(n\theta) + \delta_n \cos(n\theta))
+\end{multline}
+\end{frame}
+
+\begin{frame}{Particular Solution}
+Potential is symmetric in $\pm\theta \implies \gamma_n=0, \; \forall n$
+
+Potential is finite at infinity $\implies \alpha_n=0, \; \forall n$
+
+We expect $\phi(r, \theta)=\phi(r, \theta +2\pi)$, so $n \in \mathbb{Z}$ and
+\be
+\phi(r, \theta) = \beta_0 + \sum_{n=1}^{\infty} \frac{\beta_n}{r^n} \cos(n\theta)
+\ee
+\end{frame}
+
+\begin{frame}{Particular Solution cont.}
+As $r \rightarrow \infty$, $\phi \rightarrow -\frac{Vx}{d}=-\frac{Vr}{d}\cos(\theta)$.
+
+Hence, $\beta_0=-\frac{Vr}{d}\cos(\theta)$.
+
+At the surface of the cylinder $\phi(R,\theta) = 0 \implies \beta_1=\frac{VR^2}{d}$ and
+$\beta_{n \geq 2} = 0$.
+
+Final solution is:
+\be
+\phi(r, \theta) = \frac{V}{d}(\frac{R^2}{r}-r)\cos(\theta)
+\ee
+for $r>R$ and $0$ otherwise.
+\end{frame}
+
+
+\section{Numerical Solution}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\end{document} %end of document
