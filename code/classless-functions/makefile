@@ -15,3 +15,9 @@ estatics: $(OBJ)
 %.o: %.cpp $(DEPS)
 	@echo "Compiling $@..."
 	@$(CC) $(CFLAGS) -c $< -o $@ $(LIBS)
+
+
+.PHONY:	clean
+
+clean:
+	rm *.o
