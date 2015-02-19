@@ -14,11 +14,13 @@ estatics: $(OBJ)
 	@$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 	@echo "Done!"
 
-%.o: %.cpp $(DEPS) $(DIRECTORIES)
+%.o: %.cpp $(DEPS) | $(DIRECTORIES)
 	@echo "Compiling $@..."
 	@$(CC) $(CFLAGS) -c $< -o $@ $(LIBS)
-	@ test -d data || mkdir data
-	@ test -d plots || mkdir plots
+	
+$(DIRECTORIES):	
+	@mkdir plots
+	@mkdir data
 
 .PHONY: clean
 
@@ -26,6 +28,3 @@ clean:
 	@echo "Removing object files!"	
 	@rm -f *.o
 	@echo "Done!"
-
-
-
