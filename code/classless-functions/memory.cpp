@@ -24,7 +24,7 @@ int mem_measure()
 	{
 		if (strncmp(line,"VmSize:",7) == 0)
 		{
-			result = parseLine(line);
+			result = parseline(line);
 			break;
 		}
 	}
