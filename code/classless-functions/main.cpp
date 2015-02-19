@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     double runtime = double(tm) / CLOCKS_PER_SEC;
 
     // Measure memory used by process:
-    int mem_used = getValue();
+    int mem_used = mem_measure();
 
     cout << "Memory used: " << mem_used << " KB\n";
 
