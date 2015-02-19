@@ -3,7 +3,7 @@ CFLAGS = -g -Wall
 LIBS = -lm
 
 DEPS = headers.h bitmap_image.hpp
-OBJ = bitmap.o data_out.o fdm.o plot.o main.o 
+OBJ = bitmap.o data_out.o fdm.o plot.o memory.o main.o
 
 default: estatics
 
@@ -16,8 +16,7 @@ estatics: $(OBJ)
 	@echo "Compiling $@..."
 	@$(CC) $(CFLAGS) -c $< -o $@ $(LIBS)
 
-
-.PHONY:	clean
+.PHONY: clean
 
 clean:
-	rm *.o
+	@rm -f *.o
