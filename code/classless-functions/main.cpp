@@ -1,3 +1,19 @@
+/********************************************
+
+Command line arguments:
+0 - program name
+1 - image name
+2 - potential for black pixels
+3 - potential for red pixels
+4 - potential for green pixels
+5 - potential for blue pixels
+6 - maximum number of iterations
+7 - relaxation parameter (recommended values between 1 and 2)
+8 - desired convergence
+
+**********************************************/
+
+
 #include "headers.h"
 
 int main(int argc, char *argv[])
