@@ -1,4 +1,6 @@
 // COMPILE WITH "-std=c++11" flag or "stoi" and "stof" may not work
+// run with ./name columns rows file1 file2
+
 
 #include <iostream>
 #include <fstream>
@@ -8,38 +10,49 @@
 #include <sstream>
 #include <vector>
 
+
 int main(int argc, char *argv[])
 {
 	int columns = atof(argv[1]); // tell program how many rows image/grid has
 	int rows = atof(argv[2]); // tell program how many columns image/grid has
-
+	std::string file_1 = argv[3];
+	std::string file_2 = argv[4];
 	// make a grid of size specified by command line arguments
-	std::vector< std::vector <double> > grid;
+	std::vector< std::vector <double> > grid_a;
+	std::vector< std::vector <double> > grid_b;
+	std::vector< std::vector <double> > grid_diff;
 
 	for ( int i = 0 ; i < columns ; i ++ )
 	{
-		grid.push_back(std::vector<double>());
+		grid_a.push_back(std::vector<double>());
+		grid_b.push_back(std::vector<double>());
+		grid_diff.push_back(std::vector<double>());
 	}
-
 	for (int i = 0; i < columns; i++)
 	{
 		for (int j = 0; j < rows; j++)
 		{
-			grid[i].push_back(j);
-			grid[i][j] = 0;
+			grid_a[i].push_back(j);
+			grid_b[i].push_back(j);
+			grid_diff[i].push_back(j);
+			grid_a[i][j] = 0;
+			grid_b[i][j] = 0;
+			grid_diff[i][j] = 0;
 		}
 	}
-
 	std::string sLine;
 	std::ifstream data;
-	data.open ("data/potential.dat");
+
+// FILE_1
+
+	data.open (("data/"+file_1).c_str());
 	if ( data.is_open() )
 	{
 		std::string x;
 		std::string y;
 		std::string value;
 
-		std::cout << "Data being read in..." << std::endl;
+		std::cout << ("Data being read in from "+file_1).c_str() << "..." << std::endl;
 		while ( std::getline(data,sLine) )
 		{
 			std::stringstream data(sLine);
@@ -52,14 +65,14 @@ int main(int argc, char *argv[])
 				int row = stoi(y);
 				double potential = stod(value);
 
-				grid[column][row] = potential;
+				grid_a[column][row] = potential;
 			//	std::cout << "X: " << column << "Y: " << row << " grid[x][y]" << grid[column][row] << std::endl;
 			}
 			else
 			{
 				continue;
 			//	std::cout << "empty string" << std::endl;
-			}
+			}		
 			// std::cout << "Working..." << std::endl;
 		}
 		data.close();
@@ -67,17 +80,50 @@ int main(int argc, char *argv[])
 	}
 	else 
 	{
-		std::cout << "Unable to open potential.dat, exiting now." << std::endl;
+		std::cout << ("Unable to open "+file_1+", exiting now.").c_str() << std::endl;
 		exit(EXIT_FAILURE);
 	}
-int d = rows/2; //half-distance between plates
-int h = columns/2; //approximate infinite plate as being half this height
-int R = 25; //radius of cylinder
-int V = 1; //voltage at plate
 
-double r; //radial co-ordinate
-double theta; //angular co-ordinate
-double phi = 0; //potential
+// FILE_2
+
+		data.open (("data/"+file_2).c_str());
+	if ( data.is_open() )
+	{
+		std::string x;
+		std::string y;
+		std::string value;
+
+		std::cout << ("Data being read in from "+file_2).c_str() << "..." << std::endl;
+		while ( std::getline(data,sLine) )
+		{
+			std::stringstream data(sLine);
+			data >> x >> y >> value;
+
+			if ( !sLine.empty() )
+			{
+			//	std::string::size_type sz;
+				int column = stoi(x);
+				int row = stoi(y);
+				double potential = stod(value);
+
+				grid_b[column][row] = potential;
+			//	std::cout << "X: " << column << "Y: " << row << " grid[x][y]" << grid[column][row] << std::endl;
+			}
+			else
+			{
+				continue;
+			//	std::cout << "empty string" << std::endl;
+			}		
+			// std::cout << "Working..." << std::endl;
+		}
+		data.close();
+		std::cout << "Data reading finished." << std::endl;
+	}
+	else 
+	{
+		std::cout << ("Unable to open "+file_2+", exiting now.").c_str() << std::endl;
+		exit(EXIT_FAILURE);
+	}
 
 std::ofstream output;
 output.open("data/difference.dat");
@@ -91,20 +137,8 @@ for (int x = 0; x < columns ; x++)
 //		}
 		for (int y = 0; y < rows ; y++)
 		{ //loop over y co-ordinates
-			r = sqrt((x-d)*(x-d)+(y-h)*(y-h)); // calculate radius from middle at (x,y)
-			theta = atan2((y-h),(x-d)); // calculate angle of vector from middle to (x,y)
-			
-			if ( r*r <= R*R ) //if r^2 < R^2, phi=0
-			{
-				phi = 0; 
-			} //if r^2 < R^2, phi=0
-			else  //otherwise, for r > R, phi = (V/d)((R^2/r -r)cos(theta)
-			{ 
-				phi = ( (double) V/d ) * ( (double) (R*R)/r - r ) * cos(theta); 
-			}
-			grid[x][y] = grid[x][y] - phi; 
-		//	std::cout << "phi = " << phi << " grid[x][y] = " << grid[x][y] << std::endl;
-			output << x << "\t" << y << "\t" << grid[x][y] << std::endl;
+			grid_diff[x][y] = grid_a[x][y] - grid_b[x][y];
+			output << x << "\t" << y << "\t" << grid_diff[x][y] << std::endl;
 		}
 		output << std::endl;
 	}
