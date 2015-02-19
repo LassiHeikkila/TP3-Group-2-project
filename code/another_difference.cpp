@@ -102,7 +102,7 @@ for (int x = 0; x < columns ; x++)
 				phi = ((float)V/d)*((float)(R*R)/r - r)*cos(theta); 
 			} //otherwise, for r > R, phi = (V/d)((R^2/r -r)cos(theta)
 			grid[x][y] = grid[x][y] - phi; 
-			output << x << "\t" << y << "\t" << phi << std::endl;
+			output << x << "\t" << y << "\t" << grid[x][y] << std::endl;
 		}
 		output << std::endl;
 	}
