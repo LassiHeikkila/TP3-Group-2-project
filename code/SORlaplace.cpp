@@ -124,12 +124,24 @@ count=0;
                         conv = sqrt((prevu.array[i][j]-u.array[i][j])*(prevu.array[i][j]-u.array[i][j])); // finds modulus of the convergence
                         if (conv < desiredconv){
                                 count++;
+                                if (i>0 && i<d-1 && j>0 && j<h-1 && m==1){
+                                        if (pixels.array[i+1][j]==1 || pixels.array[i-1][j]==1 || pixels.array[i][j+1]==1 || pixels.array[i][j-1]$
+                                                pixels.array[i][j]=1;
+                                        }
+                                }
                         }
                         prevu.array[i][j]=u.array[i][j];
                 }
         }
 itt++;
+if(itt%100==0){
+        if (count-prevcount>0){
+                m=1;
+        }
 }
+prevcount=count;
+}
+
 std::cout<<"Number of iterations: "<<itt<<std::endl;
 u.OutputPotential(dx,dy); // Text file
 u.OutputField(dx,dy); // Text file
