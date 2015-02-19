@@ -43,6 +43,11 @@ int main(int argc, char *argv[])
     // Convert to seconds:
     double runtime = double(tm) / CLOCKS_PER_SEC;
 
+    // Measure memory used by process:
+    int mem_used = getValue();
+
+    cout << "Memory used: " << mem_used << " KB\n";
+
     // Output data to files:
     data_out(&data, runtime);
 
