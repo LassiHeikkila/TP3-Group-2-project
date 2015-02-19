@@ -3,6 +3,8 @@
 #include <time.h>
 #include <fstream>
 #include <string>
+#include <string.h>
+#include <stdio.h>
 #include <cstdlib>
 #include "bitmap_image.hpp"
 
@@ -28,3 +30,5 @@ array_data * fdm(char*, double*, double, int, double);
 void plot(int, string, string);
 array_data * locations(char*, double, double, double, double);
 void data_out(array_data**, double);
+int parseline(char*);
+int mem_measure();
