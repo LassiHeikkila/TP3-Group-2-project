@@ -1,9 +1,6 @@
-// Compile this with the '-std=c++11' flag. Otherwise stoi and stof may not work.
-
-
+// COMPILE WITH "-std=c++11" flag or "stoi" and "stof" may not work
 
 #include <iostream>
-//#include <iomanip>
 #include <fstream>
 #include <string>
 #include <cstdlib>
@@ -11,11 +8,10 @@
 #include <sstream>
 #include <vector>
 
-
 int main(int argc, char *argv[])
 {
-	int columns = atof(argv[1]); // tell program how many columns image/grid has
-	int rows = atof(argv[2]); // tell program how many rows image/grid has
+	int columns = atof(argv[1]); // tell program how many rows image/grid has
+	int rows = atof(argv[2]); // tell program how many columns image/grid has
 
 	// make a grid of size specified by command line arguments
 	std::vector< std::vector <double> > grid;
@@ -39,26 +35,31 @@ int main(int argc, char *argv[])
 	data.open ("data/potential.dat");
 	if ( data.is_open() )
 	{
+		std::string x;
+		std::string y;
+		std::string value;
+
 		std::cout << "Data being read in..." << std::endl;
 		while ( std::getline(data,sLine) )
 		{
-			std::string x;
-			std::string y;
-			std::string value;
-
 			std::stringstream data(sLine);
-
 			data >> x >> y >> value;
 
-		//	std::string::size_type sz;
-			int column = stoi(x);
-			int row = stoi(y);
-			float potential = stod(value);
+			if ( !sLine.empty() )
+			{
+			//	std::string::size_type sz;
+				int column = stoi(x);
+				int row = stoi(y);
+				double potential = stod(value);
 
-			grid[column][row] = potential;
-
-			std::cout << "X: " << column << "Y: " << row << " grid[x][y]" << grid[column][row] << std::endl;
-
+				grid[column][row] = potential;
+			//	std::cout << "X: " << column << "Y: " << row << " grid[x][y]" << grid[column][row] << std::endl;
+			}
+			else
+			{
+				continue;
+			//	std::cout << "empty string" << std::endl;
+			}
 			// std::cout << "Working..." << std::endl;
 		}
 		data.close();
@@ -69,7 +70,6 @@ int main(int argc, char *argv[])
 		std::cout << "Unable to open potential.dat, exiting now." << std::endl;
 		exit(EXIT_FAILURE);
 	}
-
 int d = rows/2; //half-distance between plates
 int h = columns/2; //approximate infinite plate as being half this height
 int R = 25; //radius of cylinder
@@ -91,17 +91,19 @@ for (int x = 0; x < columns ; x++)
 //		}
 		for (int y = 0; y < rows ; y++)
 		{ //loop over y co-ordinates
-
-			r = sqrt((x-d)*(x-d)+(y-h)*(y-h)), theta = atan2((y-h),(x-d)); //define radius and angle
-			if(r*r <= R*R) 
+			r = sqrt((x-d)*(x-d)+(y-h)*(y-h)); // calculate radius from middle at (x,y)
+			theta = atan2((y-h),(x-d)); // calculate angle of vector from middle to (x,y)
+			
+			if ( r*r <= R*R ) //if r^2 < R^2, phi=0
 			{
-				phi=0; 
+				phi = 0; 
 			} //if r^2 < R^2, phi=0
-			else 
+			else  //otherwise, for r > R, phi = (V/d)((R^2/r -r)cos(theta)
 			{ 
-				phi = ((float)V/d)*((float)(R*R)/r - r)*cos(theta); 
-			} //otherwise, for r > R, phi = (V/d)((R^2/r -r)cos(theta)
+				phi = ( (double) V/d ) * ( (double) (R*R)/r - r ) * cos(theta); 
+			}
 			grid[x][y] = grid[x][y] - phi; 
+		//	std::cout << "phi = " << phi << " grid[x][y] = " << grid[x][y] << std::endl;
 			output << x << "\t" << y << "\t" << grid[x][y] << std::endl;
 		}
 		output << std::endl;
