@@ -5,6 +5,8 @@ LIBS = -lm
 DEPS = headers.h bitmap_image.hpp
 OBJ = bitmap.o data_out.o fdm.o plot.o memory.o main.o
 
+DIRECTORIES = data plots
+
 default: estatics
 
 estatics: $(OBJ)
@@ -12,7 +14,7 @@ estatics: $(OBJ)
 	@$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 	@echo "Done!"
 
-%.o: %.cpp $(DEPS)
+%.o: %.cpp $(DEPS) $(DIRECTORIES)
 	@echo "Compiling $@..."
 	@$(CC) $(CFLAGS) -c $< -o $@ $(LIBS)
 
@@ -20,3 +22,6 @@ estatics: $(OBJ)
 
 clean:
 	@rm -f *.o
+
+$(DIRECTORIES):	
+	mkdir -p $(DIRECTORIES)
