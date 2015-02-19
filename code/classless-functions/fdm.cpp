@@ -15,7 +15,8 @@ array_data * fdm(char* image, double* potentials, double rel_par, int iterations
     sysdat = locations(image, potentials[0], potentials[1], potentials[2], potentials[3]);
 
     double conv = 0;
-    int convcount = 0, count = 0;
+    int prev_convcount = 0, convcount = 0, count = 0;
+    bool lock = false;
     int pixels = sysdat->rows * sysdat->columns;
 
     double**u = sysdat -> values;
@@ -27,11 +28,6 @@ array_data * fdm(char* image, double* potentials, double rel_par, int iterations
 //    for (int count = 0; count < iterations; count++)
     {
         convcount = 0;
-
-        if (count % 50 == 0)
-        {
-            cout << "\rIteration " << count << "." << std::flush;
-        }
 
         // Loop through x coordinates 
         for (int i = 0; i < sysdat->columns; i++)
@@ -108,13 +104,31 @@ array_data * fdm(char* image, double* potentials, double rel_par, int iterations
                 {
 //                    sysdat->mask[i][j] = 1;
                     convcount++;
+
+                    if (lock && (sysdat->mask[i-1][j] || sysdat->mask[i+1][j] || sysdat->mask[i][j-1] || sysdat->mask[i][j+1]))
+                    {
+                        sysdat->mask[i][j] = true;
+                    }
                 }
 
                 pu[i][j] = u[i][j];
             }
         }
-        
+
         count++;
+
+        if (count % 100 == 0)
+        {
+            cout << "\rIteration " << count << "." << std::flush;
+
+            if (convcount > prev_convcount)
+            {
+                lock = true;
+            }
+        }
+
+        prev_convcount = convcount;
+
     }
 
     cout << endl;
