@@ -12,7 +12,6 @@
 \usepackage{algorithm}                 %use package for pseudocode
 \usepackage{caption}                   %use package for multiple figures
 \usepackage{subcaption}                %use package for multiple figures
-%\usepackage{hyperref}                  %use package for hyperlinks
 %\usepackage{listings}                  %use package for c++ code in appendix
 %\usepackage{colour}                    %use package for code listings
 %\usepackage[utf8]{inputenc}            %use package for colours in code
@@ -58,7 +57,17 @@
 %use tikz library for shapes
 \usetikzlibrary{shapes.geometric, arrows}
 
-\title{Numerical solutions of Laplace's equation}
+%define block styles in tikz
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=red!30]
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30]
+\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!30]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+
+%set graphics path
+\graphicspath{{/home/danmfr/p3t/laplace/images/}}
+
+\title{On the effect of solid conductors on the electric field}
 \author{S. Brown, F. Hayes, L. Heikkil{\"a}, W. Liu, D. Richardson\\
         School of Physics and Astronomy,\\
         University of Glasgow,\\
@@ -81,35 +90,31 @@
 
 \section{Introduction}
 
-\begin{frame}{System A}
+\begin{frame}{Electrostatic Systems}
 
-\begin{figure}[h!]
-\begin{center}
-\begin{tikzpicture}
-\draw (0,0) node[below] {$x = -d$} -- (0,5) node[above] {$\phi = V$}; 
-\draw (10,0) node[below] {$x = d$} -- (10,5) node[above] {$\phi = -V$}; 
-\draw (5,2.5) circle (1cm) node[below] {$\phi=0$};
-\draw[dashed] (5,2.5) -- (5.6,3.3) node[pos=0.5,above left] {$R$};
-\end{tikzpicture}
-\end{center}
-\caption{Cross-sectional diagram of System A}
-\end{figure}
-
-\end{frame}
-
-\begin{frame}{System C}
-
-\begin{figure}[h!]
-\begin{center}
-\begin{tikzpicture}
-\draw (0,0) -- (10,0) node[right] {$\phi = V$}; 
-\draw (0,5) -- (10,5) node[pos=0.25, above] {GND} node[pos=0.5, above] {GND} node[pos=0.75,above] {GND}; 
-\draw (2,5) rectangle (3,4.75);
-\draw (4.5,5) rectangle (5.5,4.75);
-\draw (7,5) rectangle (8,4.75);
-\end{tikzpicture}
-\end{center}
-\caption{Cross-sectional diagram of System C}
+\begin{figure}
+\centering
+\begin{subfigure}[b]{0.45\textwidth}
+	\begin{tikzpicture}
+	\draw (0,0) -- (0,2.5) node[above, font=\footnotesize] {$\phi = V$}; 
+	\draw (4.2,0) -- (4.2,2.5) node[above, font=\footnotesize] {$\phi = -V$}; 
+	\draw (2.1,1.25) circle (0.5cm) node[below, font=\footnotesize, yshift=-0.4cm] {GND};
+	\draw[dashed] (2.1,1.25) -- (2.5,1.55) node[pos=0.2, above, font=\footnotesize] {$R$};
+	\end{tikzpicture}
+	\caption{System A}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.45\textwidth}
+	\begin{tikzpicture}
+	\draw (0,0) -- (4,0) node[right, font=\footnotesize] {$\phi = V$}; 
+	\draw (0,2.5) -- (4,2.5) node[pos=0.25, above, font=\footnotesize] {GND} node[pos=0.5, above, font=\footnotesize] {GND} node[pos=0.75,above, font=\footnotesize] {GND};
+	\draw (0.8,2.5) rectangle (1.2,2.375);
+	\draw (1.8,2.5) rectangle (2.2,2.375);
+	\draw (2.8,2.5) rectangle (3.2,2.375);
+	\end{tikzpicture}
+	\caption{System C}
+\end{subfigure}
+\caption{Cross-sectional diagram of two electrostatic systems}
 \end{figure}
 
 \end{frame}
@@ -133,11 +138,20 @@ This is Laplace's equation.
 \section{Analytical Solution}
 
 \begin{frame}{General Solution}
-Wish to solve $\nabla ^2 \phi = 0$
+Wish to solve $\nabla ^2 \phi = 0$ in polar co-ordinates:
+%
+\be
+\frac{1}{r}\frac{\partial}{\partial r}(r \frac{\partial \phi}{\partial r})
++ \frac{1}{r^2}\frac{\partial ^2 \phi}{\partial \theta^2} = 0
+\ee
 
 Separate variables, $\phi(r,\theta)=f(r)g(\theta)$, say.
 
-Produces pair of second-order ODEs.
+Produces pair of second-order ODEs, for some $k \in \mathbb{R}$:
+%
+\be
+r\frac{d}{dr}(r \frac{df(r)}{dr}) = k^2 f(r) \quad \frac{d^2 g(\theta)}{d\theta^2} = -k^2 g(\theta)
+\ee
 
 Solve to give general solution in polar co-ordinates:
 %
@@ -152,8 +166,7 @@ Solve to give general solution in polar co-ordinates:
 We have
 %
 \begin{multline}
-\phi(r, \theta) = (\alpha_0 \ln(r) + \beta_0)(\gamma_0\theta + \delta_0) + 
-\\
+\phi(r, \theta) = (\alpha_0 \ln(r) + \beta_0)(\gamma_0\theta + \delta_0) \\
                 + \sum_{n=1}^{\infty}(\alpha_n r^n+\beta_n r^{-n})(\gamma_n \sin(n\theta) + \delta_n \cos(n\theta))
 \end{multline}
 
@@ -197,7 +210,7 @@ for $r>R$ and $0$ otherwise.
 
 \begin{figure}[h!]
 \begin{center}
-\includegraphics[scale=0.8]{/home/danmfr/p3t/laplace/pdfs/analytic.pdf}
+\includegraphics[scale=0.8]{analytic.pdf}
 \caption{Analytic solution with $V=1$, $R=15$ on $100\times100$ grid}
 \end{center}
 \end{figure}
@@ -207,16 +220,52 @@ for $r>R$ and $0$ otherwise.
 \section{Numerical Solution}
 
 \begin{frame}{Finite Difference Methods}
+We approximate first derivatives as
+%
+\be
+\frac{df}{dt} \approx \frac{f(t+\Delta t) - f(t)}{\Delta t}
+\ee
+%
+and second derivatives as
+%
+\begin{align}
+\frac{d^2 f}{dt^2} &\approx \frac{f'(t+\Delta t) - f'(t)}{\Delta t} \\
+		   &= \frac{\frac{f(t+\Delta t) - f(t)}{\Delta t} - \frac{f(t) - f(t-\Delta t)}{\Delta t}}{\Delta t} \\
+\frac{d^2 f}{dt^2} &\approx  \frac{f(t+\Delta t) - 2f(t) + f(t-\Delta t)}{\Delta t^2}
+\end{align}
+
 \end{frame}
 
 \begin{frame}{The Relaxation Method}
+Hence, Laplace's eqaution is discretised as
+%
+\be
+\frac{\partial^2 \phi}{\partial x^2}+\frac{\partial^2 \phi}{\partial y^2} = 0
+\longrightarrow
+\frac{\phi_{j+1,k}-2\phi_{j,k}+\phi_{j-1,k}}{\Delta x^2} + \frac{\phi_{j,k+1}-2\phi_{j,k}+\phi_{j,k-1}}{\Delta y^2}=0
+\ee
+%
+where $j$ and $k$ index the $x$ and $y$ directions.
+
+For a unique step-size $\Delta = \Delta x = \Delta y$:
+%
+\be
+\phi_{j,k}= \frac{1}{4}(\phi_{j+1,k}+\phi_{j-1,k}+\phi_{j,k+1}+\phi_{j,k-1})
+\ee
+
+The value of $\phi$ is the average of the surrounding points.
+This is the relaxation method. 
+
+\end{frame}
+
+\begin{frame}{Algorithm}
 \end{frame}
 
 \begin{frame}{Numerical Solution}
 
 \begin{figure}
 \begin{center}
-\includegraphics[scale=0.8]{/home/danmfr/p3t/laplace/pdfs/numerical.pdf}
+\includegraphics[scale=0.8]{potential.pdf}
 \caption{Numerical potential with $V=1$, $R=15$ on $100\times100$ grid for $10000$ iterations}
 \label{fig:numerical}
 \end{center}
@@ -233,9 +282,9 @@ for $r>R$ and $0$ otherwise.
 \centering
 \begin{subfigure}[b]{0.45\textwidth}
 	\begin{tikzpicture}
-	\draw (0,0) -- (3.5,0) node[right] {$-V$};
-	\draw (0,2) -- (3.5,2) node[right] {$-V$};
-	\draw [draw=none](0,1) -- (3.5,1) node[right] {GND};
+	\draw (0,0) -- (3.5,0) node[right, font=\footnotesize] {$-V$};
+	\draw (0,2) -- (3.5,2) node[right, font=\footnotesize] {$-V$};
+	\draw [draw=none](0,1) -- (3.5,1) node[right, font=\footnotesize] {GND};
 	\fill [fill=black] (0.5,1) circle (1mm);
 	\fill [fill=black] (1,1) circle (1mm);
 	\fill [fill=black] (1.5,1) circle (1mm);
@@ -248,8 +297,8 @@ for $r>R$ and $0$ otherwise.
 \quad
 \begin{subfigure}[b]{0.45\textwidth}
 	\begin{tikzpicture}
-	\draw (0,0) -- (3.5,0) node[right] {GND};
-	\draw (0,2) -- (3.5,2) node[right] {GND};
+	\draw (0,0) -- (3.5,0) node[right, font=\footnotesize] {GND};
+	\draw (0,2) -- (3.5,2) node[right, font=\footnotesize] {GND};
 	\draw (0.49,0.9) rectangle (0.91,1.1) node[midway, above, font=\footnotesize] {GND};
 	\draw (1.19,0.9) rectangle (1.61,1.1) node[midway, above, font=\footnotesize] {$+V$};
 	\draw (1.89,0.9) rectangle (2.31,1.1) node[midway, above, font=\footnotesize] {$-V$};
@@ -260,36 +309,39 @@ for $r>R$ and $0$ otherwise.
 
 \begin{subfigure}[b]{0.45\textwidth}
 	\begin{tikzpicture}
-	\draw (0,0) circle (2mm) node[above, font=\footnotesize] {GND};
-	\draw (1.75,0) circle (2mm) node[above, font=\footnotesize] {GND};
-	\draw (3.5,0) circle (2mm) node[above, font=\footnotesize] {GND};
-	\draw (0,1.6) circle (2mm) node[above, font=\footnotesize] {GND};
-	\draw (1.75,1.6) circle (2mm) node[above, font=\footnotesize] {GND};
-	\draw (3.5,1.6) circle (2mm) node[above, font=\footnotesize] {GND};
-	\draw (0.875,0.8) circle (2mm) node[above, font=\footnotesize] {$+V$};
-	\draw (2.625,0.8) circle (2mm) node[above, font=\footnotesize] {$+V$};
+	\draw (0,0) circle (2mm) node[above, font=\footnotesize, yshift=0.15cm] {GND};
+	\draw (1.75,0) circle (2mm) node[above, font=\footnotesize, yshift=0.15cm] {GND};
+	\draw (3.5,0) circle (2mm) node[above, font=\footnotesize, yshift=0.15cm] {GND};
+	\draw (0,1.6) circle (2mm) node[above, font=\footnotesize, yshift=0.15cm] {GND};
+	\draw (1.75,1.6) circle (2mm) node[above, font=\footnotesize, yshift=0.15cm] {GND};
+	\draw (3.5,1.6) circle (2mm) node[above, font=\footnotesize, yshift=0.15cm] {GND};
+	\draw (0.875,0.8) circle (2mm) node[above, font=\footnotesize, yshift=0.15cm] {$+V$};
+	\draw (2.625,0.8) circle (2mm) node[above, font=\footnotesize, yshift=0.15cm] {$+V$};
 	\end{tikzpicture}
 	\caption{System E}
 \end{subfigure}
 \quad
 \begin{subfigure}[b]{0.45\textwidth}
 	\begin{tikzpicture}
-	\draw (0,0) -- (3.5,0) node[right] {GND};
-	\draw (0,2) -- (3.5,2) node[right] {$-V_3$};
-	\draw (0,1) -- (1.5,1);
-	\draw (2,1) -- (3.5,1) node[right] {$-V_2$};
+	\draw (0,0) -- (3.5,0) node[right, font=\footnotesize] {GND};
+	\draw (0,2) -- (3.5,2) node[right, font=\footnotesize] {$-V_3$};
+	\draw (0,0.75) -- (1.5,0.75);
+	\draw (2,0.75) -- (3.5,0.75) node[right, font=\footnotesize] {$-V_2$};
 	\draw (0,0.5) -- (1.5,0.5);
-	\draw (2,0.5) -- (3.5,0.5) node[right] {$-V_1$};
-	\draw [fill=brown] (0,0.5) rectangle (1.5,1);
-	\draw [fill=brown] (2,0.5) rectangle (3.5,1);
-	\draw [draw=none] (1.75,1) circle (1mm) node[above, font=\footnotesize] {$|V_3|>|V_2|>>|V_1|$};
+	\draw (2,0.5) -- (3.5,0.5) node[right, font=\footnotesize] {$-V_1$};
+	\draw [fill=brown] (0,0.5) rectangle (1.5,0.75);
+	\draw [fill=brown] (2,0.5) rectangle (3.5,0.75);
+	\draw [draw=none] (1.75,0.8) circle (1mm) node[above, font=\footnotesize] {$|V_3|>|V_2|>>|V_1|$};
 	\end{tikzpicture}
 	\caption{System F}
 \end{subfigure}
 
-\caption{Alternate electrostatic conifgurations}
+\caption{Alternate electrostatic configurations}
 \end{figure}
 
+\end{frame}
+
+\begin{frame}{Software Package}
 \end{frame}
 
 \begin{frame}{Bitmaps}
@@ -299,6 +351,12 @@ for $r>R$ and $0$ otherwise.
 \end{frame}
 
 \begin{frame}{Convergence locking}
+\end{frame}
+
+\begin{frame}{Succesive Over Relaxation}
+\end{frame}
+
+\begin{frame}{Timing and CPU Usage}
 \end{frame}
 
 \section{Conclusion}
