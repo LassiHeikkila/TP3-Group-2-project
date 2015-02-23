@@ -102,10 +102,9 @@ array_data * fdm(char* image, double* potentials, double rel_par, int iterations
 
                 if (conv < desiredconv)
                 {
-//                    sysdat->mask[i][j] = 1;
                     convcount++;
 
-                    if (lock && (sysdat->mask[i-1][j] || sysdat->mask[i+1][j] || sysdat->mask[i][j-1] || sysdat->mask[i][j+1]))
+                    if (lock && mintrue(sysdat->mask,i,j,2))
                     {
                         sysdat->mask[i][j] = true;
                     }
@@ -153,4 +152,20 @@ array_data * fdm(char* image, double* potentials, double rel_par, int iterations
 
     }
     return sysdat;
+}
+
+
+// Function to determine if at least some minimum number
+// of bools are true.
+bool mintrue(bool**mask,int i, int j, int min)
+{
+    int count = 0;
+
+    for (int x = -1; x < 2; x += 2)
+    {
+        count += mask[i+x][j] ? 1 : 0;
+        count += mask[i][j+x] ? 1 : 0;
+    }
+
+    return (count >= min);
 }
