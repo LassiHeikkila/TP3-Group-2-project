@@ -146,8 +146,10 @@ array_data * fdm(char* image, double* potentials, double rel_par, int iterations
         for (int j = 0; j < (sysdat->rows - 1); j++)
         {
             // Approximation of gradients:
-            sysdat->xgrad[i][j] = -1*(u[i+1][j]-u[i][j]);
-            sysdat->ygrad[i][j] = -1*(u[i][j+1]-u[i][j]);
+            if (i != 0 && j != 0 ){
+                sysdat->xgrad[i][j] = -0.5*(u[i+1][j]-u[i-1][j]);
+                sysdat->ygrad[i][j] = -0.5*(u[i][j+1]-u[i][j-1]);
+            }
         }
 
     }
