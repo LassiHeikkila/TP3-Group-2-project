@@ -18,16 +18,11 @@ Command line arguments:
 
 int main(int argc, char *argv[])
 {
-    // Declare potential array:
-    double potentials[4];
-
-    // Assign command line args to corresponding boundary potential
-    // array:
-    potentials[0] = atof(argv[2]), potentials[1] = atof(argv[3]);
-    potentials[2] = atof(argv[4]), potentials[3] = atof(argv[5]);
+    // Declare potential array, initialise with command line arguments:
+    double potentials[4] = {atof(argv[2]), atof(argv[3]), atof(argv[4]), atof(argv[5])};
 
     // Final command line argument is iteration count:
-    int iterations=atoi(argv[6]);
+    int iterations = atoi(argv[6]);
     double relaxation = atof(argv[7]);
     double convergence = atof(argv[8]);
     
