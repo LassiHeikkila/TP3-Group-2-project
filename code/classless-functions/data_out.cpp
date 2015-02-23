@@ -22,7 +22,7 @@ void data_out(array_data**u, double time_elapsed)
             // Write potential to file:
             potential << setw(10) << i << "\t" << setw(10) << j << "\t" << setw(10) << (*u) -> values[i][j] << endl;
 
-            if (i == (*u)->columns - 1 || j == (*u)->rows - 1)
+            if (i == (*u)->columns - 1 || j == (*u)->rows - 1 || i % 10 != 0 || j % 10 != 0)
             {
                 continue;
             }
