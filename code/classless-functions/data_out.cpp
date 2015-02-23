@@ -2,7 +2,7 @@
 
 void data_out(array_data**u, double time_elapsed)
 {
-    cout << "Solving time: " << time_elapsed << endl;
+    cout << "Solving time: " << time_elapsed << " seconds.\n";
     cout << "Iterations: " << (*u)->req_its << endl;
     cout << "Writing data files...\n";
     
