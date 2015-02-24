@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     // Declare potential array, initialise with command line arguments:
     double potentials[4] = {atof(argv[2]), atof(argv[3]), atof(argv[4]), atof(argv[5])};
 
-    // Final command line argument is iteration count:
+    // Initialise other starting variables:
     int iterations = atoi(argv[6]);
     double relaxation = atof(argv[7]);
     double convergence = atof(argv[8]);

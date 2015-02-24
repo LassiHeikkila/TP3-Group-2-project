@@ -32,4 +32,4 @@ array_data * locations(char*, double, double, double, double);
 void data_out(array_data**, double);
 int parseline(char*);
 int mem_measure();
-bool mintrue(bool**,int,int, int);
+bool mintrue(array_data*,int,int, int);

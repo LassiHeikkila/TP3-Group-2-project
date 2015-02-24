@@ -104,7 +104,7 @@ array_data * fdm(char* image, double* potentials, double rel_par, int iterations
                 {
                     convcount++;
 
-                    if (lock && mintrue(sysdat->mask,i,j,2))
+                    if (lock && mintrue(sysdat,i,j,2))
                     {
                         sysdat->mask[i][j] = true;
                     }
@@ -159,14 +159,19 @@ array_data * fdm(char* image, double* potentials, double rel_par, int iterations
 
 // Function to determine if at least some minimum number
 // of bools are true.
-bool mintrue(bool**mask,int i, int j, int min)
+bool mintrue(array_data*u,int i, int j, int min)
 {
     int count = 0;
 
+    if (i == 0 || i == u->columns - 1 || j == 0 || j == u->rows - 1)
+    {
+    	return false;
+    }
+
     for (int x = -1; x < 2; x += 2)
     {
-        count += mask[i+x][j] ? 1 : 0;
-        count += mask[i][j+x] ? 1 : 0;
+        count += u->mask[i+x][j] ? 1 : 0;
+        count += u->mask[i][j+x] ? 1 : 0;
     }
 
     return (count >= min);
