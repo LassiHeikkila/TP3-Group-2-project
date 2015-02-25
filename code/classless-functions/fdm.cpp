@@ -62,7 +62,7 @@ array_data * fdm(char* image, double* potentials, double rel_par, int iterations
                     }
                     else
                     {
-                        u[i][j]=(1-rel_par)*pu[i][j] + rel_par*(1/3.0)*(u[i+1][j]+u[i][j+1]+u[i][j-1]);
+                        u[i][j] = (1-rel_par)*pu[i][j] + rel_par*(1/3.0)*(u[i+1][j]+u[i][j+1]+u[i][j-1]);
                     }
                 }
                 // Right edge and corners:
