@@ -21,6 +21,11 @@ estatics: $(OBJ)
 $(DIRECTORIES):	
 	@mkdir plots
 	@mkdir data
+	
+difference:	difference_between_two_files.cpp
+	@echo "Compiling $@..."
+	@$(CC) -std=c++11 -o $@ $<
+	@echo "Done!"
 
 .PHONY: clean
 
