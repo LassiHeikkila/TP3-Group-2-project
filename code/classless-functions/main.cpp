@@ -59,6 +59,8 @@ int main(int argc, char *argv[])
     plot(0,"pngcairo","png");
     // Plot E-field:
     plot(1,"pngcairo","png");
+    // Plot equipotential lines:
+    plot(2,"pngcairo","png");
     cout << "Done!\n";
 
     return 0;

@@ -41,6 +41,17 @@ void plot(int mode, string terminal, string file_ext)
         fputs("normy(x,y) = scaling * ( y / mag(x,y) )\n",pipe_gnuplot);
         fputs("plot 'data/field.dat' using ($1):($2):(normx($3,$4)):(normy($3,$4)):(mag($3,$4)) with vectors head filled size screen 0.005,30,60 lc palette\n", pipe_gnuplot);
     }
+    else if (mode == 2)
+    {
+        fputs(("set output 'plots/equipotential."+file_ext+"'\n").c_str(),pipe_gnuplot);
+        fputs("set key outside\n",pipe_gnuplot);
+        fputs("unset tics\n",pipe_gnuplot);
+        fputs("set view map\n",pipe_gnuplot);
+        fputs("unset surface\n",pipe_gnuplot);
+        fputs("set contour base\n",pipe_gnuplot);
+        fputs("set cntrparam levels incremental -11,1,10\n",pipe_gnuplot);
+        fputs("splot 'data/potential.dat' w l ls 1\n",pipe_gnuplot);
+    }
 
     // Close GNUPlot:
     pclose(pipe_gnuplot);
