@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 			grid_diff[i].push_back(j);
 			grid_a[i][j] = 0;
 			grid_b[i][j] = 0;
-			grid_diff[i][j] = 0;
+			grid_diff[i][j] = 1;
 		}
 	}
 	std::string sLine;
@@ -129,6 +129,8 @@ std::ofstream output;
 output.open("data/difference.dat");
 std::cout << "Calculating difference and outputting results now..." << std::endl;
 
+double epsilon = 0.000000001;
+
 for (int x = 0; x < columns ; x++)
 	{ //loop over x co-ordinates
 //		if ( x % 20 == 0)
@@ -137,7 +139,14 @@ for (int x = 0; x < columns ; x++)
 //		}
 		for (int y = 0; y < rows ; y++)
 		{ //loop over y co-ordinates
-			grid_diff[x][y] = grid_a[x][y] - grid_b[x][y];
+			if ( grid_a[x][y] <= epsilon && grid_b[x][y] <= epsilon )
+			{
+				grid_diff[x][y] = 0;
+			}
+			else
+			{
+				grid_diff[x][y] = std::abs(2 * (grid_a[x][y] - grid_b[x][y]) / (grid_a[x][y]+grid_b[x][y]))*100;	
+			}
 			output << x << "\t" << y << "\t" << grid_diff[x][y] << std::endl;
 		}
 		output << std::endl;
