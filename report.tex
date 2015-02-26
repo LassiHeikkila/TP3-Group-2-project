@@ -4,9 +4,10 @@
 \documentclass[12pt, a4paper]{article}
 
 %specify packages used 
+\usepackage{microtype}		       %use package for minor typographical adjustments
 \usepackage{graphicx} 		       %use package for diagram 
 \usepackage{listings}                  %use package for c++ code in appendix
-\usepackage{colour}                    %use package for code listings
+\usepackage{color}                     %use package for code listings
 \usepackage[utf8]{inputenc}            %use package for colours in code
 \usepackage{amsmath}                   %use package for various math symbols
 \usepackage{amsfonts}                  %use package for number sets
@@ -21,11 +22,8 @@
 %\usepackage{url}                       %use package to display urls properly
 %\usepackage{array}                     %use package for centering table contents
 
-%use tikz library for shapes
-\usetikzlibrary{shapes.geometric, arrows}
-
-%set style of bibliography
-\bibliographystyle{unsrt}
+%set graphics path
+\graphicspath{{/home/danmfr/p3t/laplace/images/}}
 
 %define colours for code listings
 \definecolor{codegreen}{rgb}{0,0.6,0}
@@ -56,12 +54,18 @@
 %set style of listing to that defined above
 \lstset{style=mystyle}
 
+%use tikz library for shapes
+\usetikzlibrary{shapes.geometric, arrows}
+
 %define block styles in tikz
 \tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=red!30]
 \tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30]
 \tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30]
 \tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!30]
 \tikzstyle{arrow} = [thick,->,>=stealth]
+
+%set style of bibliography
+\bibliographystyle{unsrt}
 
 %set style of footnotes
 \renewcommand{\thefootnote}{\roman{footnote}}
@@ -75,7 +79,7 @@
 
 %display title, my details and current date
 \title{On the analytical and numerical solutions of Laplace's equation for different electrostatic configurations}
-\author{S. Brown, F. Hayes, L. Heikkil{\"a}, W. Liu, D. Richardson\\
+\author{S. Brown, F. Hayes, L. Heikkil{\"a}, D. Richardson\\
 	School of Physics and Astronomy,\\
 	University of Glasgow,\\
 	Glasgow, United Kingdom}
@@ -101,7 +105,7 @@ approximate numerical solution, and study the convergence of the numerical metho
 
 %start of introduction
 \section{Introduction}
-\subsection{Derivation of Laplace's Equation}
+\subsection{Laplace's Equation}
 
 Gauss' Law may used to express the relation between the \emph{divergence} of the
 electric field, represented by \textbf{E}, and the \emph{charge density} $\rho$,
@@ -130,7 +134,7 @@ derivative of the magnetic field, denoted \textbf{B}:
 \nabla \times \bm{E} = - \frac{\partial \bm{B}}{\partial t}
 \ee
 
-If the magentic field is constant, in other words unchanging with time, this equation
+If the magnetic field is constant, in other words unchanging with time, this equation
 reduces to the statement that the electric field is \emph{irrotational}. A
 consequence of irrotationality is that the electric field may then be written as
 negative the gradient of some scalar potential, $\phi$ say. Mathematically:
@@ -175,7 +179,7 @@ derivative and write
 \ee
 %
 where $f(t+\Delta t)$ and $f(t)$ are two values of $f$, evaluated at two points
-a distance $\Delta t$ apart.
+a distance $\Delta t$ apart. This is known as the \emph{forward difference approximation}.
 
 To approximate the second derivative of a function, one writes
 %
@@ -185,40 +189,94 @@ To approximate the second derivative of a function, one writes
 = \frac{f(t +\Delta t) - 2f(t) + f(t-\Delta t)}{\Delta t ^2}
 \ee
 
-\subsubsection{Derivation of the Relaxation Method}
+\subsubsection{The Relaxation Method}
 
 For our purposes, we wish to discretise the following equation:
-%
-\be
+% 
+\be 
 \frac{\partial^2 \phi}{\partial x^2}+\frac{\partial^2 \phi}{\partial y^2} = 0
-\ee
-%
-One can approximate this partial differential equation as:
-%
+\label{eq:laplace}
+\ee 
+
+One can define a region on which to discretise this equation, $\{(x,y)|0<x<L,0<y<D\}$,
+and define a grid of points of spacial separation in $\Delta x$ in the $x$ direction,
+and $\Delta y$ in the $y$ direction. We wish to find the value of $\phi$ at each point.
+
+One can now approximate Equation~\ref{eq:laplace} as:
+% 
 \be
 \frac{\phi_{j+1,k}-2\phi_{j,k}+\phi_{j-1,k}}{\Delta x^2} = - \frac{\phi_{j,k+1}-2\phi_{j,k}+\phi_{j,k-1}}{\Delta y^2}
 \ee
 %
 where $j$ and $k$ index the $x$ and $y$ directions respectively.
 
-If we use the same step-size $\Delta=\Delta x=\Delta y$ in both $x$ and $y$ directions this
+If we use the same spacing $\Delta=\Delta x=\Delta y$ in both $x$ and $y$ directions this
 reduces to:
 %
 \be
 \phi_{j,k}= \frac{1}{4}(\phi_{j-1,k}+\phi_{j+1,k}+\phi_{j,k-1}+\phi_{j,k+1})
+\label{eq:relax}
 \ee
 %
-In other words, the value of the potential at a specific point is the average of
-the four surrounding points. This is the relaxation method.
+In other words the value of the potential at a specific point is the average
+of the value of the potential at the four surrounding points. 
+
+Suppose one has some initial guess of the value of $\phi$ at all points, $\phi_{j,k,0}$,
+say. One evaluates Equation~\ref{eq:relax} at all points on the grid simultaneously and
+generates a new better approximation for the potential, $\phi_{j,k,1}$. Iterating this
+process $n$ times, one has
+%
+\be
+\phi_{j,k,n+1}= \frac{1}{4}(\phi_{j-1,k,n}+\phi_{j+1,k,n}+\phi_{j,k-1,n}+\phi_{j,k+1,n})
+\ee
+%
+This is known as \emph{Jacobi's iterative method}, and after each iteration the
+approximation converges, or \emph{relaxes}, towards the correct solution. Hence, it is
+also known as the \emph{relaxation method}.
+
+\subsubsection{The Gauss-Seidel Method}
+
+It is often unfeasible and computationally intensive to store the previous value of the
+potential at each point, as in the Jacobi iterative method. An alternative method, known
+as the \emph{Gauss-Seidel method}, exists where it is not neccessary to do this, and
+instead the iterative algorithm is defined by
+%
+\be
+\phi_{j,k,n+1}= \frac{1}{4}(\phi_{j-1,k,n+1}+\phi_{j+1,k,n}+\phi_{j,k-1,n-1}+\phi_{j,k+1,n})
+\ee
+%
+where the previous points $\phi_{j-1,k}$ and $\phi_{j,k-1}$ have already been updated
+by the algorithm as it loops through the grid.
+
+It can be shown that this method actually converges faster than Jacobi's iterative
+method, and it also has the added bonus of not requiring the previous value of the 
+potential at each grid point to be stored.
+
+\subsubsection{Successive Over-Relaxation}
+
+Neither the Jacobi iterative method or the Gauss-Seidel method utilise the value
+of the potential at the current point in the previous iteration, in our notation
+$\phi_{j,k,n}$. It can be shown that using this point, defining a
+\emph{relaxation parameter}, $1<s<2$, and defining an iterative algorithm as shown
+%
+\be
+\phi_{j,k,n+1}= (1-s)\phi_{j,k,n}+\frac{s}{4}(\phi_{j-1,k,n+1}+\phi_{j+1,k,n}+\phi_{j,k-1,n-1}+\phi_{j,k+1,n})
+\ee
+%
+results in a more convergent numerical method. This technique is known as
+successive over-relaxation.
+
+\subsubsection{Checkerboard (Red-Black) Updating}
 
 %start of section
-\section{System A}
+\section{System One}
 
 Suppose one has a perfectly uniform electric field between two infinite planes
 at potentials $V$ and $-V$, and they are a distance $2d$ apart. Suppose one then
 places an infinitely long perfectly conducting cylinder, of radius $R$, into the centre
-of the field, at ground potential. We wish to find the resulting form of the
-electrostatic potential, and hence the electric field, surrounding the cylinder.
+of the field, at ground potential, as in Figure~\ref{fig:sys one}. We wish to find the
+resulting form of the electrostatic potential, and hence the electric field, surrounding
+the cylinder.
 
 \begin{figure}[h!]
 \begin{center}
@@ -229,7 +287,8 @@ electrostatic potential, and hence the electric field, surrounding the cylinder.
 \draw[dashed] (5,3) -- (5.6,3.8) node[pos=0.5,above left] {$R$};
 \end{tikzpicture}
 \end{center}
-\caption{Cross-sectional diagram of System A}
+\caption{Cross-sectional diagram of System One}
+\label{fig:sys one}
 \end{figure}
 
 \subsection{Analytic Solution}
@@ -287,7 +346,7 @@ a sum of these terms:
 \ee
 
 For a particular solution to the system considered here one must impose boundary
-conditions.
+conditions, specifically we use \emph{Dirichlet boundary conditions}.
 
 By considering the geometry of the system, we expect a solution that is symmetric
 about $\theta=0$. This implies that $\gamma = 0$ and $\gamma_n=0$, $\forall n$ as
@@ -326,7 +385,7 @@ a graph of which is shown in Figure~\ref{fig:analytic}.
 
 \begin{figure}
 \begin{center}
-\includegraphics{/home/danmfr/p3t/laplace/pdfs/analytic.pdf}
+\includegraphics{analytic.pdf}
 \caption{Analytic solution with $V=1$, $R=15$ on $100\times100$ grid}
 \label{fig:analytic}
 \end{center}
@@ -334,11 +393,11 @@ a graph of which is shown in Figure~\ref{fig:analytic}.
 
 \subsection{Numerical Solution}
 
-To numerically approximate the electrostatic potential for System A via the 
+To numerically approximate the electrostatic potential for System 1 via the 
 relaxation method the following rudimentary algorithm was developed.
 
 \begin{algorithm}
-\begin{algorithmic}[]
+\begin{algorithmic}[1]
 \Procedure{The Relaxation Method}{}
 \State declare variables:
 \State $V \gets$ potential on plates
@@ -387,14 +446,14 @@ and Figure~\ref{fig:field} shows the electric field around the cylinder.
 
 \begin{figure}
 \centering
-\begin{subfigure}[b]{0.6\textwidth}
-	\includegraphics[width=\textwidth]{/home/danmfr/p3t/laplace/pdfs/numerical.pdf}
+\begin{subfigure}[b]{0.7\textwidth}
+	\includegraphics[width=\textwidth]{potentialA.pdf}
 	\caption{electrostatic potential}
 	\label{fig:numerical}
 \end{subfigure}
 
-\begin{subfigure}[b]{0.6\textwidth}
-	\includegraphics[width=\textwidth]{/home/danmfr/p3t/laplace/pdfs/field.pdf}
+\begin{subfigure}[b]{0.7\textwidth}
+	\includegraphics[width=\textwidth]{fieldA.pdf}
 	\caption{electric field}
 	\label{fig:field}
 \end{subfigure}
@@ -405,11 +464,12 @@ $V=1$, $R=15$ on $100\times100$ grid for $10000$ iterations}
 \subsection{Comparison of Analytical and Numerical Solution}
 
 %start of section
-\section{System C}
+\section{System Two}
 
 The second system considered was a silicon detector---a system consisting of two
 silicon wafers, one segmented with doped implants at ground potential and the other,
-referred to as the backplane, uniformly doped, held at a potential $+V$.
+referred to as the backplane, uniformly doped, held at a potential $+V$, as shown
+in Figure~\ref{fig:sys two}.
 
 \begin{figure}[h!]
 \begin{center}
@@ -421,7 +481,8 @@ referred to as the backplane, uniformly doped, held at a potential $+V$.
 \draw (8.5,5) rectangle (9.5,4.75);
 \end{tikzpicture}
 \end{center}
-\caption{Cross-sectional diagram of System B}
+\caption{Cross-sectional diagram of System Two}
+\label{fig:sys two}
 \end{figure}
 
 \subsection{Numerical Solution}
@@ -434,9 +495,9 @@ electric field for an arbitrary electrostatic system. It accepts input of a colo
 bitmap, where the colours represent different potentials, and returns plots of the
 resultant electrostatic potential and electric field.
 
-Here is a flowchart representing the algorithm 
+Figure~\ref{fig:flowchart} shows a flowchart representing the algorithm employed.
 
-\begin{figure}[h!]
+\begin{figure}[htbp!]
 \begin{center}
 \begin{tikzpicture}[node distance=2cm]
 
@@ -454,16 +515,20 @@ Here is a flowchart representing the algorithm
 \draw [arrow] (in1) -- (pro1);
 \draw [arrow] (pro1) -- (pro2);
 \draw [arrow] (pro2) -- (dec1);
-\draw [arrow] (dec1) -- node[left] {yes} (pro3);
+\draw [arrow] (dec1) -- node[left] {convergent} (pro3);
 \draw (dec1) -- (inv);
-\draw [arrow] (inv) |- node[pos=0.25, right] {no} (pro2);
+\draw [arrow] (inv) |- node[pos=0.25, right] {non-convergent} (pro2);
 \draw [arrow] (pro3) -- (out1);
 \draw [arrow] (out1) -- (stop);
 
 \end{tikzpicture}
 \end{center}
 \caption{Flowchart of steps in software package}
+\label{fig:flowchart}
 \end{figure}
+
+\subsection{Bitmaps, Boolean Masks and Convergence}
+\subsection{Timing and CPU usage}
 
 %start of section
 \section{Conclusion}
