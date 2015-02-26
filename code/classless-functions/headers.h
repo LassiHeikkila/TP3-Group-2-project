@@ -27,7 +27,7 @@ struct array_data {
 };
 
 array_data * fdm(char*, double*, double, int, double);
-void plot(int, string, string);
+void plot(int, string, string, int, int);
 array_data * locations(char*, double, double, double, double);
 void data_out(array_data**, double);
 int parseline(char*);

@@ -8,7 +8,7 @@
 
 #include "headers.h"
 
-void plot(int mode, string terminal, string file_ext)
+void plot(int mode, string terminal, string file_ext, int columns, int rows)
 {
     // Open GNUPlot as file to be written to:
     FILE *pipe_gnuplot = popen("gnuplot -persistent", "w");
@@ -32,8 +32,10 @@ void plot(int mode, string terminal, string file_ext)
         fputs("unset tics\n",pipe_gnuplot);
         fputs("unset colorbox\n",pipe_gnuplot);
         fputs("set border 0\n",pipe_gnuplot);
-        fputs("set xrange [0:400]\n",pipe_gnuplot);
-        fputs("set yrange [0:300]\n",pipe_gnuplot);
+        fprintf(pipe_gnuplot,"set xrange [0:%d]\n",columns); // have to use fprintf to insert an int into the middle of a string, it doesn't look as pretty but it works.
+        fprintf(pipe_gnuplot,"set yrange [0:%d]\n",rows);
+    //  fputs(("set xrange [0:%d]\n",columns),pipe_gnuplot);
+    //  fputs(("set yrange [0:%d]\n",rows),pipe_gnuplot);
         fputs("set palette defined ( 0 \"blue\", 1 \"red\")\n",pipe_gnuplot);
         fputs("scaling = 5\n",pipe_gnuplot);
         fputs("mag(x,y) = sqrt( x*x + y*y )\n",pipe_gnuplot);

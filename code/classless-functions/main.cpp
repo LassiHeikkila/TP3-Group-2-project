@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
     int iterations = atoi(argv[6]);
     double relaxation = atof(argv[7]);
     double convergence = atof(argv[8]);
-    
+
     // Store current CPU time:
     clock_t tm;
     tm = clock();
@@ -46,6 +46,10 @@ int main(int argc, char *argv[])
     // Output data to files:
     data_out(&data, runtime);
 
+     // Store width and height of image for plotting purposes
+    int columns = data->columns;
+    int rows = data->rows;
+
     // Clean up memory:
     delete data -> prev_values;
     delete data -> values;
@@ -56,11 +60,11 @@ int main(int argc, char *argv[])
 
     cout << "Plotting data...\n";
     // Plot potential:
-    plot(0,"pngcairo","png");
+    plot(0,"pngcairo","png",columns,rows);
     // Plot E-field:
-    plot(1,"pngcairo","png");
+    plot(1,"pngcairo","png",columns,rows);
     // Plot equipotential lines:
-    plot(2,"pngcairo","png");
+    plot(2,"pngcairo","png",columns,rows);
     cout << "Done!\n";
 
     return 0;
