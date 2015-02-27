@@ -10,150 +10,163 @@
 
 array_data * fdm(char* image, double* potentials, double rel_par, int iterations, double desiredconv)
 {
-    // Use locations() to build initial array with boundaries:
-    array_data * sysdat;
-    sysdat = locations(image, potentials[0], potentials[1], potentials[2], potentials[3]);
+	// Use locations() to build initial array with boundaries:
+	array_data * sysdat;
+	sysdat = locations(image, potentials[0], potentials[1], potentials[2], potentials[3]);
 
-    double conv = 0;
-    int prev_convcount = 0, convcount = 0, count = 0;
-    bool lock = false;
-    int pixels = sysdat->rows * sysdat->columns;
+	double conv = 0;
+	int prev_convcount = 0, convcount = 0, count = 0;
+	bool lock = false;
+	int pixels = sysdat->rows * sysdat->columns;
+	int start = 0;
+	cout << "Pixels: " << pixels << endl;
+	double**u = sysdat -> values;
+	double**pu = sysdat -> prev_values;
 
-    double**u = sysdat -> values;
-    double**pu = sysdat -> prev_values;
-
-    // Loop until either desired convergence or maximum
-    // iterations are achieved:
-    while ( convcount < pixels && count < iterations )
+	// Loop until either desired convergence or maximum
+	// iterations are achieved:
+	while ( convcount < pixels && count < iterations )
 //    for (int count = 0; count < iterations; count++)
-    {
-        convcount = 0;
+	{
+		if (count % 2 == 0)
+		{
+			convcount = 0;
+		}
 
-        // Loop through x coordinates 
-        for (int i = 0; i < sysdat->columns; i++)
-        {
-            // Loop through y:
-            for (int j = 0; j < sysdat->rows; j++)
-            {
-                // Test if point is boundary value. If so, ignore:
-                if (sysdat->mask[i][j])
-                {
-                    convcount++;
-                    continue;
-                }
+		// Loop through x coordinates 
+		for (int i = 0; i < sysdat->columns; i++)
+		{
+			if (count % 2 == 0)
+			{
+				start = (i != 0 && i % 2 != 0) ? 1 : 0;
+			}
+			else
+			{
+				start = (i == 0 || i % 2 == 0) ? 1 : 0;
+			}
 
-                // Finite Difference Method to calculate potential as
-                // average of surrounding values, checking if point is
-                // on an edge. If so, and it isn't a boundary value,
-                // calculate as average of surrounding points inside box
-                // - two for corners, three for points on edge. If not on
-                // edge, calculate as average of four surrounding points.
+			// Loop through y:
+			for (int j = start; j < sysdat->rows; j += 2)
+			{
+				// Test if point is boundary value. If so, ignore: 
+				if (sysdat->mask[i][j])
+				{
+					convcount++;
+					continue;
+				}
 
-                // Left edge and corners:
-                if (i == 0)
-                {
-                    if (j == 0)
-                    {
-                        u[i][j] = (1-rel_par)*pu[i][j] + rel_par*0.5*(u[i+1][j]+u[i][j+1]);
-                    }
-                    else if (j == sysdat->rows - 1)
-                    {
-                        u[i][j] = (1-rel_par)*pu[i][j] + rel_par*0.5*(u[i+1][j]+u[i][j-1]);
-                    }
-                    else
-                    {
-                        u[i][j] = (1-rel_par)*pu[i][j] + rel_par*(1/3.0)*(u[i+1][j]+u[i][j+1]+u[i][j-1]);
-                    }
-                }
-                // Right edge and corners:
-                else if (i == (sysdat->columns - 1))
-                {
-                    if (j == 0)
-                    {
-                        u[i][j] = (1-rel_par)*pu[i][j] + rel_par*0.5*(u[i-1][j]+u[i][j+1]);
-                    }
-                    else if (j == sysdat->rows - 1)
-                    {
-                        u[i][j] = (1-rel_par)*pu[i][j] + rel_par*0.5*(u[i-1][j]+u[i][j-1]);
-                    }
-                    else
-                    {
-                        u[i][j] = (1-rel_par)*pu[i][j] + rel_par*(1/3.0)*(u[i-1][j]+u[i][j+1]+u[i][j-1]);
-                    }
-                }
-                // Top edge:
-                else if (j == 0)
-                {
-                    u[i][j] = (1-rel_par)*pu[i][j] + rel_par*(1/3.0)*(u[i-1][j]+u[i+1][j]+u[i][j+1]);
-                }
-                // Bottom edge:
-                else if (j == (sysdat->rows - 1))
-                {
-                    u[i][j] = (1-rel_par)*pu[i][j] + rel_par*(1/3.0)*(u[i-1][j]+u[i+1][j]+u[i][j-1]);
-                }
-                // Rest of area:
-                else
-                {
-                    u[i][j]=(1-rel_par)*pu[i][j] + rel_par*0.25*(u[i+1][j]+u[i][j+1]+u[i-1][j]+u[i][j-1]);
-                }
+				// Finite Difference Method to calculate potential as
+				// average of surrounding values, checking if point is
+				// on an edge. If so, and it isn't a boundary value,
+				// calculate as average of surrounding points inside box
+				// - two for corners, three for points on edge. If not on
+				// edge, calculate as average of four surrounding points.
 
-                // Find absolute value of convergence:
-                conv = abs(pu[i][j] - u[i][j]);
+				// Left edge and corners:
+				if (i == 0)
+				{
+					if (j == 0)
+					{
+						u[i][j] = (1-rel_par)*pu[i][j] + rel_par*0.5*(u[i+1][j]+u[i][j+1]);
+					}
+					else if (j == sysdat->rows - 1)
+					{
+						u[i][j] = (1-rel_par)*pu[i][j] + rel_par*0.5*(u[i+1][j]+u[i][j-1]);
+					}
+					else
+					{
+						u[i][j] = (1-rel_par)*pu[i][j] + rel_par*(1/3.0)*(u[i+1][j]+u[i][j+1]+u[i][j-1]);
+					}
+				}
+				// Right edge and corners:
+				else if (i == (sysdat->columns - 1))
+				{
+					if (j == 0)
+					{
+						u[i][j] = (1-rel_par)*pu[i][j] + rel_par*0.5*(u[i-1][j]+u[i][j+1]);
+					}
+					else if (j == sysdat->rows - 1)
+					{
+						u[i][j] = (1-rel_par)*pu[i][j] + rel_par*0.5*(u[i-1][j]+u[i][j-1]);
+					}
+					else
+					{
+						u[i][j] = (1-rel_par)*pu[i][j] + rel_par*(1/3.0)*(u[i-1][j]+u[i][j+1]+u[i][j-1]);
+					}
+				}
+				// Top edge:
+				else if (j == 0)
+				{
+					u[i][j] = (1-rel_par)*pu[i][j] + rel_par*(1/3.0)*(u[i-1][j]+u[i+1][j]+u[i][j+1]);
+				}
+				// Bottom edge:
+				else if (j == (sysdat->rows - 1))
+				{
+					u[i][j] = (1-rel_par)*pu[i][j] + rel_par*(1/3.0)*(u[i-1][j]+u[i+1][j]+u[i][j-1]);
+				}
+				// Rest of area:
+				else
+				{
+					u[i][j]=(1-rel_par)*pu[i][j] + rel_par*0.25*(u[i+1][j]+u[i][j+1]+u[i-1][j]+u[i][j-1]);
+				}
 
-                if (conv < desiredconv)
-                {
-                    convcount++;
+				// Find absolute value of convergence:
+				conv = abs(pu[i][j] - u[i][j]);
 
-                    if (lock && mintrue(sysdat,i,j,2))
-                    {
-                        sysdat->mask[i][j] = true;
-                    }
-                }
+				if (conv < desiredconv)
+				{
+					convcount++;
 
-                pu[i][j] = u[i][j];
-            }
-        }
+					if (lock && mintrue(sysdat,i,j,3))
+					{
+						sysdat->mask[i][j] = true;
+					}
+				}
 
-        count++;
+				pu[i][j] = u[i][j];
+			}
+		}
 
-        if (count % 100 == 0)
-        {
-            cout << "\rIteration " << count << "." << std::flush;
+		count++;
 
-            if (convcount > prev_convcount)
-            {
-                lock = true;
-            }
-        }
+		if (count % 200 == 0)
+		{
+			cout << "\rIteration " << count / 2 << "." << std::flush;
 
-        prev_convcount = convcount;
+			if (convcount > prev_convcount)
+			{
+				lock = true;
+			}
+		}
 
-    }
+		prev_convcount = convcount;
 
-    cout << endl;
+	}
 
-    // Pass iterations required to struct:
-    sysdat->req_its = count;
-    // Create 2D arrays for grad:
-    sysdat->xgrad = new double*[sysdat->columns];
-    sysdat->ygrad = new double*[sysdat->columns];
+	cout << endl;
 
-    for (int i = 0; i < (sysdat->columns - 1); i++)
-    {
-        sysdat->xgrad[i] = new double[sysdat->rows];
-        sysdat->ygrad[i] = new double[sysdat->rows];
+	// Pass iterations required to struct:
+	sysdat->req_its = count / 2;
+	// Create 2D arrays for grad:
+	sysdat->xgrad = new double*[sysdat->columns];
+	sysdat->ygrad = new double*[sysdat->columns];
 
-        for (int j = 0; j < (sysdat->rows - 1); j++)
-        {
-            // Approximation of gradients:
-            if (i != 0 && j != 0 ){
-                sysdat->xgrad[i][j] = -0.5*(u[i+1][j]-u[i-1][j]);
-                sysdat->ygrad[i][j] = -0.5*(u[i][j+1]-u[i][j-1]);
-            }
-        }
+	for (int i = 0; i < (sysdat->columns - 1); i++)
+	{
+		sysdat->xgrad[i] = new double[sysdat->rows];
+		sysdat->ygrad[i] = new double[sysdat->rows];
 
-    }
-    return sysdat;
+		for (int j = 0; j < (sysdat->rows - 1); j++)
+		{
+			// Approximation of gradients:
+			if (i != 0 && j != 0 ){
+				sysdat->xgrad[i][j] = -0.5*(u[i+1][j]-u[i-1][j]);
+				sysdat->ygrad[i][j] = -0.5*(u[i][j+1]-u[i][j-1]);
+			}
+		}
+
+	}
+	return sysdat;
 }
 
 
@@ -161,18 +174,18 @@ array_data * fdm(char* image, double* potentials, double rel_par, int iterations
 // of bools are true.
 bool mintrue(array_data*u,int i, int j, int min)
 {
-    int count = 0;
+	int count = 0;
 
-    if (i == 0 || i == u->columns - 1 || j == 0 || j == u->rows - 1)
-    {
-    	return false;
-    }
+	if (i == 0 || i == u->columns - 1 || j == 0 || j == u->rows - 1)
+	{
+		return false;
+	}
 
-    for (int x = -1; x < 2; x += 2)
-    {
-        count += u->mask[i+x][j] ? 1 : 0;
-        count += u->mask[i][j+x] ? 1 : 0;
-    }
+	for (int x = -1; x < 2; x += 2)
+	{
+		count += u->mask[i+x][j] ? 1 : 0;
+		count += u->mask[i][j+x] ? 1 : 0;
+	}
 
-    return (count >= min);
+	return (count >= min);
 }
