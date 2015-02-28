@@ -5,6 +5,7 @@
 
 // will create quantitative comparison, i.e. average difference between analytical and numerical for each method
 // plot this difference as a function of iterations to see convergence of methods
+// will implement relative convergence
 
 #include <iostream>
 #include <cstdlib>
@@ -16,17 +17,18 @@ int main(int argc, char *argv[])
 //start clock
 clock_t t0 = clock();
 
-int count = 0;
-int i, j; //declare three counters
+//declare three counters
+int i = 0, j = 0, count = 0;
 
-//choose arbitrary values, not CLIs for simplicity
-int d=30;	//plate separation
-int h=30;	//plate height
-int dx=1;	//step-size in x
-int dy=1;	//step-size in y
-int nx=30; 	//x points
-int ny=30; 	//y points
+//arbitrary values, not CLIs for simplicity
+int d = 100;	//plate separation
+int h = 100;	//plate height
+int dx = 1;	//step-size in x
+int dy = 1;	//step-size in y
+int nx = 100; 	//x points
+int ny = 100; 	//y points
 
+//get command line arguments
 float R = atof(argv[1]); 	//radius of cylinder
 int loops = atoi(argv[2]); 	//number of iterations
 float epsilon = atof(argv[3]); 	//desired convergence
@@ -35,9 +37,10 @@ int V=1; //define arbitrary plate potential
 
 float omega=2/(1+float(M_PI)/nx); //define optimum relaxation parameter by given formula
 
-//declare matrices for electrostatic potential for different algorithms
+//declare matrices for electrostatic potential
+//requires second matrix to store previous values
 float checker[nx+2][ny+2];
-float checker_new[nx+2][ny+2]; //requires second matrix to store previous values
+float checker_new[nx+2][ny+2];
 
 std::cout << "Checkboard (red-black) updating\n";
 std::cout << "-------------------------------\n";
@@ -84,9 +87,9 @@ int conv_count;
 
 //iterate to find potential until max its
 //or every point has converged to required level
-while ( conv_count < nx*ny && count <= loops)
+while (conv_count < nx*ny && count <= loops)
 {
-//set number of convergeny points to zero
+//set number of convergent points to zero
 conv_count = 0;
 
  //loop over grid, ignore potential at boundaries (first and last x,y)
@@ -110,8 +113,7 @@ conv_count = 0;
   }
  }
 
- //update checker at odd points
- //requires second loop
+ //update matrix at odd points in second loop
  for (i=1; i<=nx; i++)
  {
   for (j=1; j<=ny; j++)
@@ -124,14 +126,13 @@ conv_count = 0;
   }
  }
 
- //update all of checker and check convergence
- //requires third loop
+ //update all of checker and check convergence in third loop
  for (i=1; i<=nx; i++)
  {
   for (j=1; j<=ny; j++)
   {
 	//check convergence
-	if (sqrt(pow(checker_new[i][j]-checker[i][j],2)) < epsilon) { conv_count++; }
+	if (fabs(checker_new[i][j]-checker[i][j]) < epsilon) { conv_count++; }
 
    	checker[i][j] = checker_new[i][j];
   }
