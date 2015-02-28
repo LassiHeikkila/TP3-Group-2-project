@@ -111,7 +111,7 @@ array_data * fdm(char* image, double* potentials, double rel_par, int iterations
 				}
 
 				// Find absolute value of convergence:
-				conv = abs(pu[i][j] - u[i][j]);
+				conv = fabs(pu[i][j] - u[i][j]); 	//abs() returns int, use fabs() instead (also in cmath)
 
 				if (conv < desiredconv)
 				{
