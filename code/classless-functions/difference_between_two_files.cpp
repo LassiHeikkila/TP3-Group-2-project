@@ -187,7 +187,7 @@ int main(int argc, char *argv[])
 	//		}
 			for (int y = 0; y < rows ; y++)
 			{ //loop over y co-ordinates
-				if ( grid_a[x][y] <= epsilon && grid_b[x][y] <= epsilon ) // if both points have values less than epsilon, set the difference to zero to avoid dividing by tiny values (could cause issues with floating point arithmetic)
+				if ( std::abs(grid_a[x][y]) <= epsilon && std::abs(grid_b[x][y]) <= epsilon ) // if both points have values less than epsilon, set the difference to zero to avoid dividing by tiny values (could cause issues with floating point arithmetic)
 				{
 					grid_diff[x][y] = 0;
 				}
