@@ -1,11 +1,13 @@
 // Dan Richardson, 26/2/15, gauss.cpp
 
-// assesses convergence of gauss-seidel to method analytical solution
+// assesses convergence of gauss-seidel method to analytical solution
 // command line arguments: radius, max_its and desired convergence
 
-// will create quantitative comparison, i.e. average difference between analytical and numerical for each method
-// plot this difference as a function of iterations to see convergence of methods
-// will implement relative convergence
+// creates data files of:
+// - numerical solution
+// - iterations vs desired convergence
+// - CPU time vs desired convergence
+// - difference between analytical and numerical vs iterations
 
 #include <iostream>
 #include <cstdlib>
@@ -29,9 +31,9 @@ int nx = 100; 	//x points
 int ny = 100; 	//y points
 
 //get command line arguments
-float R = atof(argv[1]); 	//radius of cylinder
-int loops = atoi(argv[2]); 	//number of iterations
-float epsilon = atof(argv[3]); 	//desired convergence
+float R = atof(argv[1]); 		//radius of cylinder
+int loops = atoi(argv[2]);	 	//number of iterations
+double epsilon = atof(argv[3]); 	//desired convergence
 
 int V=1; //define arbitrary plate potential
 
@@ -107,6 +109,8 @@ conv_count = 0;
    	}
 	//check convergence
 	if (fabs(gauss_new[i][j]-gauss[i][j]) < epsilon) { conv_count++; }
+//	if ( fabs(gauss_new[i][j]/gauss[i][j]) < 1 + epsilon || fabs(gauss_new[i][j]/gauss[i][j]) > 1 - epsilon ) { conv_count++; }
+
   }
  }
 
@@ -129,6 +133,8 @@ float r, theta; //declare polar co-ordinates
 
 std::cout << "Finding differences and writing files...";
 
+float difference = 0; //declare difference of analytical and numerical
+
 //output difference of numerical and analytical solution, for a given method
 for (j=0; j<=ny+1; j++)
 {
@@ -137,17 +143,22 @@ for (j=0; j<=ny+1; j++)
   r=sqrt((i*dx-0.5*d)*(i*dx-0.5*d)+(j*dy-0.5*h)*(j*dy-0.5*h));	//define the radius
   theta = atan2(j*dy-0.5*ny,i*dx-0.5*nx);			//define the angle
 
-  //open files for appending
-  std::ofstream file("data/gauss.dat", std::ios::out | std::ios::app);
+  //open file
+//std::ofstream file("data/gauss.dat", std::ios::out);
 
   //if in the circle, difference will be zero
   if (r*r < R*R)
   {
-   	file << i*dx << "\t" << j*dy << "\t" << 0 << std::endl;
+	//output numerical
+//   	file << i*dx << "\t" << j*dy << "\t" << 0 << std::endl;
   }
   else //otherwise
   {
-   	file << i*dx << "\t" << j*dy << "\t" << gauss[i][j]/*-((float)2*V/d)*((float)(R*R)/r - r)*cos(theta)*/ << std::endl;
+	//output numerical
+//	file << i*dx << "\t" << j*dy << "\t" << gauss[i][j] << std::endl;
+
+	//increment difference
+	difference += gauss[i][j]-((float)2*V/d)*((float)(R*R)/r - r)*cos(theta);
   }
  }
 }
@@ -157,9 +168,15 @@ std::cout << "Done!\n";
 //end clock
 clock_t t1 = clock();
 
+//open files for appending
+std::ofstream file1("data/gauss_its.dat", std::ios::out | std::ios::app);
+std::ofstream file2("data/gauss_time.dat", std::ios::out | std::ios::app);
+std::ofstream file3("data/gauss_diff.dat", std::ios::out | std::ios::app);
+
 //output statistics
-std::cout << "Convergence: " << epsilon << std::endl;
-std::cout << "Iterations: " << count << std::endl;
-std::cout << "CPU time: " << double(t1 - t0) / CLOCKS_PER_SEC << "s" << std::endl;
+file1 << epsilon << '\t' << count << std::endl;
+file2 << epsilon << '\t' << double(t1 - t0) / CLOCKS_PER_SEC << std::endl;
+file3 << count << '\t' << difference/((nx+2)*(ny+2)) << std::endl;
+
 std::cout << std::endl;
 }
