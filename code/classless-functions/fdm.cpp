@@ -160,8 +160,8 @@ array_data * fdm(char* image, double* potentials, double rel_par, int iterations
 		{
 			// Approximation of gradients:
 			if (i != 0 && j != 0 ){
-				sysdat->xgrad[i][j] = -0.5*(u[i+1][j]-u[i-1][j]);
-				sysdat->ygrad[i][j] = -0.5*(u[i][j+1]-u[i][j-1]);
+				sysdat->xgrad[i][j] = 0.5*(u[i-1][j]-u[i+1][j]); // changed so the minus sign is not needed
+				sysdat->ygrad[i][j] = 0.5*(u[i][j-1]-u[i][j+1]); // changed so the minus sign is not needed
 			}
 		}
 
