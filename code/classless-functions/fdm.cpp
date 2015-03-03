@@ -8,18 +8,24 @@
 
 #include "headers.h"
 
-array_data * fdm(char* image, double* potentials, double rel_par, int iterations, double desiredconv)
+//array_data * fdm(array_data* sysdat, double rel_par, int iterations, double desiredconv)
+array_data * fdm(input_data* in_data)
 {
 	// Use locations() to build initial array with boundaries:
-	array_data * sysdat;
-	sysdat = locations(image, potentials[0], potentials[1], potentials[2], potentials[3]);
+	// array_data * sysdat;
+	// sysdat = locations(image, potentials[0], potentials[1], potentials[2], potentials[3]);
+
+	// Splitting input struct into variables to be manipulated:
+	array_data* sysdat = in_data->sys;
+	double* rel_par = in_data->relaxation;
+	double* desiredconv = in_data->convergence;
+	int* iterations = in_data->iterations;
 
 	double conv = 0;
-	int prev_convcount = 0, convcount = 0, count = 0;
+	int prev_convcount = 0, convcount = 0, count = 0, start = 0;;
 	bool lock = false;
 	int pixels = sysdat->rows * sysdat->columns;
-	int start = 0;
-	cout << "Pixels: " << pixels << endl;
+
 	double**u = sysdat -> values;
 	double**pu = sysdat -> prev_values;
 

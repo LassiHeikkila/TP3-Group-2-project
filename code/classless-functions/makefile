@@ -1,9 +1,9 @@
 CC = g++
 CFLAGS = -g -Wall
-LIBS = -lm
+LIBS = -lm -lpthread -std=c++11
 
 DEPS = headers.h bitmap_image.hpp
-OBJ = bitmap.o data_out.o fdm.o plot.o memory.o main.o
+OBJ = bitmap.o data_out.o fdm_thread.o plot.o threader.o memory.o main.o
 
 DIRECTORIES = data plots
 

@@ -19,20 +19,29 @@ Command line arguments:
 int main(int argc, char *argv[])
 {
     // Declare potential array, initialise with command line arguments:
-    double potentials[4] = {atof(argv[2]), atof(argv[3]), atof(argv[4]), atof(argv[5])};
+//    double potentials[4] = {atof(argv[2]), atof(argv[3]), atof(argv[4]), atof(argv[5])};
 
     // Initialise other starting variables:
     int iterations = atoi(argv[6]);
     double relaxation = atof(argv[7]);
     double convergence = atof(argv[8]);
 
+    int core_count = std::thread::hardware_concurrency();
+
+    cout << core_count << " cores.\n";
+
     // Store current CPU time:
     clock_t tm;
     tm = clock();
 
+    // Build array from bitmap:
+    cout << "Building array...\n";
+    array_data * data = locations(argv[1], atof(argv[2]), atof(argv[3]), atof(argv[4]), atof(argv[5]));
+    cout << "Done!\n";
     // Run solver:
-    array_data * data = fdm(argv[1], potentials, relaxation, iterations, convergence);
-
+    cout << "Threading...\n";
+    data = threader(data, relaxation, convergence, iterations, core_count);
+    cout << "Done!\n";
     // Calculate elapsed CPU time:
     tm = clock() - tm;
     // Convert to seconds:
