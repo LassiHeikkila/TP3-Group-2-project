@@ -1,4 +1,4 @@
-%report.tex, Dan Richardson
+%report.tex
 
 %specify class of document
 \documentclass[12pt, a4paper]{article}
@@ -78,7 +78,7 @@
 \begin{document}
 
 %display title, my details and current date
-\title{On the analytical and numerical solutions of Laplace's equation for different electrostatic configurations}
+\title{On numerical approximations to solutions of Laplace's equation for different electrostatic configurations}
 \author{S. Brown, F. Hayes, L. Heikkil{\"a}, D. Richardson\\
 	School of Physics and Astronomy,\\
 	University of Glasgow,\\
@@ -90,18 +90,22 @@
 \begin{abstract}
 
 The behaviour of the electric field under the presence and influence of solid
-conducting objects is modelled and studied. Finite difference methods, namely the
-relaxation method, are employed to solve the Laplace equation numerically,
+conducting objects is modelled and studied. Finite difference methods, namely
+relaxation methods, are employed to solve the Laplace equation numerically,
 to find the approximate form of the electrostatic potential, and hence the electric
-field, present in various electrostatic systems. We explicitly focus on two such
-systems: the case of a long perfectly conducting cylinder centred between two infinite
-planes at potential $+V$ and $-V$; and the case of a silicon detector---a system
-composed of two silicon wafers with segmented doped implants at ground potential on one
-side and a uniform doped implant, referred to as the backplane, on the other side, held
-at a potential $+V$. We compare the analytical solution of the first system to its
-approximate numerical solution, and study the convergence of the numerical method.
+field, present in various electrostatic systems.
+We explicitly focus on two such systems: the case of a long perfectly conducting
+cylinder centred between two infinite planes at potential $+V$ and $-V$; and the
+case of a silicon detector---a system composed of two silicon wafers with segmented
+doped implants at ground potential on one side and a uniform doped implant on the
+other side, held at a potential $+V$. We compare the analytical solution of the first
+system to its approximate numerical solution, and study the convergence of the
+numerical methods employed.
 
 \end{abstract} % end of abstract
+
+%do not include in final version
+\tableofcontents
 
 %start of introduction
 \section{Introduction}
@@ -123,17 +127,16 @@ integral form, as:
 \ee
 %
 where the integral is taken over a closed surface, $S$, and $Q$ is the enclosed charge.
-
 In the absence of charge, as is the case outside a conductor, this reduces to the
 statement the electric field is \emph{solenoidal}.
 
 One can also relate the \emph{curl} of the electric field to the time
-derivative of the magnetic field, denoted \textbf{B}:
+derivative of the magnetic field, denoted \textbf{B}, by the Maxwell-Faraday equation:
 %
 \be
 \nabla \times \bm{E} = - \frac{\partial \bm{B}}{\partial t}
 \ee
-
+%
 If the magnetic field is constant, in other words unchanging with time, this equation
 reduces to the statement that the electric field is \emph{irrotational}. A
 consequence of irrotationality is that the electric field may then be written as
@@ -144,6 +147,7 @@ negative the gradient of some scalar potential, $\phi$ say. Mathematically:
 \ee
 %
 This scalar potential is called the \emph{electrostatic potential}.
+
 One then has \emph{Laplace's equation}:
 %
 \be
@@ -156,9 +160,13 @@ is the \emph{Laplacian operator}\footnote{Specifically in Cartesian co-ordinates
 
 This is a second-order partial differential equation that can be solved, given some
 well-posed boundary conditions, to find the electrostatic potential and electric field
-for some physical system.
+for some physical system. 
 
-\subsection{Finite Difference Schemes}
+This equation is found in many areas of physics, from studies of fluid dynamics and heat
+conduction to astronomy, and our analysis here could be generalised to other such areas
+of physics.
+
+\subsection{Finite Difference Methods}
 
 It is often the case that differential equations, such as the Laplace equation, cannot
 be solved analytically, and their solution must be numerically approximated.
@@ -189,87 +197,8 @@ To approximate the second derivative of a function, one writes
 = \frac{f(t +\Delta t) - 2f(t) + f(t-\Delta t)}{\Delta t ^2}
 \ee
 
-\subsubsection{The Relaxation Method}
-
-For our purposes, we wish to discretise the following equation:
-% 
-\be 
-\frac{\partial^2 \phi}{\partial x^2}+\frac{\partial^2 \phi}{\partial y^2} = 0
-\label{eq:laplace}
-\ee 
-
-One can define a region on which to discretise this equation, $\{(x,y)|0<x<L,0<y<D\}$,
-and define a grid of points of spacial separation in $\Delta x$ in the $x$ direction,
-and $\Delta y$ in the $y$ direction. We wish to find the value of $\phi$ at each point.
-
-One can now approximate Equation~\ref{eq:laplace} as:
-% 
-\be
-\frac{\phi_{j+1,k}-2\phi_{j,k}+\phi_{j-1,k}}{\Delta x^2} = - \frac{\phi_{j,k+1}-2\phi_{j,k}+\phi_{j,k-1}}{\Delta y^2}
-\ee
-%
-where $j$ and $k$ index the $x$ and $y$ directions respectively.
-
-If we use the same spacing $\Delta=\Delta x=\Delta y$ in both $x$ and $y$ directions this
-reduces to:
-%
-\be
-\phi_{j,k}= \frac{1}{4}(\phi_{j-1,k}+\phi_{j+1,k}+\phi_{j,k-1}+\phi_{j,k+1})
-\label{eq:relax}
-\ee
-%
-In other words the value of the potential at a specific point is the average
-of the value of the potential at the four surrounding points. 
-
-Suppose one has some initial guess of the value of $\phi$ at all points, $\phi_{j,k,0}$,
-say. One evaluates Equation~\ref{eq:relax} at all points on the grid simultaneously and
-generates a new better approximation for the potential, $\phi_{j,k,1}$. Iterating this
-process $n$ times, one has
-%
-\be
-\phi_{j,k,n+1}= \frac{1}{4}(\phi_{j-1,k,n}+\phi_{j+1,k,n}+\phi_{j,k-1,n}+\phi_{j,k+1,n})
-\ee
-%
-This is known as \emph{Jacobi's iterative method}, and after each iteration the
-approximation converges, or \emph{relaxes}, towards the correct solution. Hence, it is
-also known as the \emph{relaxation method}.
-
-\subsubsection{The Gauss-Seidel Method}
-
-It is often unfeasible and computationally intensive to store the previous value of the
-potential at each point, as in the Jacobi iterative method. An alternative method, known
-as the \emph{Gauss-Seidel method}, exists where it is not neccessary to do this, and
-instead the iterative algorithm is defined by
-%
-\be
-\phi_{j,k,n+1}= \frac{1}{4}(\phi_{j-1,k,n+1}+\phi_{j+1,k,n}+\phi_{j,k-1,n-1}+\phi_{j,k+1,n})
-\ee
-%
-where the previous points $\phi_{j-1,k}$ and $\phi_{j,k-1}$ have already been updated
-by the algorithm as it loops through the grid.
-
-It can be shown that this method actually converges faster than Jacobi's iterative
-method, and it also has the added bonus of not requiring the previous value of the 
-potential at each grid point to be stored.
-
-\subsubsection{Successive Over-Relaxation}
-
-Neither the Jacobi iterative method or the Gauss-Seidel method utilise the value
-of the potential at the current point in the previous iteration, in our notation
-$\phi_{j,k,n}$. It can be shown that using this point, defining a
-\emph{relaxation parameter}, $1<s<2$, and defining an iterative algorithm as shown
-%
-\be
-\phi_{j,k,n+1}= (1-s)\phi_{j,k,n}+\frac{s}{4}(\phi_{j-1,k,n+1}+\phi_{j+1,k,n}+\phi_{j,k-1,n-1}+\phi_{j,k+1,n})
-\ee
-%
-results in a more convergent numerical method. This technique is known as
-successive over-relaxation.
-
-\subsubsection{Checkerboard (Red-Black) Updating}
-
-%start of section
-\section{System One}
+\subsection{System Desricption}
+\subsubsection{System One}
 
 Suppose one has a perfectly uniform electric field between two infinite planes
 at potentials $V$ and $-V$, and they are a distance $2d$ apart. Suppose one then
@@ -291,7 +220,28 @@ the cylinder.
 \label{fig:sys one}
 \end{figure}
 
-\subsection{Analytic Solution}
+\subsubsection{System Two}
+
+The second system considered was a silicon detector---a system consisting of two
+silicon wafers, one segmented with doped implants at ground potential and the other,
+referred to as the backplane, uniformly doped, held at a potential $+V$, as shown
+in Figure~\ref{fig:sys two}.
+
+\begin{figure}[h!]
+\begin{center}
+\begin{tikzpicture}
+\draw (0,0) -- (12,0) node[right] {$\phi = V$}; 
+\draw (0,5) -- (12,5) node[pos=0.25, above] {GND} node[pos=0.5, above] {GND} node[pos=0.75,above] {GND}; 
+\draw (2.5,5) rectangle (3.5,4.75);
+\draw (5.5,5) rectangle (6.5,4.75);
+\draw (8.5,5) rectangle (9.5,4.75);
+\end{tikzpicture}
+\end{center}
+\caption{Cross-sectional diagram of System Two}
+\label{fig:sys two}
+\end{figure}
+
+\subsection{Analytical Solution to System One}
 
 First, one realises that the three-dimensional problem can be reduced entirely to two
 dimensions due to the translation symmetry of the system along the length of the
@@ -391,7 +341,112 @@ a graph of which is shown in Figure~\ref{fig:analytic}.
 \end{center}
 \end{figure}
 
-\subsection{Numerical Solution}
+\section{Relaxation Methods}
+
+\subsection{Jacobi's Iterative Method}
+
+For our purposes, we wish to discretise the following equation:
+% 
+\be 
+\frac{\partial^2 \phi}{\partial x^2}+\frac{\partial^2 \phi}{\partial y^2} = 0
+\label{eq:laplace}
+\ee 
+
+One can define a region on which to discretise this equation, $\{(x,y)|\:0<x<L,0<y<D\}$,
+and define a grid of points of spacial separation in $\Delta x$ in the $x$ direction,
+and $\Delta y$ in the $y$ direction. We wish to find the value of $\phi$ at each point.
+
+One can now approximate Eqn.~\ref{eq:laplace} as:
+% 
+\be
+\frac{\phi_{j+1,k}-2\phi_{j,k}+\phi_{j-1,k}}{\Delta x^2} = - \frac{\phi_{j,k+1}-2\phi_{j,k}+\phi_{j,k-1}}{\Delta y^2}
+\ee
+%
+where $j$ and $k$ index the $x$ and $y$ directions respectively.
+
+If we use the same spacing $\Delta=\Delta x=\Delta y$ in both $x$ and $y$ directions this
+reduces to the statement that the value of the potential at a specific point is the
+average of the value of the potential at the four surrounding points: 
+%
+\be
+\phi_{j,k}= \frac{1}{4}(\phi_{j-1,k}+\phi_{j+1,k}+\phi_{j,k-1}+\phi_{j,k+1})
+\label{eq:relax}
+\ee
+
+Suppose one has some initial guess of the value of $\phi$ at all points, $\phi_{j,k,0}$,
+say. One evaluates Eqn~\ref{eq:relax} at all points on the grid simultaneously and
+generates a new better approximation for the potential, $\phi_{j,k,1}$. Iterating this
+process $n$ times, one has
+%
+\be
+\phi_{j,k,n+1}= \frac{1}{4}(\phi_{j-1,k,n}+\phi_{j+1,k,n}+\phi_{j,k-1,n}+\phi_{j,k+1,n})
+\ee
+%
+This is known as \emph{Jacobi's iterative method}, the simplest version of a
+\emph{relaxation method}, an algorithm where the numerical approximation converges or
+\emph{relaxes} towards the analytical solution with increasing iterations. 
+
+\subsection{The Gauss-Seidel Method}
+
+An alternative relaxation method, known as the \emph{Gauss-Seidel method}, exists where
+points at which the potential has already been updated by the algorithm as it loops
+through the grid, namely $\phi_{j-1,k}$ and $\phi_{j,k-1}$ in our notation, are used in
+the iteration scheme, as shown:
+%
+\be
+\phi_{j,k,n+1}= \frac{1}{4}(\phi_{j-1,k,n+1}+\phi_{j+1,k,n}+\phi_{j,k-1,n+1}+\phi_{j,k+1,n})
+\ee
+
+It can be shown that this method actually converges faster than Jacobi's iterative
+method, and it also has the added bonus of not requiring the previous value of the 
+potential at each grid point to be stored, thus reducing computation time.
+
+\subsection{Successive Over-Relaxation}
+
+Neither the Jacobi iterative method or the Gauss-Seidel method utilise the value
+of the potential at the current point in the previous iteration, in our notation
+$\phi_{j,k,n}$. It can be shown that using this point, and defining a
+\emph{relaxation parameter}, $1<s<2$, one can define the following iterative algorithm:
+%
+\be
+\phi_{j,k,n+1}= (1-s)\phi_{j,k,n}+\frac{s}{4}(\phi_{j-1,k,n+1}+\phi_{j+1,k,n}+\phi_{j,k-1,n+1}+\phi_{j,k+1,n})
+\ee
+%
+which is a more convergent numerical method. This technique is known as successive
+over-relaxation.
+
+%add fergus
+%input{sor.tex}
+
+\subsection{Checkerboard (Red-Black) Updating}
+
+In each of the previous methods, the value of the potential is calculated from, at most,
+its previous value at the current point and the current or previous values of the
+potential at the four neighbouring points. Noting this, let us denote $\phi_{j,k}$ as
+\emph{odd} if $j+k$ is odd, and even otherwise. Then the potential at each even point
+solely depends on the potential at odd points (and its previous value). One could then,
+in principle, iterate through the grid of points at which we approximate the potential,
+and update all the odd points, and then re-iterate through the grid, updating all the
+even points using the value of the potential at the newly updated odd points. Such an
+iterative scheme exists, and is known as Checkerboard (Red-Black) Updating, for obvious
+reasons. It can be shown to be a more convergent method than those outlined previously,
+and successive over-relaxation can easily be implemented within the scheme.
+
+%add stephen
+%\input{checker.tex}
+
+%add fergus
+\subsection{Nine-point Stenciling}
+%\input{nine_p.tex}
+
+\subsection{Comparison of methods}
+
+This is the scheme we shall use to numerically approximate the electrostatic potential
+in different . 
+
+%start of section
+%section is still under work, and out of order
+\section{Software Package for general electrostatic systems, \emph{estatics}}
 
 To numerically approximate the electrostatic potential for System 1 via the 
 relaxation method the following rudimentary algorithm was developed.
@@ -461,35 +516,6 @@ and Figure~\ref{fig:field} shows the electric field around the cylinder.
 $V=1$, $R=15$ on $100\times100$ grid for $10000$ iterations}
 \end{figure}
 
-\subsection{Comparison of Analytical and Numerical Solution}
-
-%start of section
-\section{System Two}
-
-The second system considered was a silicon detector---a system consisting of two
-silicon wafers, one segmented with doped implants at ground potential and the other,
-referred to as the backplane, uniformly doped, held at a potential $+V$, as shown
-in Figure~\ref{fig:sys two}.
-
-\begin{figure}[h!]
-\begin{center}
-\begin{tikzpicture}
-\draw (0,0) -- (12,0) node[right] {$\phi = V$}; 
-\draw (0,5) -- (12,5) node[pos=0.25, above] {GND} node[pos=0.5, above] {GND} node[pos=0.75,above] {GND}; 
-\draw (2.5,5) rectangle (3.5,4.75);
-\draw (5.5,5) rectangle (6.5,4.75);
-\draw (8.5,5) rectangle (9.5,4.75);
-\end{tikzpicture}
-\end{center}
-\caption{Cross-sectional diagram of System Two}
-\label{fig:sys two}
-\end{figure}
-
-\subsection{Numerical Solution}
-
-%start of section
-\section{Other Electrostatic Systems}
-
 We developed a general software package in C++ to solve and plot the potential and
 electric field for an arbitrary electrostatic system. It accepts input of a coloured
 bitmap, where the colours represent different potentials, and returns plots of the
@@ -527,8 +553,29 @@ Figure~\ref{fig:flowchart} shows a flowchart representing the algorithm employed
 \label{fig:flowchart}
 \end{figure}
 
-\subsection{Bitmaps, Boolean Masks and Convergence}
+%adds fergus' section
+\subsection{Bitmaps}
+%\input{bitmap.tex}
+
+%fergus
+\subsection{Convergence}
+%\input{convergence.tex}
+
+%stephen
+\subsection{Data Handling}
+%\input{data.tex}
+
+%adds stephen's section, uncomment and compile
+\subsection{Boolean Masks and Locking}
+%\input{boolean.tex}
+
 \subsection{Timing and CPU usage}
+
+%adds lassi's section, uncomment and compile
+\subsection{Output and Plotting}
+%\input{plotting.tex}
+
+\subsection{Results}
 
 %start of section
 \section{Conclusion}
