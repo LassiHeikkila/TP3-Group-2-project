@@ -428,9 +428,29 @@ solely depends on the potential at odd points (and its previous value). One coul
 in principle, iterate through the grid of points at which we approximate the potential,
 and update all the odd points, and then re-iterate through the grid, updating all the
 even points using the value of the potential at the newly updated odd points. Such an
-iterative scheme exists, and is known as Checkerboard (Red-Black) Updating, for obvious
-reasons. It can be shown to be a more convergent method than those outlined previously,
-and successive over-relaxation can easily be implemented within the scheme.
+iterative scheme exists, and is known as \emph{Checkerboard (Red-Black) Updating}, for
+obvious reasons. It can be shown to be a more convergent method than those outlined
+previously, and successive over-relaxation can easily be implemented within the scheme.
+Figure~\ref{fig:checker} shows an illustration of the algorithm.
+
+\begin{figure}[h!]
+\begin{center}
+\begin{tikzpicture}
+\draw[fill=red] (0,0) circle (0.2cm) node[below] {$\phi_{j+1,k-1}$}; 
+\draw[fill=black] (2,0) circle (0.2cm) node[below] {$\phi_{j+1,k}$}; 
+\draw[fill=red] (4,0) circle (0.2cm) node[below] {$\phi_{j+1,k+1}$};
+\draw[fill=black] (0,2) circle (0.2cm) node[below] {$\phi_{j,k-1}$};
+\draw[fill=red] (2,2) circle (0.2cm) node[below] {$\phi_{j,k}$};
+\draw[fill=black] (4,2) circle (0.2cm) node[below] {$\phi_{j,k+1}$};
+\draw[fill=red] (0,4) circle (0.2cm) node[below] {$\phi_{j-1,k-1}$};
+\draw[fill=black] (2,4) circle (0.2cm) node[below] {$\phi_{j-1,k}$};
+\draw[fill=red] (4,4) circle (0.2cm) node[below] {$\phi_{j-1,k+1}$};
+\end{tikzpicture}
+\end{center}
+\caption{An illustration of checkerboard updating. The black points are updated first,
+and then red points are calculated from the newly updated black points.}
+\label{fig:checker}
+\end{figure}
 
 %add stephen
 %\input{checker.tex}
@@ -445,76 +465,8 @@ This is the scheme we shall use to numerically approximate the electrostatic pot
 in different . 
 
 %start of section
-%section is still under work, and out of order
-\section{Software Package for general electrostatic systems, \emph{estatics}}
-
-To numerically approximate the electrostatic potential for System 1 via the 
-relaxation method the following rudimentary algorithm was developed.
-
-\begin{algorithm}
-\begin{algorithmic}[1]
-\Procedure{The Relaxation Method}{}
-\State declare variables:
-\State $V \gets$ potential on plates
-\State $\delta \gets$ position step-size
-\State $d \gets$ distance between plates
-\State $h \gets$ height of plates
-\State $r \gets$ radius of cylinder
-\State $its \gets$ number of iterations
-\State $nx \gets \frac{d}{\delta}$ 
-\State $ny \gets \frac{h}{\delta}$ 
-\State specify boundary potentials:
-\For {$j=1$ to $ny$}
-   \State $u_{j, 1} = +V$
-   \State $u_{j, nx} = -V$
-\EndFor
-\For {$k=1$ to $nx$}
-   \State $u_{1, k} \gets V-\frac{2Vj}{nx}$
-   \State $u_{ny, k} \gets V-\frac{2Vj}{nx}$
-\EndFor
-\State find solution:
-\For {$i=1$ to $its$}
-   \For {$j=2$ to $ny-1$}
-      \For {$k=2$ to $nx-1$}
-         \If {$(j \delta-\frac{1}{2} d)^2+(k \delta-\frac{1}{2} h)^2<r^2$}
-            \State $u_{j, k} \gets 0$
-         \Else
-            \State $u_{j,k} \gets \frac{1}{4}(u_{j-1,k}+u_{j+1,k}+u_{j,k-1}+u_{j,k+1})$
-         \EndIf
-      \EndFor
-   \EndFor
-\EndFor
-\State find electric field:
-\For {$j=1$ to $ny-1$}
-   \For {$k=1$ to $nx-1$}
-      \State $(Ex)_{j, k} \gets -\left(u_{j,k+1}-u_{j,k}\right)/\delta$
-      \State $(Ey)_{j,k} \gets -\left(u_{j+1,1}-u_{j,k}\right)/\delta$
-   \EndFor
-\EndFor
-\State plot potential and field
-\EndProcedure
-\end{algorithmic}
-\end{algorithm}
-
-Figure~\ref{fig:numerical} shows the numerical approximation to the potential,
-and Figure~\ref{fig:field} shows the electric field around the cylinder.
-
-\begin{figure}
-\centering
-\begin{subfigure}[b]{0.7\textwidth}
-	\includegraphics[width=\textwidth]{potentialA.pdf}
-	\caption{electrostatic potential}
-	\label{fig:numerical}
-\end{subfigure}
-
-\begin{subfigure}[b]{0.7\textwidth}
-	\includegraphics[width=\textwidth]{fieldA.pdf}
-	\caption{electric field}
-	\label{fig:field}
-\end{subfigure}
-\caption{Numerical approximations for electstatic potential and electric field with
-$V=1$, $R=15$ on $100\times100$ grid for $10000$ iterations}
-\end{figure}
+%section is still under work
+\section{Software Package \emph{estatics} for general electrostatic systems}
 
 We developed a general software package in C++ to solve and plot the potential and
 electric field for an arbitrary electrostatic system. It accepts input of a coloured
@@ -576,6 +528,26 @@ Figure~\ref{fig:flowchart} shows a flowchart representing the algorithm employed
 %\input{plotting.tex}
 
 \subsection{Results}
+Figure~\ref{fig:numerical} shows the numerical approximation to the potential,
+and Figure~\ref{fig:field} shows the electric field around the cylinder.
+
+\begin{figure}
+\centering
+\begin{subfigure}[b]{0.7\textwidth}
+	\includegraphics[width=\textwidth]{potentialA.pdf}
+	\caption{electrostatic potential}
+	\label{fig:numerical}
+\end{subfigure}
+
+\begin{subfigure}[b]{0.7\textwidth}
+	\includegraphics[width=\textwidth]{fieldA.pdf}
+	\caption{electric field}
+	\label{fig:field}
+\end{subfigure}
+\caption{Numerical approximations for electrostatic potential and electric field with
+$V=1$, $R=15$ on $100\times100$ grid for $10000$ iterations}
+\end{figure}
+
 
 %start of section
 \section{Conclusion}
@@ -588,5 +560,53 @@ Figure~\ref{fig:flowchart} shows a flowchart representing the algorithm employed
 %start of appendix
 \appendix
 \section{Appendices}
+\subsection{Algorithm for System A}
+To numerically approximate the electrostatic potential for System 1 via the 
+relaxation method the following rudimentary algorithm was developed.
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+\Procedure{The Relaxation Method}{}
+\State declare variables:
+\State $V \gets$ potential on plates
+\State $\delta \gets$ position step-size
+\State $d \gets$ distance between plates
+\State $h \gets$ height of plates
+\State $r \gets$ radius of cylinder
+\State $its \gets$ number of iterations
+\State $nx \gets \frac{d}{\delta}$ 
+\State $ny \gets \frac{h}{\delta}$ 
+\State specify boundary potentials:
+\For {$j=1$ to $ny$}
+   \State $u_{j, 1} = +V$
+   \State $u_{j, nx} = -V$
+\EndFor
+\For {$k=1$ to $nx$}
+   \State $u_{1, k} \gets V-\frac{2Vj}{nx}$
+   \State $u_{ny, k} \gets V-\frac{2Vj}{nx}$
+\EndFor
+\State find solution:
+\For {$i=1$ to $its$}
+   \For {$j=2$ to $ny-1$}
+      \For {$k=2$ to $nx-1$}
+         \If {$(j \delta-\frac{1}{2} d)^2+(k \delta-\frac{1}{2} h)^2<r^2$}
+            \State $u_{j, k} \gets 0$
+         \Else
+            \State $u_{j,k} \gets \frac{1}{4}(u_{j-1,k}+u_{j+1,k}+u_{j,k-1}+u_{j,k+1})$
+         \EndIf
+      \EndFor
+   \EndFor
+\EndFor
+\State find electric field:
+\For {$j=1$ to $ny-1$}
+   \For {$k=1$ to $nx-1$}
+      \State $(Ex)_{j, k} \gets -\left(u_{j,k+1}-u_{j,k}\right)/\delta$
+      \State $(Ey)_{j,k} \gets -\left(u_{j+1,1}-u_{j,k}\right)/\delta$
+   \EndFor
+\EndFor
+\State plot potential and field
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
 
 \end{document} %end of document
