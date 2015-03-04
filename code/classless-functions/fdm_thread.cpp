@@ -61,7 +61,16 @@ void * fdm(void* input)
 			{
 				//cout << "Mask (" << i << ", " << j << "): " << sysdat->mask[i][j] << endl;
 				//cout << "COUNT: " << in_data->count << ". CONVCOUNT: " << in_data->convcount << endl;				 
-				in_data->convcount += 1;
+				// if (startcol == 0)
+				// {
+					in_data->convcounts[startcol] += 1;
+					// in_data->zeroconvcount += 1;
+				// }
+				// else
+				// {
+					// in_data->oneconvcount += 1;
+				// }
+
 				continue;
 			}
 
@@ -125,14 +134,14 @@ void * fdm(void* input)
 
 			if (conv < desiredconv)
 			{
-				if (startcol == 0)
-				{
-					in_data->zeroconvcount += 1;
-				}
-				else
-				{
-					in_data->oneconvcount += 1;
-				}
+				// if (startcol == 0)
+				// {
+					in_data->convcounts[startcol] += 1;
+				// }
+				// else
+				// {
+					// in_data->oneconvcount += 1;
+				// }
 
 				if (in_data->lock && mintrue(sysdat,i,j,3))
 				{

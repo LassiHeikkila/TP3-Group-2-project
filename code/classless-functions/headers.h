@@ -40,6 +40,7 @@ struct input_args {
 
 	int count;
 	int convcount;
+	int* convcounts;
 	int zeroconvcount;
 	int oneconvcount;
 	int prev_convcount;

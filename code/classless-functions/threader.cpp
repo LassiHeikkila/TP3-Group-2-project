@@ -27,20 +27,28 @@ array_data * threader(array_data* u, double relaxation, double convergence, int 
 	cout << pixels << " pixels.\n";
 	cout << data->iterations << " iterations.\n";
 
-	pthread_t redthreads[core_count];
-	pthread_t blackthreads[core_count];
+	pthread_t threads[core_count];
+	//pthread_t blackthreads[core_count];
 	if (pthread_barrier_init(&waiter,NULL,core_count))
 	{
 		cout << "Barrier initialisation failed!\n";
 	}
+
+	data->convcounts = new int[core_count];
 
 	int rc;
 
 	while ( data->convcount < pixels && data->count < 2*iterations )
 	{
 		data->convcount = 0;
-		data->zeroconvcount = 0;
-		data->oneconvcount = 0;				
+
+		for (int i = 0; i < core_count; i++)
+		{
+			data->convcounts[i] = 0;
+		}
+
+		// data->zeroconvcount = 0;
+		// data->oneconvcount = 0;				
 
 		data->redblack = true;
 
@@ -53,7 +61,7 @@ array_data * threader(array_data* u, double relaxation, double convergence, int 
 			{
 				startbool = false;
 				data->t_start = i;
-				rc = pthread_create(&redthreads[i], NULL, fdm, (void *)data);
+				rc = pthread_create(&threads[i], NULL, fdm, (void *)data);
 			}
 			else
 			{
@@ -68,7 +76,7 @@ array_data * threader(array_data* u, double relaxation, double convergence, int 
 
 		for(int i = 0; i < core_count; i++)
 		{
-			pthread_join(redthreads[i], NULL);
+			pthread_join(threads[i], NULL);
 		}
 
 		data->redblack = false;
@@ -82,7 +90,7 @@ array_data * threader(array_data* u, double relaxation, double convergence, int 
 			{
 				startbool = false;
 				data->t_start = j;
-				rc = pthread_create(&blackthreads[j], NULL, fdm, (void *)data);
+				rc = pthread_create(&threads[j], NULL, fdm, (void *)data);
 			}
 			else
 			{
@@ -95,23 +103,28 @@ array_data * threader(array_data* u, double relaxation, double convergence, int 
 			}
 		}
 	
+		//pthread_barrier_wait(&waiter);
 		for(int i = 0; i < core_count; i++)
 		{
-			pthread_join(blackthreads[i], NULL);
+			pthread_join(threads[i], NULL);
 		}
 
-		data->convcount += data->zeroconvcount + data->oneconvcount;
-		data->zeroconvcount = 0;
-		data->oneconvcount = 0;	
+		for (int i = 0; i < core_count; i++)
+		{
+			data->convcount += data->convcounts[i];
+		}
+		// data->convcount += data->zeroconvcount + data->oneconvcount;
+		// data->zeroconvcount = 0;
+		// data->oneconvcount = 0;	
 		data->count += 1;
 
-		//cout << "COUNT: " << data->count << ".\tCONVCOUNT: " << data->convcount << endl;
 		if (data->count % 200 == 0)
 		{
 			cout << "\rIteration " << data->count / 2 << "." << std::flush;
-			//cout << "COUNT: " << data->count << ". CONV: " << data->convcount << endl;
+			// cout << "COUNT: " << data->count << ". CONV: " << data->convcount << endl;
 			if (data->convcount > data->prev_convcount)
 			{
+				//cout << "LOCK ON\n";
 				data->lock = true;
 			}
 		}
