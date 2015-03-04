@@ -1,7 +1,8 @@
-%present.tex, Dan Richardson
+%group_present.tex
 
 \documentclass{beamer}
 \mode<presentation>
+\usetheme{default}
 
 \usepackage{graphicx}                  %use package for diagram 
 \usepackage{amsmath}                   %use package for implies symbol
@@ -12,8 +13,8 @@
 \usepackage{algorithm}                 %use package for pseudocode
 \usepackage{caption}                   %use package for multiple figures
 \usepackage{subcaption}                %use package for multiple figures
+%\usepackage{color}                     %use package for code listings
 %\usepackage{listings}                  %use package for c++ code in appendix
-%\usepackage{colour}                    %use package for code listings
 %\usepackage[utf8]{inputenc}            %use package for colours in code
 %\usepackage{url}                       %use package to display urls properly
 %\usepackage{array}                     %use package for centering table contents
@@ -47,9 +48,6 @@
 %set style of listing to that defined above
 %\lstset{style=mystyle}
 
-%set style of footnotes
-%\renewcommand{\thefootnote}{\roman{footnote}}
-
 %define command shortcuts
 \newcommand{\be}{\begin{equation}}
 \newcommand{\ee}{\end{equation}}
@@ -67,14 +65,16 @@
 %set graphics path
 \graphicspath{{/home/danmfr/p3t/laplace/images/}}
 
-\title{On the effect of solid conductors on the electric field}
-\author{S. Brown, F. Hayes, L. Heikkil{\"a}, W. Liu, D. Richardson\\
+\title{On numerical approximations to solutions of Laplace's equation for different
+boundary conditions}
+\author{S. Brown, F. Hayes, L. Heikkil{\"a}, D. Richardson\\
         School of Physics and Astronomy,\\
         University of Glasgow,\\
         Glasgow, United Kingdom}
 \date{\today}
 
-\AtBeginSection[] %layout page at start of new section
+%layout page at start of new section
+\AtBeginSection[]
 {
   \begin{frame}<beamer>
     \frametitle{Layout}
@@ -89,6 +89,25 @@
 \end{frame}
 
 \section{Introduction}
+\subsection{Laplace's Equation}
+
+\begin{frame}{Laplace's Equation}
+We have two of Maxwell's equations
+%
+\be
+\nabla \cdot \bm{E} = \frac{Q}{\epsilon_0} \qquad \nabla \times \bm{E} = -\frac{\partial \bm{B}}{\partial t}
+\ee
+
+In free space:
+\begin{itemize}
+\item $\bm{B}$ is unchanging $\implies$ $\bm{E}$ is irrotational $\implies \bm{E} = -\nabla \phi$
+\item $Q=0$ $\implies \bm{E}$ is solenoidal $\implies \nabla^2 \phi = 0$.
+\end{itemize}
+
+This is Laplace's equation.
+\end{frame}
+
+\subsection{Physical Systems}
 
 \begin{frame}{Electrostatic Systems}
 
@@ -119,23 +138,7 @@
 
 \end{frame}
 
-\begin{frame}{Derivation of Laplace's Equation}
-We have two of Maxwell's equations
-%
-\be
-\nabla \cdot \bm{E} = \frac{Q}{\epsilon_0} \qquad \nabla \times \bm{E} = -\frac{\partial \bm{B}}{\partial t}
-\ee
-
-In both systems:
-\begin{itemize}
-\item $\bm{B}$ is unchanging $\implies$ $\bm{E}$ is irrotational $\implies \bm{E} = -\nabla \phi$
-\item $Q=0$ $\implies \bm{E}$ is solenoidal $\implies \nabla^2 \phi = 0$.
-\end{itemize}
-
-This is Laplace's equation.
-\end{frame}
-
-\section{Analytical Solution}
+\subsection{Analytical Solution of System A}
 
 \begin{frame}{General Solution}
 Wish to solve $\nabla ^2 \phi = 0$ in polar co-ordinates:
@@ -217,7 +220,7 @@ for $r>R$ and $0$ otherwise.
 
 \end{frame}
 
-\section{Numerical Solution}
+\section{Numerical Methods}
 
 \begin{frame}{Finite Difference Methods}
 We approximate first derivatives as
@@ -236,37 +239,180 @@ and second derivatives as
 
 \end{frame}
 
-\begin{frame}{The Relaxation Method}
+\begin{frame}{Discretisation of Laplace's equation}
 Hence, Laplace's eqaution is discretised as
 %
-\be
-\frac{\partial^2 \phi}{\partial x^2}+\frac{\partial^2 \phi}{\partial y^2} = 0
-\longrightarrow
+\begin{multline}
+\frac{\partial^2 \phi}{\partial x^2}+\frac{\partial^2 \phi}{\partial y^2} = 0 \\
+\implies
 \frac{\phi_{j+1,k}-2\phi_{j,k}+\phi_{j-1,k}}{\Delta x^2} + \frac{\phi_{j,k+1}-2\phi_{j,k}+\phi_{j,k-1}}{\Delta y^2}=0
-\ee
+\end{multline}
 %
 where $j$ and $k$ index the $x$ and $y$ directions.
 
-For a unique step-size $\Delta = \Delta x = \Delta y$:
+For $\Delta = \Delta x = \Delta y$, $\phi$ is the average of the surrounding points:
 %
 \be
 \phi_{j,k}= \frac{1}{4}(\phi_{j+1,k}+\phi_{j-1,k}+\phi_{j,k+1}+\phi_{j,k-1})
 \ee
 
-The value of $\phi$ is the average of the surrounding points.
-This is the relaxation method. 
+\end{frame}
+
+\begin{frame}{Jacobi's iterative method}
+
+\begin{itemize}
+\item Have initial guess of the value of $\phi$ at all points, $\phi_{j,k,0}$, say.
+\item Relax at all points on the grid simultaneously to get $\phi_{j,k,1}$.
+\item Iterating $n$ times:
+%
+\be
+\phi_{j,k,n+1}= \frac{1}{4}(\phi_{j-1,k,n}+\phi_{j+1,k,n}+\phi_{j,k-1,n}+\phi_{j,k+1,n})
+\ee
+%
+\end{itemize}
+
+This is \emph{Jacobi's iterative method}, the simplest \emph{relaxation method}.
+\end{frame}
+
+\begin{frame}{Gauss-Seidel method}
+Alternative relaxation method: the \emph{Gauss-Seidel method}. 
+
+Points at which the potential has already been updated, $\phi_{j-1,k}$ and
+$\phi_{j,k-1}$, are used:
+%
+\be
+\phi_{j,k,n+1}= \frac{1}{4}(\phi_{j-1,k,n+1}+\phi_{j+1,k,n}+\phi_{j,k-1,n+1}+\phi_{j,k+1,n})
+\ee
+
+\begin{itemize}
+\item Method converges faster than Jacobi's iterative method
+\item Reduced computation time as previous potential at each grid point is not stored
+\end{itemize}
 
 \end{frame}
 
-\begin{frame}{Algorithm}
+\begin{frame}{Successive Over Relaxation}
+Neither the Jacobi iterative method or the Gauss-Seidel method use the value
+of the potential at the current point in the previous iteration, in our notation
+$\phi_{j,k,n}$.
+One can derive an iterative scheme given by
+%
+\be
+\phi_{j,k,n+1}= (1-s)\phi_{j,k,n}+\frac{s}{4}(\phi_{j-1,k,n+1}+\phi_{j+1,k,n}+\phi_{j,k-1,n+1}+\phi_{j,k+1,n})
+\ee
+%
+where $1<s<2$ is the \emph{relaxation parameter}. 
+
+This is a more convergent numerical method than those previous, and is called 
+\emph{successive over-relaxation}.
+\end{frame}
+
+\begin{frame}{Checkerboard (Red-Black) Updating}
+In previous methods, $\phi$ is calculated from at most its previous value at the
+current point and its current or previous values at the four neighbouring points.
+\begin{itemize}
+\item Denote $\phi_{j,k}$ as \emph{odd} if $j+k$ is odd, and even otherwise.
+\item Iterate through the grid
+ \begin{itemize}
+ \item Update $\phi$ at each odd point (only depends on even points)
+ \end{itemize}
+\item Re-iterate through grid
+ \begin{itemize}
+ \item Update all even points using $\phi$ at newly updated odd points
+ \end{itemize}
+\end{itemize}
+
+Have essentially separated system of $N$ linear equations into two coupled systems
+of $\frac{N}{2}$ linear equations that can be solved separately.
+
+Known as \emph{Checkerboard (Red-Black) Updating}.
+
+\begin{itemize}
+\item More convergent method than those outlined previously
+\item Can have successive over-relaxation added
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Checkerboard (Red-Black) Updating cont.}
+\begin{figure}[h!]
+\begin{center}
+\begin{tikzpicture}
+\draw[fill=red] (0,0) circle (0.2cm) node[below] {$\phi_{j+1,k-1,n}$};
+\draw[fill=black] (2,0) circle (0.2cm) node[below] {$\phi_{j+1,k,n}$};
+\draw[fill=red] (4,0) circle (0.2cm) node[below] {$\phi_{j+1,k+1,n}$};
+\draw[fill=black] (0,2) circle (0.2cm) node[below] {$\phi_{j,k-1,n}$};
+\draw[fill=red] (2,2) circle (0.2cm) node[below] {$\phi_{j,k,n}$};
+\draw[fill=black] (4,2) circle (0.2cm) node[below] {$\phi_{j,k+1,n}$};
+\draw[fill=red] (0,4) circle (0.2cm) node[below] {$\phi_{j-1,k-1,n}$};
+\draw[fill=black] (2,4) circle (0.2cm) node[below] {$\phi_{j-1,k,n}$};
+\draw[fill=red] (4,4) circle (0.2cm) node[below] {$\phi_{j-1,k+1,n}$};
+\end{tikzpicture}
+\end{center}
+\caption{An illustration of checkerboard updating. The black points are updated first,
+and then red points are calculated from the newly updated black points.}
+\label{fig:checker}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Checkerboard (Red-Black) Updating cont.}
+\begin{figure}[h!]
+\begin{center}
+\begin{tikzpicture}
+\draw[fill=red] (0,0) circle (0.2cm) node[below] {$\phi_{j+1,k-1,n}$};
+\draw[fill=black] (2,0) circle (0.2cm) node[below] {$\phi_{j+1,k,n+1}$};
+\draw[fill=red] (4,0) circle (0.2cm) node[below] {$\phi_{j+1,k+1,n}$};
+\draw[fill=black] (0,2) circle (0.2cm) node[below] {$\phi_{j,k-1,n+1}$};
+\draw[fill=red] (2,2) circle (0.2cm) node[below] {$\phi_{j,k,n}$};
+\draw[fill=black] (4,2) circle (0.2cm) node[below] {$\phi_{j,k+1,n+1}$};
+\draw[fill=red] (0,4) circle (0.2cm) node[below] {$\phi_{j-1,k-1,n}$};
+\draw[fill=black] (2,4) circle (0.2cm) node[below] {$\phi_{j-1,k,n+1}$};
+\draw[fill=red] (4,4) circle (0.2cm) node[below] {$\phi_{j-1,k+1,n}$};
+\end{tikzpicture}
+\end{center}
+\caption{An illustration of checkerboard updating. The black points are updated first,
+and then red points are calculated from the newly updated black points.}
+\label{fig:checker}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Checkerboard (Red-Black) Updating cont.}
+\begin{figure}[h!]
+\begin{center}
+\begin{tikzpicture}
+\draw[fill=red] (0,0) circle (0.2cm) node[below] {$\phi_{j+1,k-1,n+1}$};
+\draw[fill=black] (2,0) circle (0.2cm) node[below] {$\phi_{j+1,k,n+1}$};
+\draw[fill=red] (4,0) circle (0.2cm) node[below] {$\phi_{j+1,k+1,n+1}$};
+\draw[fill=black] (0,2) circle (0.2cm) node[below] {$\phi_{j,k-1,n+1}$};
+\draw[fill=red] (2,2) circle (0.2cm) node[below] {$\phi_{j,k,n+1}$};
+\draw[fill=black] (4,2) circle (0.2cm) node[below] {$\phi_{j,k+1,n+1}$};
+\draw[fill=red] (0,4) circle (0.2cm) node[below] {$\phi_{j-1,k-1,n+1}$};
+\draw[fill=black] (2,4) circle (0.2cm) node[below] {$\phi_{j-1,k,n+1}$};
+\draw[fill=red] (4,4) circle (0.2cm) node[below] {$\phi_{j-1,k+1,n+1}$};
+\end{tikzpicture}
+\end{center}
+\caption{An illustration of checkerboard updating. The black points are updated first,
+and then red points are calculated from the newly updated black points.}
+\label{fig:checker}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Nine-point stenciling}
+\end{frame}
+
+\begin{frame}{Comparison of methods}
 \end{frame}
 
 \begin{frame}{Numerical Solution}
 
 \begin{figure}
 \begin{center}
-\includegraphics[scale=0.8]{potential.pdf}
-\caption{Numerical potential with $V=1$, $R=15$ on $100\times100$ grid for $10000$ iterations}
+\includegraphics[scale=0.8]{potentialA.pdf}
+\caption{Numerical potential returned by \emph{Jacobi's method} with $V=1$, $R=15$ on
+$100\times100$ grid for $10000$ iterations}
 \label{fig:numerical}
 \end{center}
 \end{figure}
@@ -353,7 +499,7 @@ This is the relaxation method.
 \begin{frame}{Convergence locking}
 \end{frame}
 
-\begin{frame}{Succesive Over Relaxation}
+\begin{frame}{Successive Over Relaxation}
 \end{frame}
 
 \begin{frame}{Timing and CPU Usage}
