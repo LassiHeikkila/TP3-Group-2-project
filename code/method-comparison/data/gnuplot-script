@@ -1,0 +1,78 @@
+set terminal pdf enhanced
+
+set output "time.pdf"
+
+set xlabel "Number of iterations"
+set ylabel "Completion time"
+set key top left
+plot './jacobi_time.dat' pt 2 lc 0 title "Jacobi's method", \
+     './gauss_time.dat' pt 2 lc 1 title "Gauss-Seidel method", \
+     './sor_time.dat' pt 2 lc 3 title "Successive over-relaxation", \
+     './checker_time.dat' pt 2 lc 8 title "Checkerboard updating", \
+     './checker_sor_time.dat' pt 2 lc 9 title "Checkerboard updating with over-relaxation"
+
+set output "convergence.pdf"
+
+set xlabel "Number of iterations"
+set ylabel "Average absolute convergence of each point potential" rotate by 0
+set key top right
+plot './jacobi_conv.dat' pt 2 lc 0 title "Jacobi's method", \
+     './gauss_conv.dat' pt 2 lc 1 title "Gauss-Seidel method", \
+     './sor_conv.dat' pt 2 lc 3 title "Successive over-relaxation", \
+     './checker_conv.dat' pt 2 lc 8 title "Checkerboard updating", \
+     './checker_sor_conv.dat' pt 2 lc 9 title "Checkerboard updating with over-relaxation"
+
+set output "error.pdf"
+
+set xlabel "Number of iterations"
+set ylabel "Average absolute error between numerical and analytical solution" rotate by 0
+plot './jacobi_err.dat' pt 2 lc 0 title "Jacobi's method", \
+     './gauss_err.dat' pt 2 lc 1 title "Gauss-Seidel method", \
+     './sor_err.dat' pt 2 lc 3 title "Successive over-relaxation", \
+     './checker_err.dat' pt 2 lc 8 title "Checkerboard updating", \
+     './checker_sor_err.dat' pt 2 lc 9 title "Checkerboard updating with over-relaxation"
+
+set output "jacobi.pdf"
+
+set xlabel "x"
+set ylabel "y"
+set zlabel "{/Symbol j}"
+set xrange [0:100] 
+set yrange [0:100] 
+splot "./jacobi.dat" title "Jacobi's Method" w dots
+
+set output "gauss.pdf"
+
+set xlabel "x"
+set ylabel "y"
+set zlabel "{/Symbol j}"
+set xrange [0:100] 
+set yrange [0:100] 
+splot "./gauss.dat" w dots title "Gauss-Seidel method"
+
+set output "sor.pdf"
+
+set xlabel "x"
+set ylabel "y"
+set zlabel "{/Symbol j}"
+set xrange [0:100] 
+set yrange [0:100] 
+splot "./sor.dat" w dots title "Successive Over-relaxation"
+
+set output "checker.pdf"
+
+set xlabel "x"
+set ylabel "y"
+set zlabel "{/Symbol j}"
+set xrange [0:100] 
+set yrange [0:100] 
+splot "./checker.dat" w dots title "Checkerboard Updating"
+
+set output "checker_sor.pdf"
+
+set xlabel "x"
+set ylabel "y"
+set zlabel "{/Symbol j}"
+set xrange [0:100] 
+set yrange [0:100] 
+splot "./checker_sor.dat" w dots title "Checkerboard + SOR"
