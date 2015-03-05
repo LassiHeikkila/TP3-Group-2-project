@@ -1,18 +1,38 @@
 #!/bin/bash
 
-# bash script runs each method for
-# command line arguments:
-# radius, max_its, convergence
-# for decreasing convergences
+# bash script runs each of the five methods
+# for different number of iterations
+# specified as command line arguments to cpp file
 
-for file in jacobi.exe gauss.exe sor.exe checker.exe
+# each cpp file writes out data files for:
+# - CPU time vs its,
+# - convergence vs its,
+# - error vs its,
+# - and potential at last iteration,
+# in the data directory.
+
+#for each file
+for file in jacobi gauss checker sor checker_sor
 do
- for i in 1e-2 1.5e-3 1e-3 1.5e-4 1e-4 1.5e-5 1e-5
+
+#compile the file
+g++ -o $file.exe $file.cpp
+
+ #for specified sequence of numbers
+ for i in `seq 1 50`
  do
-  echo "Running" $file "for convergence" $i"..."
+
+  #remove data file before each loop
+  if [ -e data/$file.dat ] ; then
+	rm data/$file.dat
+  fi
+
+  #run executable for specific number of iterations
+  echo "Running" $file.exe $((200*i)) "times..."
   echo ""
-  ./$file $1 $2 $i
+   ./$file.exe $((200*i))
   echo ""
+
  done
 done
 
