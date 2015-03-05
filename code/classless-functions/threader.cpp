@@ -1,141 +1,93 @@
+//////////////////////////////////////////////////////////
+// Threadpool will be safely deleted when out of scope. //
+//////////////////////////////////////////////////////////
+
 #include "headers.h"
 
-pthread_barrier_t waiter;
+using namespace std;
 
-bool startbool = true;
-
-array_data * threader(array_data* u, double relaxation, double convergence, int iterations, int core_count)
+void threader(int core_count)
 {
-	// Build input data struct, to be passed to
-	// solver threads:
-	cout << "Building struct...\n";
-	input_args* data = new input_args();
-	data->sys = u;
-	data->relaxation = relaxation;
-	cout << "Relaxation at threader: " << data->relaxation << " = " << relaxation << endl;
-	data->convergence = convergence;
-	cout << "Convergence at threader: " << data->convergence << " = " << convergence << endl;
-	data->iterations = iterations;
-	data->t_step = core_count;
-	data->lock = false;
-	u->req_its = 0;
-	cout << "Done!\n";
-	data->prev_convcount = 0;
+	cout << "Creating pool of " << core_count << " worker threads...\n\n";
+	// Simplify access to array struct:
+	array_data* u = input->sys;
+	input->convcounts = new int[core_count];
 
+	// Initialise starting variables:
+	int count = 0, convcount = 0, prev_convcount = 0;
 	int pixels = u->rows * u->columns;
 
-	cout << pixels << " pixels.\n";
-	cout << data->iterations << " iterations.\n";
+	// Create threadpool:
+	boost::threadpool::pool thpool(core_count);
 
-	pthread_t threads[core_count];
-	//pthread_t blackthreads[core_count];
-	if (pthread_barrier_init(&waiter,NULL,core_count))
+	while (convcount < pixels && count < input->iterations)
 	{
-		cout << "Barrier initialisation failed!\n";
-	}
-
-	data->convcounts = new int[core_count];
-
-	int rc;
-
-	while ( data->convcount < pixels && data->count < 2*iterations )
-	{
-		data->convcount = 0;
+		//cout << "Convcount: " << convcount << endl;
+		// Reset convergence count, set red/black bool to red:
+		convcount = 0;
+		input->redblack = true;
 
 		for (int i = 0; i < core_count; i++)
 		{
-			data->convcounts[i] = 0;
+			input->convcounts[i] = 0;
 		}
 
-		// data->zeroconvcount = 0;
-		// data->oneconvcount = 0;				
-
-		data->redblack = true;
-
+		// Assign red elements to work queue with staggered
+		// starting columns:
 		for (int i = 0; i < core_count; i++)
 		{
-			//cout << "Starting position: " << data->t_start << endl;
-			//cout << "Running thread " << i << " (RED).\n";
-			redbackup:
-			if (startbool)
-			{
-				startbool = false;
-				data->t_start = i;
-				rc = pthread_create(&threads[i], NULL, fdm, (void *)data);
-			}
-			else
-			{
-				goto redbackup;
-			}
-			if (rc)
-			{
-				cout << "Error creating thread, please restart.\n";
-				exit(-1);
-			}
+			// Add task to queue:
+			thpool.schedule(boost::bind(&fdm,i,core_count));
 		}
 
-		for(int i = 0; i < core_count; i++)
-		{
-			pthread_join(threads[i], NULL);
-		}
+		// Wait for red threads:
+		thpool.wait();
 
-		data->redblack = false;
+		// Set red/black bool to black:
+		input->redblack = false;
 
+		// Assign black elements to work queue:
 		for (int j = 0; j < core_count; j++)
 		{
-			//cout << "Starting position: " << data->t_start << endl;
-			//cout << "Running thread " << j << " (BLACK).\n";
-			blackbackup:
-			if (startbool)
-			{
-				startbool = false;
-				data->t_start = j;
-				rc = pthread_create(&threads[j], NULL, fdm, (void *)data);
-			}
-			else
-			{
-				goto blackbackup;
-			}
-			if (rc)
-			{
-				cout << "Error creating thread, please restart.\n";
-				exit(-1);
-			}
-		}
-	
-		//pthread_barrier_wait(&waiter);
-		for(int i = 0; i < core_count; i++)
-		{
-			pthread_join(threads[i], NULL);
+			// Add task to queue:
+			thpool.schedule(boost::bind(&fdm,j,core_count));
 		}
 
+		// Wait for black threads:
+		thpool.wait();
+
+		// Sum converged points:
 		for (int i = 0; i < core_count; i++)
 		{
-			data->convcount += data->convcounts[i];
+			convcount += input->convcounts[i];
 		}
-		// data->convcount += data->zeroconvcount + data->oneconvcount;
-		// data->zeroconvcount = 0;
-		// data->oneconvcount = 0;	
-		data->count += 1;
 
-		if (data->count % 200 == 0)
+		// Increment iteration count:
+		count++;
+
+		// Check for positive rate of change in convergence,
+		// initiate locking mechanism:
+		if (count % 100 == 0)
 		{
-			cout << "\rIteration " << data->count / 2 << "." << std::flush;
-			// cout << "COUNT: " << data->count << ". CONV: " << data->convcount << endl;
-			if (data->convcount > data->prev_convcount)
+			cout << "\rIteration " << count << "." << std::flush;
+			//cout << "COUNT: " << data->count << ". CONV: " << data->convcount << endl;
+			if (convcount > prev_convcount)
 			{
-				//cout << "LOCK ON\n";
-				data->lock = true;
+				input->lock = true;
 			}
 		}
 
-		data->prev_convcount = data->convcount;
+		// Set previous convergence to current:
+		prev_convcount = convcount;
+
 	}
 
-	u->req_its = data->count / 2;
-	// Pass iterations required to struct:
-	// sysdat->req_its = in_data->count / 2;
-	// Create 2D arrays for grad:
+	// Kill thread pool:
+
+	// Store required iterations:
+	u->req_its = count;
+
+	// Build and populate gradient array:
 	u->xgrad = new double*[u->columns];
 	u->ygrad = new double*[u->columns];
 
@@ -155,8 +107,5 @@ array_data * threader(array_data* u, double relaxation, double convergence, int 
 		}
 
 	}
-
 	cout << endl;
-	
-	return u;
 }

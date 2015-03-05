@@ -1,80 +1,80 @@
-/********************************************
+// Use threadpool library from: http://threadpool.sourceforge.net/
 
-Command line arguments:
-0 - program name
-1 - image name
-2 - potential for black pixels
-3 - potential for red pixels
-4 - potential for green pixels
-5 - potential for blue pixels
-6 - maximum number of iterations
-7 - relaxation parameter (recommended values between 1 and 2)
-8 - desired convergence
+// Use global data structure that all threads can access.
+// 	State extern input_data input in header file, and
+// 	input_data input in main().
 
-**********************************************/
+// Pass only starting column integer from threader to FDM.
 
+// Run threader via intermediate function, once each for red/black.
+
+// Maybe have non-threaded intermediate function too, using plain
+// SOR instead of checkerboard in the case cores = 1.
 
 #include "headers.h"
 
-int main(int argc, char *argv[])
+input_args* input;
+
+int main(int argc, char const *argv[])
 {
-    // Declare potential array, initialise with command line arguments:
-//    double potentials[4] = {atof(argv[2]), atof(argv[3]), atof(argv[4]), atof(argv[5])};
+	int core_count = std::thread::hardware_concurrency();
+	cout << core_count << " cores detected.\n";
 
-    // Initialise other starting variables:
-    int iterations = atoi(argv[6]);
-    double relaxation = atof(argv[7]);
-    double convergence = atof(argv[8]);
+	// Store current time:
+	timespec time1, time2;
+	clock_gettime(CLOCK_MONOTONIC, &time1);
 
-    int core_count = std::thread::hardware_concurrency();
+	// Populate global FDM I/O struct:
+	cout << "Building struct...\n";
+	input = new input_args();
+	input->iterations = atoi(argv[6]);
+	input->relaxation = atof(argv[7]);
+	input->convergence = atof(argv[8]);
+	input->lock = false;
 
-    cout << core_count << " cores.\n";
+	// Analyse bitmap, build initial array, add to global struct:
+	cout << "Building array...\n";
+	array_data * sys = locations(argv[1], atof(argv[2]), atof(argv[3]), atof(argv[4]), atof(argv[5]));
+	input->sys = sys;
 
-    // Store current CPU time:
-    clock_t tm;
-    tm = clock();
+	// Run threader/solver:
+	threader(core_count);
 
-    // Build array from bitmap:
-    cout << "Building array...\n";
-    array_data * data = locations(argv[1], atof(argv[2]), atof(argv[3]), atof(argv[4]), atof(argv[5]));
-    cout << "Done!\n";
-    // Run solver:
-    cout << "Threading...\n";
-    data = threader(data, relaxation, convergence, iterations, core_count);
-    cout << "Done!\n";
-    // Calculate elapsed CPU time:
-    tm = clock() - tm;
-    // Convert to seconds:
-    double runtime = double(tm) / CLOCKS_PER_SEC;
+	// Calculate elapsed CPU time:
+	clock_gettime(CLOCK_MONOTONIC, &time2);
+	double runtime = long(diff(time1,time2).tv_sec) + 0.000000001*diff(time1,time2).tv_nsec;
 
-    // Measure memory used by process:
-    int mem_used = mem_measure();
+	// Measure memory usage:
+	int mem_used = mem_measure();
+	cout << "Memory used: " << mem_used << " KB\n";
 
-    cout << "Memory used: " << mem_used << " KB\n";
+	// Output data to files:
+	data_out(&sys, runtime);
 
-    // Output data to files:
-    data_out(&data, runtime);
+	// Store image dimensions for plotting:
+	int columns = sys->columns, rows = sys->rows;
 
-     // Store width and height of image for plotting purposes
-    int columns = data->columns;
-    int rows = data->rows;
+	// Clean up memory, deleting both structs:
+	delete sys -> prev_values;
+	delete sys -> values;
+	delete sys -> mask;
+	delete sys -> xgrad;
+	delete sys -> ygrad;
+	delete sys;
 
-    // Clean up memory:
-    delete data -> prev_values;
-    delete data -> values;
-    delete data -> mask;
-    delete data -> xgrad;
-    delete data -> ygrad;
-    delete data;
+	// delete input->sys;
+	delete input->convcounts;
+	delete input;
 
-    cout << "Plotting data...\n";
-    // Plot potential:
-    plot(0,"pngcairo","png",columns,rows);
-    // Plot E-field:
-    plot(1,"pngcairo","png",columns,rows);
-    // Plot equipotential lines:
-    plot(2,"pngcairo","png",columns,rows);
-    cout << "Done!\n";
+	// Plot data from files:
+	cout << "Plotting data...\n";
+	// Plot potential:
+	plot(0,"pngcairo","png",columns,rows);
+	// Plot E-field:
+	plot(1,"pngcairo","png",columns,rows);
+	// Plot equipotential lines:
+	plot(2,"pngcairo","png",columns,rows);
+	cout << "Done!\n";
 
-    return 0;
+	return 0;
 }

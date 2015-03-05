@@ -1,6 +1,6 @@
 #include "headers.h"
 
-array_data * locations(char* file, double p_black, double p_red, double p_green, double p_blue)
+array_data * locations(const char* file, double p_black, double p_red, double p_green, double p_blue)
 {
     // Opens specified bitmap image:
     bitmap_image image(file);

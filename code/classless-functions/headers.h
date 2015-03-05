@@ -7,7 +7,9 @@
 #include <stdio.h>
 #include <cstdlib>
 #include <thread>		// thread::hardware_concurrency() - Counts available cores.
-#include <pthread.h>	// Thread creation etc.
+//#include <pthread.h>	// Thread creation etc.
+#include <boost/threadpool.hpp>
+#include <boost/bind.hpp>
 #include "bitmap_image.hpp"
 
 using namespace std;
@@ -33,31 +35,24 @@ struct input_args {
 	double relaxation;
 	double convergence;
 	int iterations;
-	int t_start;
-	int t_step;
+	int* convcounts;
 
 	bool redblack;
-
-	int count;
-	int convcount;
-	int* convcounts;
-	int zeroconvcount;
-	int oneconvcount;
-	int prev_convcount;
 	bool lock;
 };
 
 
 // array_data * fdm(array_data*, double, int, double);
-void* fdm(void *);
+void fdm(int,int);
 void plot(int, string, string, int, int);
-array_data * locations(char*, double, double, double, double);
+array_data * locations(const char*, double, double, double, double);
 void data_out(array_data**, double);
 int parseline(char*);
 int mem_measure();
 bool mintrue(array_data*,int,int, int);
-array_data * threader(array_data*, double, double, int, int);
+void threader(int);
+timespec diff(timespec, timespec);
 
-extern pthread_barrier_t waiter;
-
+extern input_args* input;
 extern bool startbool;
+

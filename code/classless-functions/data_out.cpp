@@ -3,7 +3,7 @@
 void data_out(array_data**u, double time_elapsed)
 {
     cout << "Solving time: " << time_elapsed << " seconds.\n";
-    cout << "Iterations: " << (*u)->req_its << endl;
+    cout << "Iterations: " << (*u)->req_its << endl << endl;
     cout << "Writing data files...\n";
     
     // Append N against elapsed time to file:

@@ -8,171 +8,120 @@
 
 #include "headers.h"
 
-//array_data * fdm(array_data* sysdat, double rel_par, int iterations, double desiredconv)
-array_data * fdm(input_data* in_data)
+void fdm(int startcol,int core_count)
 {
-	// Use locations() to build initial array with boundaries:
-	// array_data * sysdat;
-	// sysdat = locations(image, potentials[0], potentials[1], potentials[2], potentials[3]);
-
 	// Splitting input struct into variables to be manipulated:
-	array_data* sysdat = in_data->sys;
-	double* rel_par = in_data->relaxation;
-	double* desiredconv = in_data->convergence;
-	int* iterations = in_data->iterations;
-
-	double conv = 0;
-	int prev_convcount = 0, convcount = 0, count = 0, start = 0;;
-	bool lock = false;
-	int pixels = sysdat->rows * sysdat->columns;
-
+	array_data* sysdat = input->sys;
 	double**u = sysdat -> values;
 	double**pu = sysdat -> prev_values;
 
-	// Loop until either desired convergence or maximum
-	// iterations are achieved:
-	while ( convcount < pixels && count < iterations )
-//    for (int count = 0; count < iterations; count++)
+	bool redblack = input->redblack;
+	//bool lock = input->lock;
+
+	double rel_par = input->relaxation;
+	double desiredconv = input->convergence;
+
+	double conv = 0;
+	int start = 0;
+
+	// Loop through assigned columns:
+	for (int i = startcol; i < sysdat->columns; i += core_count)
 	{
-		if (count % 2 == 0)
+		// Check whether being assigned red or black elements, process
+		// array accordingly:
+		if (redblack)
 		{
-			convcount = 0;
+			start = (i == 0 || i % 2 == 0) ? 1 : 0;
+		}
+		else
+		{
+			start = (i != 0 && i % 2 != 0) ? 1 : 0;
 		}
 
-		// Loop through x coordinates 
-		for (int i = 0; i < sysdat->columns; i++)
+		// Loop through rows:
+		for (int j = start; j < sysdat->rows; j += 2)
 		{
-			if (count % 2 == 0)
+			// Test if point is boundary value. If so, ignore: 
+			if (sysdat->mask[i][j])
 			{
-				start = (i != 0 && i % 2 != 0) ? 1 : 0;
+				//cout << "Mask (" << i << ", " << j << "): " << sysdat->mask[i][j] << endl;
+				//cout << "COUNT: " << input->count << ". CONVCOUNT: " << input->convcount << endl;				 
+				input->convcounts[startcol] += 1;
+				continue;
 			}
-			else
+
+			// Finite Difference Method to calculate potential as
+			// average of surrounding values, checking if point is
+			// on an edge. If so, and it isn't a boundary value,
+			// calculate as average of surrounding points inside box
+			// - two for corners, three for points on edge. If not on
+			// edge, calculate as average of four surrounding points.
+
+			// Left edge and corners:
+			if (i == 0)
 			{
-				start = (i == 0 || i % 2 == 0) ? 1 : 0;
-			}
-
-			// Loop through y:
-			for (int j = start; j < sysdat->rows; j += 2)
-			{
-				// Test if point is boundary value. If so, ignore: 
-				if (sysdat->mask[i][j])
+				if (j == 0)
 				{
-					convcount++;
-					continue;
+					u[i][j] = (1-rel_par)*pu[i][j] + rel_par*0.5*(u[i+1][j]+u[i][j+1]);
 				}
-
-				// Finite Difference Method to calculate potential as
-				// average of surrounding values, checking if point is
-				// on an edge. If so, and it isn't a boundary value,
-				// calculate as average of surrounding points inside box
-				// - two for corners, three for points on edge. If not on
-				// edge, calculate as average of four surrounding points.
-
-				// Left edge and corners:
-				if (i == 0)
+				else if (j == sysdat->rows - 1)
 				{
-					if (j == 0)
-					{
-						u[i][j] = (1-rel_par)*pu[i][j] + rel_par*0.5*(u[i+1][j]+u[i][j+1]);
-					}
-					else if (j == sysdat->rows - 1)
-					{
-						u[i][j] = (1-rel_par)*pu[i][j] + rel_par*0.5*(u[i+1][j]+u[i][j-1]);
-					}
-					else
-					{
-						u[i][j] = (1-rel_par)*pu[i][j] + rel_par*(1/3.0)*(u[i+1][j]+u[i][j+1]+u[i][j-1]);
-					}
+					u[i][j] = (1-rel_par)*pu[i][j] + rel_par*0.5*(u[i+1][j]+u[i][j-1]);
 				}
-				// Right edge and corners:
-				else if (i == (sysdat->columns - 1))
-				{
-					if (j == 0)
-					{
-						u[i][j] = (1-rel_par)*pu[i][j] + rel_par*0.5*(u[i-1][j]+u[i][j+1]);
-					}
-					else if (j == sysdat->rows - 1)
-					{
-						u[i][j] = (1-rel_par)*pu[i][j] + rel_par*0.5*(u[i-1][j]+u[i][j-1]);
-					}
-					else
-					{
-						u[i][j] = (1-rel_par)*pu[i][j] + rel_par*(1/3.0)*(u[i-1][j]+u[i][j+1]+u[i][j-1]);
-					}
-				}
-				// Top edge:
-				else if (j == 0)
-				{
-					u[i][j] = (1-rel_par)*pu[i][j] + rel_par*(1/3.0)*(u[i-1][j]+u[i+1][j]+u[i][j+1]);
-				}
-				// Bottom edge:
-				else if (j == (sysdat->rows - 1))
-				{
-					u[i][j] = (1-rel_par)*pu[i][j] + rel_par*(1/3.0)*(u[i-1][j]+u[i+1][j]+u[i][j-1]);
-				}
-				// Rest of area:
 				else
 				{
-					u[i][j]=(1-rel_par)*pu[i][j] + rel_par*0.25*(u[i+1][j]+u[i][j+1]+u[i-1][j]+u[i][j-1]);
+					u[i][j] = (1-rel_par)*pu[i][j] + rel_par*(1/3.0)*(u[i+1][j]+u[i][j+1]+u[i][j-1]);
 				}
-
-				// Find absolute value of convergence:
-				conv = abs(pu[i][j] - u[i][j]);
-
-				if (conv < desiredconv)
-				{
-					convcount++;
-
-					if (lock && mintrue(sysdat,i,j,3))
-					{
-						sysdat->mask[i][j] = true;
-					}
-				}
-
-				pu[i][j] = u[i][j];
 			}
-		}
-
-		count++;
-
-		if (count % 200 == 0)
-		{
-			cout << "\rIteration " << count / 2 << "." << std::flush;
-
-			if (convcount > prev_convcount)
+			// Right edge and corners:
+			else if (i == (sysdat->columns - 1))
 			{
-				lock = true;
+				if (j == 0)
+				{
+					u[i][j] = (1-rel_par)*pu[i][j] + rel_par*0.5*(u[i-1][j]+u[i][j+1]);
+				}
+				else if (j == sysdat->rows - 1)
+				{
+					u[i][j] = (1-rel_par)*pu[i][j] + rel_par*0.5*(u[i-1][j]+u[i][j-1]);
+				}
+				else
+				{
+					u[i][j] = (1-rel_par)*pu[i][j] + rel_par*(1/3.0)*(u[i-1][j]+u[i][j+1]+u[i][j-1]);
+				}
 			}
-		}
-
-		prev_convcount = convcount;
-
-	}
-
-	cout << endl;
-
-	// Pass iterations required to struct:
-	sysdat->req_its = count / 2;
-	// Create 2D arrays for grad:
-	sysdat->xgrad = new double*[sysdat->columns];
-	sysdat->ygrad = new double*[sysdat->columns];
-
-	for (int i = 0; i < (sysdat->columns - 1); i++)
-	{
-		sysdat->xgrad[i] = new double[sysdat->rows];
-		sysdat->ygrad[i] = new double[sysdat->rows];
-
-		for (int j = 0; j < (sysdat->rows - 1); j++)
-		{
-			// Approximation of gradients:
-			if (i != 0 && j != 0 ){
-				sysdat->xgrad[i][j] = -0.5*(u[i+1][j]-u[i-1][j]);
-				sysdat->ygrad[i][j] = -0.5*(u[i][j+1]-u[i][j-1]);
+			// Top edge:
+			else if (j == 0)
+			{
+				u[i][j] = (1-rel_par)*pu[i][j] + rel_par*(1/3.0)*(u[i-1][j]+u[i+1][j]+u[i][j+1]);
 			}
-		}
+			// Bottom edge:
+			else if (j == (sysdat->rows - 1))
+			{
+				u[i][j] = (1-rel_par)*pu[i][j] + rel_par*(1/3.0)*(u[i-1][j]+u[i+1][j]+u[i][j-1]);
+			}
+			// Rest of array:
+			else
+			{
+				u[i][j]=(1-rel_par)*pu[i][j] + rel_par*0.25*(u[i+1][j]+u[i][j+1]+u[i-1][j]+u[i][j-1]);
+			}
 
+			// Find absolute value of convergence:
+			conv = abs(pu[i][j] - u[i][j]);
+
+			if (conv < desiredconv)
+			{
+				input->convcounts[startcol] += 1;
+
+				if (input->lock && mintrue(sysdat,i,j,3))
+				{
+					cout << "LOCKED\n";
+					sysdat->mask[i][j] = true;
+				}
+			}
+
+			pu[i][j] = u[i][j];
+		}
 	}
-	return sysdat;
 }
 
 
