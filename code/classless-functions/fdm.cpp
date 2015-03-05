@@ -106,7 +106,7 @@ void fdm(int startcol,int core_count)
 			}
 
 			// Find absolute value of convergence:
-			conv = abs(pu[i][j] - u[i][j]);
+			conv = fabs(pu[i][j] - u[i][j]);
 
 			if (conv < desiredconv)
 			{

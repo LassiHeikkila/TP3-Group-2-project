@@ -82,8 +82,6 @@ void threader(int core_count)
 
 	}
 
-	// Kill thread pool:
-
 	// Store required iterations:
 	u->req_its = count;
 
@@ -101,8 +99,8 @@ void threader(int core_count)
 			// Approximation of gradients:
 			if (i != 0 && j != 0 )
 			{
-				u->xgrad[i][j] = -0.5*(u->values[i+1][j]-u->values[i-1][j]);
-				u->ygrad[i][j] = -0.5*(u->values[i][j+1]-u->values[i][j-1]);
+				u->xgrad[i][j] = 0.5*(u->values[i-1][j]-u->values[i+1][j]);
+				u->ygrad[i][j] = 0.5*(u->values[i][j-1]-u->values[i][j+1]);
 			}
 		}
 
