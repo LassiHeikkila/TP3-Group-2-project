@@ -187,13 +187,13 @@ int main(int argc, char *argv[])
 	//		}
 			for (int y = 0; y < rows ; y++)
 			{ //loop over y co-ordinates
-				if ( std::abs(grid_a[x][y]) <= epsilon && std::abs(grid_b[x][y]) <= epsilon ) // if both points have values less than epsilon, set the difference to zero to avoid dividing by tiny values (could cause issues with floating point arithmetic)
+				if ( fabs(grid_a[x][y]) <= epsilon && fabs(grid_b[x][y]) <= epsilon ) // if both points have values less than epsilon, set the difference to zero to avoid dividing by tiny values (could cause issues with floating point arithmetic)
 				{
 					grid_diff[x][y] = 0;
 				}
 				else // if both points greater than epsilon, set grid_diff[x][y] to be the difference between the two points as a percentage of the average of the two points
 				{
-					grid_diff[x][y] = std::abs(2 * (grid_a[x][y] - grid_b[x][y]) / (grid_a[x][y]+grid_b[x][y]))*100;	
+					grid_diff[x][y] = fabs(2 * (grid_a[x][y] - grid_b[x][y]) / (grid_a[x][y]+grid_b[x][y]))*100;	
 				}
 			}
 		}
