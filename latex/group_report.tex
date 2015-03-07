@@ -1,4 +1,4 @@
-%report.tex
+%group_report.tex
 
 %specify class of document
 \documentclass[12pt, a4paper]{article}
@@ -19,6 +19,7 @@
 \usepackage{tikz}		       %use package for diagram drawings
 \usepackage{caption}		       %use package for multiple figures
 \usepackage{subcaption}                %use package for multiple figures
+\usepackage{tabularx}		       %use package for tables
 %\usepackage{url}                       %use package to display urls properly
 %\usepackage{array}                     %use package for centering table contents
 
@@ -353,7 +354,7 @@ For our purposes, we wish to discretise the following equation:
 \ee 
 
 One can define a region on which to discretise this equation, $\{(x,y)|\:0<x<L,0<y<D\}$,
-and define a grid of points of spacial separation in $\Delta x$ in the $x$ direction,
+and define a grid of points of spacial separation $\Delta x$ in the $x$ direction,
 and $\Delta y$ in the $y$ direction. We wish to find the value of $\phi$ at each point.
 
 One can now approximate Eqn.~\ref{eq:laplace} as:
@@ -455,9 +456,9 @@ and then red points are calculated from the newly updated black points.}
 %add stephen
 %\input{checker.tex}
 
-%add fergus
+%add fergus' section
 \subsection{Nine-point Stenciling}
-%\input{nine_p.tex}
+\input{nine_p.tex}
 
 \subsection{Comparison of methods}
 
@@ -507,7 +508,7 @@ Figure~\ref{fig:flowchart} shows a flowchart representing the algorithm employed
 
 %adds fergus' section
 \subsection{Bitmaps}
-%\input{bitmap.tex}
+\input{bitmap.tex}
 
 %fergus
 \subsection{Convergence}
@@ -525,9 +526,11 @@ Figure~\ref{fig:flowchart} shows a flowchart representing the algorithm employed
 
 %adds lassi's section, uncomment and compile
 \subsection{Output and Plotting}
-%\input{plotting.tex}
+\input{plotting.tex}
 
+%adds lassi's section on results for different systems
 \subsection{Results}
+%\input{results.tex}
 Figure~\ref{fig:numerical} shows the numerical approximation to the potential,
 and Figure~\ref{fig:field} shows the electric field around the cylinder.
 
@@ -548,11 +551,11 @@ and Figure~\ref{fig:field} shows the electric field around the cylinder.
 $V=1$, $R=15$ on $100\times100$ grid for $10000$ iterations}
 \end{figure}
 
-
 %start of section
 \section{Conclusion}
 
 \subsection{Further Work}
+Fast Fourier transforms
 
 %include BibTex bibliography
 \bibliography{report}
