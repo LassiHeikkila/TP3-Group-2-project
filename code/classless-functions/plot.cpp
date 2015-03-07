@@ -48,7 +48,7 @@ void plot(int mode, string terminal, string file_ext, int columns, int rows)
         fputs("set title 'Vector plot representing the electric field across the grid'\n",pipe_gnuplot);
         fputs("set xlabel 'x-axis'\n",pipe_gnuplot);
         fputs("set ylabel 'y-axis'\n",pipe_gnuplot);
-        fputs("set cblabel 'Magnitude'\n",pipe_gnuplot);
+        fputs("set cblabel 'Magnitude of vectors'\n",pipe_gnuplot);
         fputs("set palette defined ( 0 \"blue\", 1 \"red\")\n",pipe_gnuplot);
         fputs("scaling = 7\n",pipe_gnuplot);
         fputs("mag(x,y) = sqrt( x*x + y*y )\n",pipe_gnuplot);
@@ -91,7 +91,7 @@ void plot(int mode, string terminal, string file_ext, int columns, int rows)
         fputs("set title 'Vector plot representing the electric field across the grid with equipotential lines overlaid'\n",pipe_gnuplot);
         fputs("set xlabel 'x-axis'\n",pipe_gnuplot);
         fputs("set ylabel 'y-axis'\n",pipe_gnuplot);
-        fputs("set cblabel 'Magnitude'\n",pipe_gnuplot);
+        fputs("set cblabel 'Magnitude of vectors'\n",pipe_gnuplot);
 
         // define palette
         fputs("set palette defined ( 0 \"blue\", 1 \"red\")\n",pipe_gnuplot);
