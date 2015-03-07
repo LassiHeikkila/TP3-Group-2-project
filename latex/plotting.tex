@@ -1,34 +1,5 @@
 % plotting.tex - to be inserted into the the main report.tex file
 
-
-%specify class of document
-\documentclass[12pt, a4paper]{article}
-
-%specify packages used 
-\usepackage{microtype}           %use package for minor typographical adjustments
-\usepackage{graphicx}            %use package for diagram 
-\usepackage{listings}                  %use package for c++ code in appendix
-\usepackage{color}                     %use package for code listings
-\usepackage[utf8]{inputenc}            %use package for colours in code
-\usepackage{amsmath}                   %use package for various math symbols
-\usepackage{amsfonts}                  %use package for number sets
-\usepackage{bm}            %use package for bolds in math mode
-% \usepackage{hyperref}                  %use package for hyperlinks
-% \usepackage{algpseudocode}             %use package for pseudocode
-% \usepackage{algorithm}                 %use package for pseudocode
-% \usepackage{fullpage}                  %use package for full page size
-% \usepackage{tikz}          %use package for diagram drawings
-% \usepackage{caption}           %use package for multiple figures
-% \usepackage{subcaption}                %use package for multiple figures
-%\usepackage{url}                       %use package to display urls properly
-%\usepackage{array}                     %use package for centering table contents
-\usepackage[scale=0.80]{geometry}
-\usepackage{tabularx}
-
-%start of document
-\begin{document}
-
-
 \section{Outputting and plotting the results} % explain what the output files look like and how they are plotted
 The final matrix contains the numerical value of the electric potential at each point in the grid as a number of type \emph{double}. The program outputs the value of each point along the y-direction corresponding to an x-value, then moves on to the next x-value and repeats the process. The program writes the value of the potential at each point to a file in the format shown in table \ref{table:potential_data}.
 
@@ -110,6 +81,4 @@ An equipotential plot is also produced. This uses the same data file as the heat
     \label{fig:vectors_and_contours}
 \end{figure}
 
-All of the plotting in the program is done internally via C++ functions which call gnuplot to be run. The source code can be found in the appendix \ref{code:plot.cpp}.
-
-\end{document}
+All of the plotting in the program is done internally via C++ functions which call gnuplot to be run. The source code can be found in the appendix \ref{code:plot.cpp}. % Remove sentence if source code not included.
