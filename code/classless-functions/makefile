@@ -3,7 +3,7 @@ CFLAGS = -g -Wall
 LIBS = -lm -lpthread -lboost_system -lboost_thread -std=c++11
 
 DEPS = headers.h bitmap_image.hpp
-OBJ = bitmap.o data_out.o fdm.o plot.o threader.o memory.o main.o
+OBJ = bitmap.o convergence.o data_out.o fdm.o plot.o threader.o memory.o main.o
 
 DIRECTORIES = data plots
 

@@ -19,9 +19,7 @@ void fdm(int startcol,int core_count)
 	// bool lock = input->lock;
 
 	double rel_par = input->relaxation;
-	double desiredconv = input->convergence;
 
-	double conv = 0;
 	int start = 0;
 
 	// Loop through assigned columns:
@@ -104,43 +102,6 @@ void fdm(int startcol,int core_count)
 			{
 				u[i][j]=(1-rel_par)*pu[i][j] + rel_par*0.25*(u[i+1][j]+u[i][j+1]+u[i-1][j]+u[i][j-1]);
 			}
-
-			// Find absolute value of convergence:
-			conv = fabs(pu[i][j] - u[i][j]);
-
-			if (conv < desiredconv)
-			{
-				input->convcounts[startcol] += 1;
-
-				// if (lock && mintrue(sysdat,i,j,3))
-				// {
-				// 	cout << "LOCKED\n";
-				// 	sysdat->mask[i][j] = true;
-				// }
-			}
-
-			pu[i][j] = u[i][j];
 		}
 	}
-}
-
-
-// Function to determine if at least some minimum number
-// of bools are true.
-bool mintrue(array_data*u,int i, int j, int min)
-{
-	int count = 0;
-
-	if (i == 0 || i == u->columns - 1 || j == 0 || j == u->rows - 1)
-	{
-		return false;
-	}
-
-	for (int x = -1; x < 2; x += 2)
-	{
-		count += u->mask[i+x][j] ? 1 : 0;
-		count += u->mask[i][j+x] ? 1 : 0;
-	}
-
-	return (count >= min);
 }

@@ -15,7 +15,7 @@ void threader(int core_count)
 	input->convcounts = new int[core_count];
 
 	// Initialise starting variables:
-	int count = 0, convcount = 0;// prev_convcount = 0;
+	int count = 0, convcount = 0, prev_convcount = 0;
 	int pixels = u->rows * u->columns;
 
 	// Create threadpool:
@@ -57,6 +57,18 @@ void threader(int core_count)
 		// Wait for black threads:
 		thpool.wait();
 
+		// // Sweep across all points checking convergence:
+		// for (int i = 0; i < core_count; i++)
+		// {
+		// 	// Add task to queue:
+		// 	thpool.schedule(boost::bind(&converge,i,core_count));
+		// }
+
+		converge(0,1);
+
+		// Wait for convergence check:
+		// thpool.wait();
+
 		// Sum converged points:
 		for (int i = 0; i < core_count; i++)
 		{
@@ -72,14 +84,14 @@ void threader(int core_count)
 		{
 			cout << "\rIteration " << count << "." << std::flush;
 			//cout << "COUNT: " << data->count << ". CONV: " << data->convcount << endl;
-			// if (convcount > prev_convcount)
-			// {
-			// 	input->lock = true;
-			// }
+			if (convcount > prev_convcount)
+			{
+				input->lock = true;
+			}
 		}
 
 		// Set previous convergence to current:
-		// prev_convcount = convcount;
+		prev_convcount = convcount;
 
 	}
 

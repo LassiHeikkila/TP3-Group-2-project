@@ -52,6 +52,7 @@ int mem_measure();
 bool mintrue(array_data*,int,int, int);
 void threader(int);
 timespec diff(timespec, timespec);
+void converge(int,int);
 
 extern input_args* input;
 extern bool startbool;
