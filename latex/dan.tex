@@ -1,0 +1,734 @@
+%indiv_pres.tex, Dan Richardson
+
+\documentclass{beamer}
+
+\mode<presentation>
+
+\usetheme{default}
+
+\usepackage{graphicx}                  %use package for diagram 
+\usepackage{amsmath}                   %use package for implies symbol
+\usepackage{amsfonts}		       %use package for numbet sets
+\usepackage{bm}                        %use package for bolds in math mode
+\usepackage{tikz}                      %use package for diagram drawings
+\usepackage{algpseudocode}             %use package for pseudocode
+\usepackage{algorithm}                 %use package for pseudocode
+\usepackage{caption}                   %use package for multiple figures
+\usepackage{subcaption}                %use package for multiple figures
+\usepackage{microtype}		       %use package for small typographical changes
+
+%define command shortcuts
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+
+
+
+\graphicspath{{/home/danmfr/p3t/laplace/images/}}
+
+\title{$3^{rd}$ Year Theoretical Physics Group Project}
+\subtitle{On numerical approximations to solutions of Laplace's equation for different boundary conditions}
+\author{Dan Richardson\\
+        School of Physics and Astronomy,\\
+        University of Glasgow,\\
+        Glasgow, United Kingdom}
+\date{\today}
+
+%layout page at start of new section
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Layout}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}
+}
+
+\begin{document} %start of document
+
+\begin{frame} 
+\titlepage
+\end{frame}
+
+\begin{frame}{Contents}
+\tableofcontents
+\end{frame}
+
+\section{Overview}
+\begin{frame}{Overview}
+Aims:
+\begin{itemize}
+\item introduce and discuss the Laplace equation
+\pause
+ \begin{itemize}
+ \item find the general analytical solution in plane polar co-ordinates
+ \pause
+ \item find a particular analytical solution given certain boundary conditions
+ \end{itemize}
+\pause
+\item discuss the need for finite difference methods
+\pause
+ \begin{itemize} 
+ \item explore different methods and compare them
+ \end{itemize}
+\pause
+\item conclude which method is best to use in software package
+\end{itemize}
+
+\pause
+Our discussion of the Laplace equation occurs within the framework of electromagnetism,
+but can be generalised to other physical phenomena where the Laplace equation occurs:
+thermodynamics, fluid mechanics, astronomy.
+\end{frame}
+
+\section{Introduction}
+\subsection{Derivation of Laplace's Equation}
+
+\begin{frame}{Derivation of Laplace's Equation in Electromagnetism}
+Consider two of Maxwell's equations, Gauss' Law and Faraday's Law:
+%
+\be
+\nabla \cdot \bm{E} = \frac{\rho}{\epsilon_0} \qquad \nabla \times \bm{E} = -\frac{\partial \bm{B}}{\partial t}
+\ee
+
+\pause
+
+In static free space:
+\pause
+\begin{itemize}
+\item $\bm{B}$ is unchanging $\implies$ $\bm{E}$ is irrotational $\implies \bm{E} = -\nabla \phi$
+\pause
+\item $\rho=0$ $\implies \bm{E}$ is solenoidal $\implies \nabla^2 \phi = 0$.
+\end{itemize}
+
+\pause
+This is Laplace's equation.
+\pause
+\begin{itemize}
+ \item $2^{nd}$ order PDE that can be solved to find $\phi$ and hence $\bm{E}$
+ \pause
+ \item $\bm{E}$ allows equation of motion of test particles to be found (Lorentz force)
+\end{itemize}
+\end{frame}
+
+\subsection{Physical Systems}
+
+\begin{frame}{Electrostatic Systems}
+Goal: find $\bm{E}$ around the following systems (and more!), and hence equation of
+motions of test particles.
+\begin{figure}
+\centering
+\begin{subfigure}[b]{0.45\textwidth}
+	\begin{tikzpicture}
+	\draw (0,0) -- (0,2.5) node[above, font=\footnotesize] {$\phi = V$}; 
+	\draw (4.2,0) -- (4.2,2.5) node[above, font=\footnotesize] {$\phi = -V$}; 
+	\draw (2.1,1.25) circle (0.5cm) node[below, font=\footnotesize, yshift=-0.4cm] {GND};
+	\draw[dashed] (2.1,1.25) -- (2.5,1.55) node[pos=0.2, above, font=\footnotesize] {$R$};
+	\end{tikzpicture}
+	\caption{System A}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.45\textwidth}
+	\begin{tikzpicture}
+	\draw (0,0) -- (4,0) node[right, font=\footnotesize] {$\phi = V$}; 
+	\draw (0,2.5) -- (4,2.5) node[pos=0.25, above, font=\footnotesize] {GND} node[pos=0.5, above, font=\footnotesize] {GND} node[pos=0.75,above, font=\footnotesize] {GND};
+	\draw (0.8,2.5) rectangle (1.2,2.375);
+	\draw (1.8,2.5) rectangle (2.2,2.375);
+	\draw (2.8,2.5) rectangle (3.2,2.375);
+	\end{tikzpicture}
+	\caption{System C}
+\end{subfigure}
+\caption{Cross-sectional diagram of two electrostatic systems}
+\end{figure}
+
+\pause
+System A can be solved analytically
+\pause
+\begin{itemize}
+\item use it to find best method to numerically solve more complex systems like C, that
+do not have analytical solutions.
+\end{itemize}
+\end{frame}
+
+\subsection{Analytical Solution of System A}
+
+\begin{frame}{General Analytical Solution}
+\begin{figure}
+\centering
+	\begin{tikzpicture}
+	\draw (0,0) -- (0,2.5) node[above, font=\footnotesize] {$\phi = V$}; 
+	\draw (4.2,0) -- (4.2,2.5) node[above, font=\footnotesize] {$\phi = -V$}; 
+	\draw (2.1,1.25) circle (0.5cm) node[below, font=\footnotesize, yshift=-0.4cm] {GND};
+	\draw[dashed] (2.1,1.25) -- (2.5,1.55) node[pos=0.2, above, font=\footnotesize] {$R$};
+	\end{tikzpicture}
+	\caption{System A}
+\end{figure}
+
+To exploit the symmetry of the system we find the general solution of $\nabla^2 \phi=0$
+in plane polar co-ordinates: 
+%
+\be
+\frac{1}{r}\frac{\partial}{\partial r}(r \frac{\partial \phi}{\partial r}) + \frac{1}{r^2}\frac{\partial ^2 \phi}{\partial \theta^2} = 0 
+\ee
+
+\pause
+Separate variables, $\phi(r,\theta)=f(r)g(\theta)$, say.
+
+\pause
+Substitution gives
+%
+\be
+\frac{r}{f(r)}\frac{d}{dr}(r \frac{df(r)}{dr}) =- \frac{1}{g(\theta)}\frac{d^2 g(\theta)}{d \theta^2}
+\ee
+
+\end{frame}
+
+\begin{frame}{General Analytical Solution cont.}
+We had that supposing $\phi(r,\theta)=f(r)g(\theta)$ gave:
+%
+\be
+\frac{r}{f(r)}\frac{d}{dr}(r \frac{df(r)}{dr}) =- \frac{1}{g(\theta)}\frac{d^2 g(\theta)}{d \theta^2}
+\ee
+%
+\pause
+Left-hand side is solely a function of $r$; right-hand side of $\theta$ 
+\begin{itemize}
+\pause
+\item both sides must be constant, so set equal to $k^2$ say, for some $k \in \mathbb{R}$.
+\end{itemize}
+
+\pause
+Produces pair of second-order ODEs:
+%
+\be
+r\frac{d}{dr}(r \frac{df(r)}{dr}) = k^2 f(r) \quad \frac{d^2 g(\theta)}{d\theta^2} = -k^2 g(\theta)
+\ee
+
+\end{frame}
+
+\begin{frame}{General Analytical Solution cont.}
+Solutions of two ODEs:
+\begin{itemize}
+\pause
+\item $k=0$:
+\pause
+\be
+f(r)=\alpha_0 \ln(r) + \beta_0  \quad \text{and} \quad g(\theta)=\gamma_0 \theta +\delta_0
+\ee
+\pause
+\item $k \neq 0$:
+\pause
+\be
+f(r)=\alpha_k r^k +\beta_k r^{-k} \quad \text{and} \quad g(\theta) = \gamma_k \sin(k\theta) +\delta_k \cos(k\theta)
+\ee
+\end{itemize}
+
+\pause
+For consistency, expect periodicity of $g$: $g(\theta+2\pi)=g(\theta)$, 
+so that $k \in \mathbb{Z}$.
+
+\pause
+Principle of superposition gives general solution of Laplace's equation in polar
+co-ordinates:
+%
+\begin{multline}
+\phi(r, \theta) = (\alpha_0 \ln(r) + \beta_0)(\gamma_0\theta + \delta_0) \\
+                + \sum_{n=1}^{\infty}(\alpha_n r^n+\beta_n r^{-n})(\gamma_n \sin(n\theta) + \delta_n \cos(n\theta))
+\end{multline}
+
+\end{frame}
+
+\begin{frame}{Particular Solution for System A}
+To find particular solution we impose \emph{Dirichlet boundary conditions}.
+
+\pause
+We have the general solution
+%
+\begin{multline}
+\phi(r, \theta) = (\alpha_0 \ln(r) + \beta_0)(\gamma_0\theta + \delta_0) + 
+\\
+                + \sum_{n=1}^{\infty}(\alpha_n r^n+\beta_n r^{-n})(\gamma_n \sin(n\theta) + \delta_n \cos(n\theta))
+\end{multline}
+
+\pause
+
+Conditions:
+\begin{itemize}
+\pause
+\item $\phi$ is symmetric in $\pm\theta$ or about $\theta=0$ \pause $\implies \gamma_n=0, \; \forall n$
+\pause
+\item $\phi$ is finite at infinity \pause $\implies \alpha_n=0, \; \forall n$
+\end{itemize}
+
+\pause 
+Hence
+%
+\be
+\phi(r, \theta) = \beta_0 + \sum_{n=1}^{\infty} \frac{\beta_n}{r^n} \cos(n\theta)
+\ee
+%
+where the $\beta$'s absorbed other constants.
+\end{frame}
+
+\begin{frame}{Particular Solution for System A cont.}
+We have
+%
+\be
+\label{eq:sum}
+\phi(r, \theta) = \beta_0 + \sum_{n=1}^{\infty} \frac{\beta_n}{r^n} \cos(n\theta)
+\ee
+
+\pause
+As $r \rightarrow \infty$, $\phi$ is linearly decreasing between the plates:
+%
+\be
+\phi \rightarrow -\frac{Vx}{d}=-\frac{Vr}{d}\cos(\theta)
+\ee.
+
+\pause
+Thus, $\beta_0=-\frac{Vr}{d}\cos(\theta)$, since the $2^{nd}$ term in eq.~\ref{eq:sum} 
+vanishes.
+
+\pause
+Then,
+%
+\be
+\phi(r, \theta) = -\frac{Vr}{d}\cos(\theta) + \sum_{n=1}^{\infty} \frac{\beta_n}{r^n} \cos(n\theta)
+\ee
+%
+\pause
+or,
+%
+\be
+\phi(r, \theta) = (\frac{\beta_1}{r}-\frac{Vr}{d})\cos(\theta) + \sum_{n=2}^{\infty} \frac{\beta_n}{r^n} \cos(n\theta)
+\ee
+
+\end{frame}
+
+\begin{frame}{Particular Solution for System A cont.}
+We have
+%
+\be
+\phi(r, \theta) = (\frac{\beta_1}{r}-\frac{Vr}{d})\cos(\theta) + \sum_{n=2}^{\infty} \frac{\beta_n}{r^n} \cos(n\theta)
+\ee
+
+\pause
+Expect continuity of $\phi$ at the surface of the cylinder:
+\pause
+%
+\be
+\phi(r=R,\theta) = 0 \pause \implies \beta_1=\frac{VR^2}{d} \quad
+\pause
+\text{and} \quad \beta_{n \geq 2} = 0
+\ee
+%
+since the set $\{\cos(n \theta)\}$ are linearly independent functions.
+
+\pause
+Final solution is:
+%
+\be
+\phi(r, \theta) = \frac{V}{d}(\frac{R^2}{r}-r)\cos(\theta)
+\ee
+for $r>R$ and $0$ otherwise.
+
+\end{frame}
+
+\begin{frame}{Analytical Solution}
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[scale=0.8]{analytic.pdf}
+\caption{Analytic solution with $V=1$, $R=15$}
+\end{center}
+\end{figure}
+
+\end{frame}
+
+\section{Numerical Methods}
+\begin{frame}{Necessity of numerical methods}
+System A is a very idealised system, that is not realisable in the real world
+\begin{itemize}
+\item plates cannot be infinite in extent
+\end{itemize}
+
+For real world systems is it difficult, and often impossible, to express boundary
+conditions in a manner that is algebraically usable, and thus impossible to find a
+particular analytical solution to Laplace's equation.
+\begin{itemize}
+\item One must solve Laplace's equation numerically.
+\end{itemize}
+
+One such way is Finite Difference Methods.
+\end{frame}
+
+\subsection{Finite Difference Methods}
+
+\begin{frame}{Finite Difference Methods}
+We use the definition of the derivative, for a function $f(t)$ say, and approximate as
+%
+\be
+\frac{df}{dt} = \lim_{\Delta t\to 0}\frac{f(t+\Delta t) - f(t)}{\Delta t} \approx \frac{f(t+\Delta t) - f(t)}{\Delta t}
+\ee
+%
+where $\Delta t$ is assumed to be small enough that the approximation is good.
+
+We can then approximate the second derivative similarly:
+%
+\begin{align}
+\frac{d^2 f}{dt^2} &\approx \frac{f'(t+\Delta t) - f'(t)}{\Delta t} \\
+		   &= \frac{\frac{f(t+\Delta t) - f(t)}{\Delta t} - \frac{f(t) - f(t-\Delta t)}{\Delta t}}{\Delta t} \\
+\frac{d^2 f}{dt^2} &\approx  \frac{f(t+\Delta t) - 2f(t) + f(t-\Delta t)}{\Delta t^2}
+\end{align}
+
+\end{frame}
+
+\begin{frame}{Finite Difference Methods cont.}
+
+Define a region on which to discretise Laplace equation, 
+%
+\be
+\{(x,y)|\:0<x<L,0<y<D\}
+\ee
+
+Create a grid of points at which to solve the equation:
+
+\begin{figure}
+\centering
+\begin{tikzpicture}
+
+\foreach \x in {0,...,10}
+{
+\draw[fill=black] (0.4*\x,0) circle (0.1cm);
+\draw[fill=black] (0.4*\x,4) circle (0.1cm);
+}
+
+\foreach \y in {0,...,10}
+{
+\draw[fill=black] (0,0.4*\y) circle (0.1cm);
+\draw[fill=black] (4,0.4*\y) circle (0.1cm);
+}
+
+\foreach \x in {1,...,9}
+\foreach \y in {1,...,9}
+{
+\draw[fill=white] (0.4*\x,0.4*\y) circle (0.1cm);
+}
+\fill (0,0) node[below left, font=\footnotesize] {$(x_0,y_0)$};
+\fill (2,0) node[below, font=\footnotesize, yshift = -0.2cm] {$x_j=j\Delta x$};
+\fill (4,2) node[right, font=\footnotesize, xshift = 0.2cm] {$y_k=k\Delta y$};
+\end{tikzpicture}
+\caption{Diagram of grid on which we approximate the potential $\phi$. White points
+are interior points that change; black points are boundary points that remain constant.}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Discretisation of Laplace's equation}
+We write the value of $\phi$ at position $(x_j,y_k)$ on the grid as $\phi_{j,k}$.
+
+Hence, Laplace's eqaution is discretised as
+%
+\be
+\frac{\phi_{j+1,k}-2\phi_{j,k}+\phi_{j-1,k}}{\Delta x^2} + \frac{\phi_{j,k+1}-2\phi_{j,k}+\phi_{j,k-1}}{\Delta y^2}=0
+\ee
+%
+where $j$ and $k$ index the $x$ and $y$ directions.
+
+For unique separation $\Delta = \Delta x = \Delta y$, $\phi_{j,k}$ is the average of the
+surrounding points:
+%
+\be
+\phi_{j,k}= \frac{1}{4}(\phi_{j+1,k}+\phi_{j-1,k}+\phi_{j,k+1}+\phi_{j,k-1})
+\ee
+
+\end{frame}
+
+\subsection{Jacobi's iterative method}
+\begin{frame}{Jacobi's iterative method}
+
+\begin{itemize}
+\item Have initial guess of the value of $\phi$ at all points, $\phi_{j,k,0}$, say.
+\item Relax at all points on the grid simultaneously to get $\phi_{j,k,1}$.
+\item Iterating $n$ times:
+%
+\be
+\phi_{j,k,n+1}= \frac{1}{4}(\phi_{j-1,k,n}+\phi_{j+1,k,n}+\phi_{j,k-1,n}+\phi_{j,k+1,n})
+\ee
+%
+\end{itemize}
+
+This is \emph{Jacobi's iterative method}, the simplest \emph{relaxation method}.
+\end{frame}
+
+\begin{frame}{Results of Jacobi's method for System A}
+\begin{figure}
+\begin{center}
+\includegraphics[scale=0.8]{jacobi.pdf}
+\caption{Numerical potential returned by \emph{Jacobi's method} with $V=1$, $R=15$ on
+$100\times100$ grid for $10000$ iterations}
+\label{fig:jacobi}
+\end{center}
+\end{figure}
+
+\end{frame}
+
+\subsection{Gauss-Seidel method}
+\begin{frame}{Gauss-Seidel method}
+Alternative relaxation method: the \emph{Gauss-Seidel method}. 
+
+Suppose one iterates throught the grid from left to right, top to bottom.
+Points at which the potential has already been updated, $\phi_{j-1,k}$ and
+$\phi_{j,k-1}$, are more accurate to the solution, and hence are used instead:
+%
+\be
+\phi_{j,k,n+1}= \frac{1}{4}(\phi_{j-1,k,n+1}+\phi_{j+1,k,n}+\phi_{j,k-1,n+1}+\phi_{j,k+1,n})
+\ee
+
+\begin{itemize}
+\item Method converges faster than Jacobi's iterative method
+\item Reduced computation time as previous potential at each grid point is not stored
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Results of Gauss-Seidel method for System A}
+\begin{figure}
+\begin{center}
+\includegraphics[scale=0.8]{gauss.pdf}
+\caption{Numerical potential returned by \emph{Gauss-Seidel method} with $V=1$, $R=15$ on
+$100\times100$ grid for $10000$ iterations}
+\label{fig:gauss}
+\end{center}
+\end{figure}
+
+\end{frame}
+
+\subsection{Successive Over-relaxation}
+\begin{frame}{Successive Over-relaxation}
+Neither the Jacobi iterative method or the Gauss-Seidel method use the value
+of the potential at the current point in the previous iteration, in our notation
+$\phi_{j,k,n}$.
+One can derive an iterative scheme given by
+%
+\be
+\phi_{j,k,n+1}= (1-s)\phi_{j,k,n}+\frac{s}{4}(\phi_{j-1,k,n+1}+\phi_{j+1,k,n}+\phi_{j,k-1,n+1}+\phi_{j,k+1,n})
+\ee
+%
+where $1<s<2$ is the \emph{relaxation parameter}.
+
+The optimum relaxation parameter, for a square grid, with $n$ points per side is:
+\be
+s = \frac{2}{1+\sin(\frac{\pi}{n})} \approx \frac{2}{1+\frac{\pi}{n}}
+\ee
+
+This is a more convergent numerical method than those previous, and is called 
+\emph{successive over-relaxation}.
+\end{frame}
+
+\begin{frame}{Results of Successive over-relaxation for System A}
+\begin{figure}
+\begin{center}
+\includegraphics[scale=0.8]{sor.pdf}
+\caption{Numerical potential returned by \emph{successive over-relaxation} with $V=1$,
+$R=15$ on $100\times100$ grid for $10000$ iterations}
+\label{fig:numerical}
+\end{center}
+\end{figure}
+
+\end{frame}
+
+\subsection{Checkerboard Updating}
+\begin{frame}{Checkerboard (Red-Black) Updating}
+In previous methods, $\phi$ is calculated from at most its previous value at the
+current point and its current or previous values at the four neighbouring points.
+\begin{itemize}
+\item Denote $\phi_{j,k}$ as \emph{odd} if $j+k$ is odd, and even otherwise.
+\item Iterate through the grid
+ \begin{itemize}
+ \item Update $\phi$ at each odd point (only depends on even points)
+ \end{itemize}
+\item Re-iterate through grid
+ \begin{itemize}
+ \item Update all even points using $\phi$ at newly updated odd points
+ \end{itemize}
+\end{itemize}
+
+Have essentially separated system of $N$ linear equations into two coupled systems
+of $\frac{N}{2}$ linear equations that can be solved separately.
+
+Known as \emph{Checkerboard (Red-Black) Updating}.
+
+\begin{itemize}
+\item More convergent method than those outlined previously
+\item Can have successive over-relaxation added
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Checkerboard (Red-Black) Updating cont.}
+\begin{figure}[h!]
+\begin{center}
+\begin{tikzpicture}
+\draw[fill=red] (0,0) circle (0.2cm) node[below] {$\phi_{j+1,k-1,n}$};
+\draw[fill=black] (2,0) circle (0.2cm) node[below] {$\phi_{j+1,k,n}$};
+\draw[fill=red] (4,0) circle (0.2cm) node[below] {$\phi_{j+1,k+1,n}$};
+\draw[fill=black] (0,2) circle (0.2cm) node[below] {$\phi_{j,k-1,n}$};
+\draw[fill=red] (2,2) circle (0.2cm) node[below] {$\phi_{j,k,n}$};
+\draw[fill=black] (4,2) circle (0.2cm) node[below] {$\phi_{j,k+1,n}$};
+\draw[fill=red] (0,4) circle (0.2cm) node[below] {$\phi_{j-1,k-1,n}$};
+\draw[fill=black] (2,4) circle (0.2cm) node[below] {$\phi_{j-1,k,n}$};
+\draw[fill=red] (4,4) circle (0.2cm) node[below] {$\phi_{j-1,k+1,n}$};
+\end{tikzpicture}
+\end{center}
+\caption{An illustration of checkerboard updating. The black points are updated first,
+and then red points are calculated from the newly updated black points.}
+\label{fig:checker}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Checkerboard (Red-Black) Updating cont.}
+\begin{figure}[h!]
+\begin{center}
+\begin{tikzpicture}
+\draw[fill=red] (0,0) circle (0.2cm) node[below] {$\phi_{j+1,k-1,n}$};
+\draw[fill=black] (2,0) circle (0.2cm) node[below] {$\phi_{j+1,k,n+1}$};
+\draw[fill=red] (4,0) circle (0.2cm) node[below] {$\phi_{j+1,k+1,n}$};
+\draw[fill=black] (0,2) circle (0.2cm) node[below] {$\phi_{j,k-1,n+1}$};
+\draw[fill=red] (2,2) circle (0.2cm) node[below] {$\phi_{j,k,n}$};
+\draw[fill=black] (4,2) circle (0.2cm) node[below] {$\phi_{j,k+1,n+1}$};
+\draw[fill=red] (0,4) circle (0.2cm) node[below] {$\phi_{j-1,k-1,n}$};
+\draw[fill=black] (2,4) circle (0.2cm) node[below] {$\phi_{j-1,k,n+1}$};
+\draw[fill=red] (4,4) circle (0.2cm) node[below] {$\phi_{j-1,k+1,n}$};
+\end{tikzpicture}
+\end{center}
+\caption{An illustration of checkerboard updating. The black points are updated first,
+and then red points are calculated from the newly updated black points.}
+\label{fig:checker}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Checkerboard (Red-Black) Updating cont.}
+\begin{figure}[h!]
+\begin{center}
+\begin{tikzpicture}
+\draw[fill=red] (0,0) circle (0.2cm) node[below] {$\phi_{j+1,k-1,n+1}$};
+\draw[fill=black] (2,0) circle (0.2cm) node[below] {$\phi_{j+1,k,n+1}$};
+\draw[fill=red] (4,0) circle (0.2cm) node[below] {$\phi_{j+1,k+1,n+1}$};
+\draw[fill=black] (0,2) circle (0.2cm) node[below] {$\phi_{j,k-1,n+1}$};
+\draw[fill=red] (2,2) circle (0.2cm) node[below] {$\phi_{j,k,n+1}$};
+\draw[fill=black] (4,2) circle (0.2cm) node[below] {$\phi_{j,k+1,n+1}$};
+\draw[fill=red] (0,4) circle (0.2cm) node[below] {$\phi_{j-1,k-1,n+1}$};
+\draw[fill=black] (2,4) circle (0.2cm) node[below] {$\phi_{j-1,k,n+1}$};
+\draw[fill=red] (4,4) circle (0.2cm) node[below] {$\phi_{j-1,k+1,n+1}$};
+\end{tikzpicture}
+\end{center}
+\caption{An illustration of checkerboard updating. The black points are updated first,
+and then red points are calculated from the newly updated black points.}
+\label{fig:checker}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Results of Checkerboard Updating for System A}
+\begin{figure}
+\begin{center}
+\includegraphics[scale=0.8]{checker.pdf}
+\caption{Numerical potential returned by \emph{Checkerboard updating} with $V=1$, $R=15$
+on $100\times100$ grid for $10000$ iterations}
+\end{center}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Results of Checkerboard Updating with SOR for System A}
+\begin{figure}
+\begin{center}
+\includegraphics[scale=0.8]{checker_sor.pdf}
+\caption{Numerical potential returned by \emph{Checkerboard updating with SOR} with
+$V=1$, $R=15$ on $100\times100$ grid for $10000$ iterations}
+\end{center}
+\end{figure}
+
+\end{frame}
+
+\section{Comparison of Methods}
+\begin{frame}{Comparison of methods}
+As you have seen, not much difference between each solution, at least graphically.
+
+We examine the average relative convergence, of each method; the average relative
+error for each method; and the time it takes each method to run to completion.
+\end{frame}
+
+\begin{frame}{Comparison of Convergence}
+\begin{figure}
+\centering
+\includegraphics[scale=0.8]{rel_convergence.pdf}
+\caption{Average relative convergence, between successive approximations for the
+potential of each method, versus number of iterations}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Comparison of Error}
+\begin{figure}
+\centering
+\includegraphics[scale=0.8]{rel_error.pdf}
+\caption{Average relative error of each method, as compared to the analytical solution,
+versus number of iterations}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Comparison of CPU Time}
+\begin{figure}
+\centering
+\includegraphics[scale=0.8]{time.pdf}
+\caption{CPU time taken by each method versus number of iterations}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Conclusion}
+We drew the following conclusions
+\begin{itemize}
+\item time is not an important factor
+\item the addition of successive over-relaxation causes drastic increase in convergence
+\item average relative error essentially converge for all methods
+\end{itemize}
+
+We shall use Checkerboard updating with successive over-relaxation in our software
+package, as it converges in the least iterations, and hence least time, but to the same
+accuracy as the other methods.
+\end{frame}
+
+\begin{frame}{Other methods}
+Multigrid methods, Fast Fourier Transform and Nine-point stenciling
+\end{frame}
+
+\section{Review}
+\begin{frame}{Review}
+What we have done:
+\begin{itemize}
+\item introduced and discussed the Laplace equation
+\pause
+ \begin{itemize}
+ \item found the general analytical solution in plane polar co-ordinates
+ \item found a particular analytical solution given certain boundary conditions
+ \end{itemize}
+\pause
+\item discussed the need for finite difference methods
+\pause
+ \begin{itemize} 
+ \item explored different methods and compared them
+ \end{itemize}
+\pause
+\item concluded which method was best to use in software package
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\end{document} %end of document
