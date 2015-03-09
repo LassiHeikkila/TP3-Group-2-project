@@ -1,0 +1,158 @@
+\documentclass{beamer}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{tikz}
+\usetheme{default}
+\title{Using the Laplace Equation to Solve Various Boundary Conditions}
+\subtitle{Graphical Boundary Conditions and Relative Error}
+\author{Fergus Hayes}
+\date{\today}
+\begin{document}
+\begin{frame}
+\titlepage
+\end{frame}
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents
+\end{frame}
+\section{Introduction}
+\begin{frame}{Introduction}
+\begin{itemize}
+\item The program uses the checker board with successive over relaxation (SOR) method.
+\item An easy way to input boundary conditions is through image files.
+\item The method requires some measure of precision. 
+\end{itemize}
+\end{frame}
+\section{Bitmaps and Boundaries}
+\subsection{Graphical Boundary Conditions}
+\begin{frame}
+\frametitle{Graphical Boundary Conditions}
+\begin{itemize}
+\item The boundary conditions for all systems can be constructed graphically on an image file. 
+\item Different can colours represent different areas of constant potential.
+\end{itemize}
+The image file must:
+\begin{itemize}
+\item Allow at least four colours to be easily distinguished.
+\item Be easy to extract information from.
+\end{itemize}
+\end{frame}
+\begin{frame}
+\subsection{Mapping Boundaries}
+\frametitle{Mapping Boundaries}
+The locations of the boundary conditions and their potential need to be mapped from the image file to two arrays.
+\begin{itemize}
+\item The grid of potentials to be iterated over using SOR.
+\item The boolean array which stores the location of constant boundary values.
+\end{itemize}
+\end{frame}
+\begin{frame}
+\subsection{Bitmaps}
+\frametitle{Bitmaps}
+\begin{itemize}
+\item Bitmaps (BMP files) are uncompressed image files.
+\item Each pixel has 24 bits of memory for storing colour (16,777,216 different colours).
+\item 8 bits of memory for each colour: red, green and blue.
+\end{itemize}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{colourscale.jpg}
+	\caption{0 to 255 colour scale for various colours.}
+\end{figure}
+\end{frame}
+\subsection{Bitmap Boundary Condition}
+\begin{frame}
+\frametitle{Bitmap Boundary Conditions}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.4\textwidth]{SystemA.jpg}
+	\caption{System A graphically represented as a BMP file.}
+\end{figure}
+\begin{itemize}
+\item The white pixels are of unsolved potential while different colours are areas of different fixed potential.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{bitmaps.cpp}
+'bitmaps.cpp' was used to extract BMP boundary information.
+\begin{itemize}
+\item Commands are used from 'bitmap\textunderscore image.hpp'.
+\item The image is opened using:\\
+\begin{align*}
+bitmap\textunderscore image \; image('file \;name')
+\end{align*}
+\item The dimensions are found:\\
+\begin{align*}
+int\; height = image.height(),\; width = image.width()
+\end{align*}
+\end{itemize}
+\end{frame}
+\begin{frame}
+\subsection{bitmaps.cpp}
+\frametitle{bitmaps.cpp}
+\begin{itemize}
+\item Each pixels colour is analysed by looping through pixel array and using:\\
+\begin{align*}
+image.get\textunderscore pixel(p,q,red,green,blue)
+\end{align*}
+\item The colour of the pixel is decided by what variable has the largest colour scale.
+\item Corresponding potential is mapped to a similar array with same coordinates.
+\item Coloured pixels are set to true in the boolean array.
+\end{itemize}
+\end{frame}
+\section{Relative Error and Convergence}
+\subsection{Convergence}
+\begin{frame}
+\frametitle{Convergence}
+\begin{itemize}
+\item SOR method does not have an easily quantifiable error. So analyse how the results converge instead.
+\item a numerically determined value $\tilde{\phi}$ converges to some true value $\phi$ over iterations $n$:
+\begin{align*}
+\lim_{n \to \infty} \tilde{\phi} = \phi
+\end{align*}
+\item As $\phi$ is a constant:
+\begin{align*}
+\lim_{n \to \infty} \frac{d \tilde{\phi}}{dn} = \lim_{n \to \infty} (\phi^{n} - \phi^{n-1}) = 0
+\end{align*}
+\item The magnitude of $\phi^{n} - \phi^{n-1}$, is related to the accuracy.
+\end{itemize}
+\end{frame}
+\subsection{Relative Error}
+\begin{frame}
+\frametitle{Relative Error}
+\begin{itemize}
+\item  The relative error $\epsilon_{rel}$:
+\begin{align*}
+\epsilon_{rel \; i,j}^{n} = |\phi_{i,j}^{n} - \phi_{i,j}^{n-1}|
+\end{align*}  
+\item The lower this value, the closer the iteration is from converging to a point.
+\end{itemize}
+\end{frame}
+\subsection{Convergence Limit}
+\begin{frame}{Convergence Limit}
+\begin{itemize}
+\item A desired relative error, $\epsilon$, is taken in from the command line arguments.
+\item The program loops until $\epsilon_{rel} < \epsilon$ for all points.
+\item Within each iteration, a count increments by one for every point where the condition is met.
+\item On the iteration when the count equals the number of pixels, the loop breaks. The system is then said to have converged.
+\end{itemize}
+\end{frame}
+\section{Evaluation}
+\begin{frame}
+\frametitle{Evaluation}
+estatics is able to..
+\begin{itemize}
+\item Determine the potential for many boundary conditions.
+\item Find potentials to any given degree of accuracy.
+\end{itemize}
+Possible improvements..
+\begin{itemize}
+
+\item Allow the bitmaps to accept more boundary conditions.
+\item Able to skip over points when converged.
+\end{itemize}
+Thanks for listening!
+\end{frame}
+\end{document}
