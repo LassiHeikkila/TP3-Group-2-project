@@ -16,7 +16,7 @@ void fdm(int startcol,int core_count)
 	double**pu = sysdat -> prev_values;
 
 	bool redblack = input->redblack;
-	//bool lock = input->lock;
+	// bool lock = input->lock;
 
 	double rel_par = input->relaxation;
 	double desiredconv = input->convergence;
@@ -112,11 +112,11 @@ void fdm(int startcol,int core_count)
 			{
 				input->convcounts[startcol] += 1;
 
-				if (input->lock && mintrue(sysdat,i,j,3))
-				{
-					cout << "LOCKED\n";
-					sysdat->mask[i][j] = true;
-				}
+				// if (lock && mintrue(sysdat,i,j,3))
+				// {
+				// 	cout << "LOCKED\n";
+				// 	sysdat->mask[i][j] = true;
+				// }
 			}
 
 			pu[i][j] = u[i][j];

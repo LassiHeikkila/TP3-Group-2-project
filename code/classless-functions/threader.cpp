@@ -8,13 +8,14 @@ using namespace std;
 
 void threader(int core_count)
 {
+	// core_count *= 2;
 	cout << "Creating pool of " << core_count << " worker threads...\n\n";
 	// Simplify access to array struct:
 	array_data* u = input->sys;
 	input->convcounts = new int[core_count];
 
 	// Initialise starting variables:
-	int count = 0, convcount = 0, prev_convcount = 0;
+	int count = 0, convcount = 0;// prev_convcount = 0;
 	int pixels = u->rows * u->columns;
 
 	// Create threadpool:
@@ -71,14 +72,14 @@ void threader(int core_count)
 		{
 			cout << "\rIteration " << count << "." << std::flush;
 			//cout << "COUNT: " << data->count << ". CONV: " << data->convcount << endl;
-			if (convcount > prev_convcount)
-			{
-				input->lock = true;
-			}
+			// if (convcount > prev_convcount)
+			// {
+			// 	input->lock = true;
+			// }
 		}
 
 		// Set previous convergence to current:
-		prev_convcount = convcount;
+		// prev_convcount = convcount;
 
 	}
 
