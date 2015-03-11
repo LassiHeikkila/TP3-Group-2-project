@@ -20,8 +20,8 @@
 \usepackage{caption}		       %use package for multiple figures
 \usepackage{subcaption}                %use package for multiple figures
 \usepackage{tabularx}		       %use package for tables
+\usepackage{array}                     %use package for centering table contents
 %\usepackage{url}                       %use package to display urls properly
-%\usepackage{array}                     %use package for centering table contents
 
 %set graphics path
 \graphicspath{{/home/danmfr/p3t/laplace/images/}}
@@ -75,10 +75,11 @@
 \newcommand{\be}{\begin{equation}}
 \newcommand{\ee}{\end{equation}}
 
-%start of document
+%redefine columns for tabular
+\newcolumntype{Y}{>{\centering \arraybackslash}X}
+
 \begin{document}
 
-%display title, my details and current date
 \title{On numerical approximations to solutions of Laplace's equation for different electrostatic configurations}
 \author{S. Brown, F. Hayes, L. Heikkil{\"a}, D. Richardson\\
 	School of Physics and Astronomy,\\
@@ -87,7 +88,6 @@
 \date{\today}
 \maketitle
 
-%start of abstract
 \begin{abstract}
 
 The behaviour of the electric field under the presence and influence of solid
@@ -99,18 +99,57 @@ We explicitly focus on two such systems: the case of a long perfectly conducting
 cylinder centred between two infinite planes at potential $+V$ and $-V$; and the
 case of a silicon detector---a system composed of two silicon wafers with segmented
 doped implants at ground potential on one side and a uniform doped implant on the
-other side, held at a potential $+V$. We compare the analytical solution of the first
-system to its approximate numerical solution, and study the convergence of the
-numerical methods employed.
+other side, held at a potential $+V$.
+We compare the analytical solution of the first system to its approximate numerical
+solution for different relaxation methods, examine the relative error and relative
+convergence of each method, and conclude that the method of 
+\emph{Checkerboard Updating with Successive over-relaxation} is best.
 
-\end{abstract} % end of abstract
+We then create a software package, \emph{estatics}, capable of solving Laplace's
+equation for arbitrary constant boundary conditions using the chosen method, and
+present the output of the package for different electrostatic systems.
 
-%do not include in final version
-\tableofcontents
+\end{abstract}
 
-%start of introduction
+% DO NOT INCLUDE IN FINAL VERSION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage                       %
+\tableofcontents               %
+\newpage                       %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Introduction}
 \subsection{Laplace's Equation}
+
+The Laplace equation, named after mathematician and physicist Pierre-Simon de Laplace,
+is a second-order partial differential equation that can be used to describe steady-state
+distributions of heat, fluids and potential. It states that the divergence of the
+gradient of a function, $\phi$ say, is zero. Symbolically:
+%
+\be
+\nabla ^2 \phi = 0
+\ee
+%
+where $\nabla^2$ is called the \emph{Laplacian operator}. The study of solutions to
+this equation is known as \emph{potential theory}.
+
+The exact form of the equation is dependent upon the co-ordinate system in which one
+considers it. In two dimensions, where subscripts denote partial differentiation with
+respect to that variable:
+
+\begin{center}
+\begin{tabularx}{0.6\textwidth}{|Y|Y|}
+\hline
+\emph{Cartesian co-ordinates} & \emph{Polar co-ordinates} \\
+$\phi_{xx}+\phi_{yy}=0$ & $\phi_{rr}+\frac{1}{r}\phi_r+\frac{1}{r^2}\phi_{\theta \theta}=0$ \\
+\hline
+\end{tabularx}
+\end{center}
+
+The Laplace equation shall now be derived in the context of electromagnetism.
+
+\subsubsection{Derivation of Laplace equation in Electomagentism}
+We begin by considering the two Maxwell equations that describe the electric field.
 
 Gauss' Law may used to express the relation between the \emph{divergence} of the
 electric field, represented by \textbf{E}, and the \emph{charge density} $\rho$,
@@ -128,8 +167,9 @@ integral form, as:
 \ee
 %
 where the integral is taken over a closed surface, $S$, and $Q$ is the enclosed charge.
-In the absence of charge, as is the case outside a conductor, this reduces to the
-statement the electric field is \emph{solenoidal}.
+In the absence of charge, as is the case in free space outside a conductor, this
+reduces to the statement the electric field is \emph{solenoidal}
+($\nabla \cdot \bm{E}=0$).
 
 One can also relate the \emph{curl} of the electric field to the time
 derivative of the magnetic field, denoted \textbf{B}, by the Maxwell-Faraday equation:
@@ -137,68 +177,35 @@ derivative of the magnetic field, denoted \textbf{B}, by the Maxwell-Faraday equ
 \be
 \nabla \times \bm{E} = - \frac{\partial \bm{B}}{\partial t}
 \ee
-%
-If the magnetic field is constant, in other words unchanging with time, this equation
-reduces to the statement that the electric field is \emph{irrotational}. A
+
+If the magnetic field is constant, this equation reduces to the statement that
+the electric field is \emph{irrotational} ($\nabla \times \bm{E}=0$). A
 consequence of irrotationality is that the electric field may then be written as
-negative the gradient of some scalar potential, $\phi$ say. Mathematically:
+the gradient of some scalar potential, $\phi$ say. Mathematically:
 %
 \be
 \bm{E} = -\nabla \phi
 \ee
 %
-This scalar potential is called the \emph{electrostatic potential}.
+where the negative sign is convention. This scalar potential is called the
+\emph{electrostatic potential}.
 
 One then has \emph{Laplace's equation}:
 %
 \be
 \nabla^2 \phi = 0
 \ee
-%
-where
-$\nabla^2 \equiv \frac{\partial^2}{\partial x^2}+\frac{\partial^2}{\partial y^2}+\frac{\partial^2}{\partial z^2}$ 
-is the \emph{Laplacian operator}\footnote{Specifically in Cartesian co-ordinates}.
 
 This is a second-order partial differential equation that can be solved, given some
-well-posed boundary conditions, to find the electrostatic potential and electric field
-for some physical system. 
+well-posed boundary conditions, to find the electrostatic potential and hence electric
+field for some physical system. This, in turn, can be used to find the equations of
+motion of test particles within the system, via the Lorentz force law.
 
-This equation is found in many areas of physics, from studies of fluid dynamics and heat
-conduction to astronomy, and our analysis here could be generalised to other such areas
-of physics.
+The following analysis occurs in the context of electromagnetism but is easily
+generalised to other areas of physics were the Laplace equation occurs, for example,
+fluid dynamics, heat conduction and astronomy.
 
-\subsection{Finite Difference Methods}
-
-It is often the case that differential equations, such as the Laplace equation, cannot
-be solved analytically, and their solution must be numerically approximated.
-
-To numerically approximate the solution to a differential equation it is
-necessary to approximate the derivative of a function. The usual method employed to
-do this is finite differencing. This approximates the derivative by using explicit
-differencing to step the function from one value to the next in small 
-increments of some variable. The smaller the increment used, the more accurate
-the approximation, but the longer and more computationally intensive the process.
-
-Suppose one wishes to approximate the first derivative of a function $f(t)$, say,
-with respect to the variable $t$. The simplest way to do this is to discretise the
-derivative and write
-%
-\be
-\frac{df}{dt} \approx \frac{f(t+\Delta t) - f(t)}{\Delta t}
-\ee
-%
-where $f(t+\Delta t)$ and $f(t)$ are two values of $f$, evaluated at two points
-a distance $\Delta t$ apart. This is known as the \emph{forward difference approximation}.
-
-To approximate the second derivative of a function, one writes
-%
-\be
-\frac{d^2 f}{dt^2} \approx \frac{f'(t) - f'(t-h)}{\Delta t} \\
-= \frac{\frac{f(t +\Delta t) - f(t)}{\Delta t} - \frac{f(t) - f(t -\Delta t)}{\Delta t}}{\Delta t} \\
-= \frac{f(t +\Delta t) - 2f(t) + f(t-\Delta t)}{\Delta t ^2}
-\ee
-
-\subsection{System Desricption}
+\subsection{Description of Physical Systems}
 \subsubsection{System One}
 
 Suppose one has a perfectly uniform electric field between two infinite planes
@@ -242,14 +249,20 @@ in Figure~\ref{fig:sys two}.
 \label{fig:sys two}
 \end{figure}
 
-\subsection{Analytical Solution to System One}
+System One can be solved analytically, as will be shown in the subsequent section. We
+shall use this solution to compare the accuracy of different numerical methods in solving
+System One, and decide which method is best suited to solve more complex systems, such
+as System Two, that do not have analytical solutions.
+
+\subsection{Analytical Solution of System One}
 
 First, one realises that the three-dimensional problem can be reduced entirely to two
 dimensions due to the translation symmetry of the system along the length of the
 cylinder. So, we consider a cross-section of the system and introduce a polar
-co-ordinate system, with origin centred on the centre of the cylinder.
+co-ordinate system, with origin centred on the centre of the cylinder, as this permits
+one to exploit the rotational symmetry of the system.
 
-Laplace's equation in polar co-ordinates is: 
+Laplace's equation in plane polar co-ordinates is: 
 %
 \be
 \frac{\partial^2 \phi}{\partial r^2}+\frac{1}{r}\frac{\partial \phi}{\partial r}+\frac{1}{r^2}\frac{\partial^2 \phi}{\partial \theta^2}
@@ -265,10 +278,11 @@ one finds that:
 \frac{r}{f(r)}\frac{d}{dr}(r \frac{df(r)}{dr}) =- \frac{1}{g(\theta)}\frac{d^2 g(\theta)}{d\theta^2}
 \ee
 
-Since this is true for arbitrary values of $r$ and $\theta$, it is constant, and
-we---with some foreknowledge---set this equal to $k^2$, for some constant 
-$k\in\mathbb{R}$.
-This gives two second order ordinary differential equations:
+Since the left-hand side is solely a function of $r$---and the right-hand side of
+$\theta$---they both must be constant if the relation is to hold for arbitrary values
+of $r$ and $\theta$. Then---with some foreknowledge---one sets this constant equal to
+$k^2$, for some constant $k\in\mathbb{R}$. This gives two second-order ordinary
+differential equations:
 %
 \be
 r\frac{d}{dr}(r \frac{df(r)}{dr}) = k^2 f(r) \qquad
@@ -285,10 +299,10 @@ f(r)=\alpha_k r^k + \beta_k r^{-k}
 g(\theta)= \gamma_k \sin(k\theta)+\delta_k \cos(k\theta)
 \ee
 
-With the physically reasonable requirement that $g(\theta)=g(\theta + 2\pi)$, we have
-that $k$ is an integer. Hence, by the principle of superposition and the linearity of
-differentiation, the general solution to the Laplace equation in polar co-ordinates is
-a sum of these terms:
+For consistency, we expect periodicity of $g$, namely that $g(\theta)=g(\theta + 2\pi)$,
+so that $k$ can only take integer values. Hence, by the principle of superposition and
+the linearity of differentiation, the general solution to the Laplace equation in
+polar co-ordinates is:
 %
 \be
 \phi(r,\theta)
@@ -300,18 +314,20 @@ For a particular solution to the system considered here one must impose boundary
 conditions, specifically we use \emph{Dirichlet boundary conditions}.
 
 By considering the geometry of the system, we expect a solution that is symmetric
-about $\theta=0$. This implies that $\gamma = 0$ and $\gamma_n=0$, $\forall n$ as
-$\sin()$ is anti-symmetric about the origin (c.f. odd). Additionally, the potential
-is finite as $r \rightarrow \infty$, implying that $\alpha$ and $\alpha_n$ are both
-zero. We now have:
+about $\theta=0$. This directly implies that $\gamma = 0$ and $\gamma_n=0$, $\forall n$
+as $\sin(\theta)$ and $\theta$ are both anti-symmetric (or odd) about the origin.
+Additionally, the potential is finite as $r \rightarrow \infty$, which implies that
+$\alpha$ and $\alpha_n$ are both zero. We now have:
 %
 \be
 \phi(r,\theta)=\beta + \sum_{n=1}^{\infty}(\frac{\beta_n}{r^n} \cos(n\theta))
 \ee
 %
 where the $\beta$'s have absorbed other constants. In particular, as
-$r \rightarrow \infty$, we require $\phi=-\frac{V}{d}x=-\frac{V}{d}r\cos(\theta)$.
-Since the infinite sum vanishes at infinity, $\beta=-\frac{V}{d}r\cos(\theta)$.
+$r \rightarrow \infty$, we expect the potential to be linearly decreasing between the
+plates. Mathematically, we require $\phi=-\frac{V}{d}x=-\frac{V}{d}r\cos(\theta)$ in
+polar co-ordinates. Since the infinite sum vanishes at infinity, we have that
+$\beta=-\frac{V}{d}r\cos(\theta)$.
 
 We now have that
 %
@@ -320,44 +336,119 @@ We now have that
               =(\frac{\beta_1}{r}-\frac{V}{d}r)\cos(\theta) + \sum_{n=2}^{\infty}(\frac{\beta_n}{r^n} \cos(n\theta))
 \ee
 
-We require that the potential is zero on the surface of the cylinder,
-$\phi(R,\theta)=0$, so that $\beta_1=\frac{VR^2}{d}$ and $\beta_{n \geq 2}=0$
+We expect continuity of the potential at the surface of the cylinder:
+$\phi(r=R,\theta)=0$, so that $\beta_1=\frac{VR^2}{d}$ and $\beta_{n \geq 2}=0$,
+since the set $\{\cos(n\theta)\}$ are linearly independent functions.
 
-Thus, the final form for the electrostatic potential is
+Thus, the final form for the electrostatic potential for System One (see
+Figure~\ref{fig:analytic}) is
 %
 \be
 \phi(r,\theta)=
-\begin{cases} \qquad 0, & \quad r \leq a \\
+\begin{cases} \quad \qquad 0, & \quad r \leq a \\
 \frac{V}{d}(\frac{R^2}{r}-r)\cos(\theta), & \quad r > a
 \end{cases}
 \ee
-%
-a graph of which is shown in Figure~\ref{fig:analytic}.
 
 \begin{figure}
 \begin{center}
 \includegraphics{analytic.pdf}
-\caption{Analytic solution with $V=1$, $R=15$ on $100\times100$ grid}
+\caption{Analytical solution for the electrostatic potential of System One, with $V=1$,
+$R=15$, $d=50$}
 \label{fig:analytic}
 \end{center}
 \end{figure}
 
-\section{Relaxation Methods}
+\section{Numerical Methods}
+\subsection{Finite Difference Methods}
 
-\subsection{Jacobi's Iterative Method}
+System One is a very idealised system, that is not practically reasonable, for example
+one cannot use charged planes that are infinite in extent. For real-world systems
+it is difficult, and often impossible, to express boundary conditions in a manner that
+is algebraically utilisable and is thus impossible to find a particular analytical
+solution to Laplace's equation for arbitrary, non-trivial, boundary conditions. These
+solutions must be numerically approximated.
 
-For our purposes, we wish to discretise the following equation:
+To numerically approximate the solution to a differential equation it is
+necessary to approximate the derivative of a function. The usual method employed to
+do this is finite differencing. This approximates the derivative by using explicit
+differencing to step the function from one value to the next in small 
+increments of some variable. The smaller the increment used, the more accurate
+the approximation, but the longer and more computationally intensive the process.
+
+Suppose one wishes to approximate the first derivative of a function $f(t)$, say,
+with respect to the variable $t$. The simplest way to do this is to discretise the
+definition of the derivative and write
+%
+\be
+\frac{df}{dt} = \lim_{\Delta t \to 0} \frac{f(t+\Delta t) - f(t)}{\Delta t} \approx \frac{f(t+\Delta t) - f(t)}{\Delta t}
+\ee
+%
+where $f(t+\Delta t)$ and $f(t)$ are two values of $f$, evaluated at two points
+a distance $\Delta t$ apart, and $\Delta t$ is assumed to be small enough that
+the approximation is good. This is known as the \emph{forward difference approximation}.
+
+Similarly, to approximate the second derivative of a function, one writes
+%
+\be
+\frac{d^2 f}{dt^2} \approx \frac{f'(t) - f'(t-h)}{\Delta t} \\
+= \frac{\frac{f(t +\Delta t) - f(t)}{\Delta t} - \frac{f(t) - f(t -\Delta t)}{\Delta t}}{\Delta t} \\
+= \frac{f(t +\Delta t) - 2f(t) + f(t-\Delta t)}{\Delta t ^2}
+\ee
+
+\subsection{Discretisation of Laplace's Equation}
+To numerically solve the Laplace equation it must be expressed in a discrete form.
+We define a rectangular region on which to discretise Laplace's equation, given by:
+%
+\be
+\{(x,y)|\:0<x<a, 0<y<b\}
+\ee
+%
+and create a grid of points at which to evaluate the potential of spacial separation
+$\Delta x$ in the $x$ direction, and $\Delta y$ in the $y$ direction (see
+Figure~\ref{fig:grid}).
+
+\begin{figure}
+\centering
+\begin{tikzpicture}
+
+\foreach \x in {0,...,10}
+{
+\draw[fill=black] (0.5*\x,0) circle (0.1cm);
+\draw[fill=black] (0.5*\x,5) circle (0.1cm);
+}
+
+\foreach \y in {0,...,10}
+{
+\draw[fill=black] (0,0.5*\y) circle (0.1cm);
+\draw[fill=black] (5,0.5*\y) circle (0.1cm);
+}
+
+\foreach \x in {1,...,9}
+\foreach \y in {1,...,9}
+{
+\draw[fill=white] (0.5*\x,0.5*\y) circle (0.1cm);
+}
+\fill (0,0) node[below left, font=\footnotesize] {$(x_0,y_0)$};
+\fill (2.5,0) node[below, font=\footnotesize, yshift = -0.2cm] {$x_j=j\Delta x$};
+\fill (5,2.5) node[right, font=\footnotesize, xshift = 0.2cm] {$y_k=k\Delta y$};
+\end{tikzpicture}
+\caption{A pictorial representation of the grid on which the potential is approximated.
+White points denote interior points that change value; black points denote constant
+boundary points at which Dirichlet boundary conditions are imposed.}
+\label{fig:grid}
+\end{figure}
+
+To be easily expressible numerically, the Laplace equation in
+two-dimensional Cartesian co-ordinates is discretised:
 % 
 \be 
 \frac{\partial^2 \phi}{\partial x^2}+\frac{\partial^2 \phi}{\partial y^2} = 0
 \label{eq:laplace}
 \ee 
 
-One can define a region on which to discretise this equation, $\{(x,y)|\:0<x<L,0<y<D\}$,
-and define a grid of points of spacial separation $\Delta x$ in the $x$ direction,
-and $\Delta y$ in the $y$ direction. We wish to find the value of $\phi$ at each point.
-
-One can now approximate Eqn.~\ref{eq:laplace} as:
+Writing the value of the potential at position $(x_j,y_k)$ on the grid as $\phi_{j,k}$,
+one can now approximate Eqn.~\ref{eq:laplace} as:
 % 
 \be
 \frac{\phi_{j+1,k}-2\phi_{j,k}+\phi_{j-1,k}}{\Delta x^2} = - \frac{\phi_{j,k+1}-2\phi_{j,k}+\phi_{j,k-1}}{\Delta y^2}
@@ -365,7 +456,7 @@ One can now approximate Eqn.~\ref{eq:laplace} as:
 %
 where $j$ and $k$ index the $x$ and $y$ directions respectively.
 
-If we use the same spacing $\Delta=\Delta x=\Delta y$ in both $x$ and $y$ directions this
+For a unique spacing $\Delta=\Delta x=\Delta y$ in both $x$ and $y$ directions this
 reduces to the statement that the value of the potential at a specific point is the
 average of the value of the potential at the four surrounding points: 
 %
@@ -374,10 +465,12 @@ average of the value of the potential at the four surrounding points:
 \label{eq:relax}
 \ee
 
-Suppose one has some initial guess of the value of $\phi$ at all points, $\phi_{j,k,0}$,
-say. One evaluates Eqn~\ref{eq:relax} at all points on the grid simultaneously and
-generates a new better approximation for the potential, $\phi_{j,k,1}$. Iterating this
-process $n$ times, one has
+\subsection{Jacobi's Iterative Method}
+
+Suppose one has some initial guess of the value of the potential at all points on the
+grid, $\phi_{j,k,0}$, say. One evaluates Eqn~\ref{eq:relax} at all points on the grid
+simultaneously and generates a new better approximation for the potential,
+$\phi_{j,k,1}$. Iterating this process $n$ times, one has
 %
 \be
 \phi_{j,k,n+1}= \frac{1}{4}(\phi_{j-1,k,n}+\phi_{j+1,k,n}+\phi_{j,k-1,n}+\phi_{j,k+1,n})
@@ -389,10 +482,11 @@ This is known as \emph{Jacobi's iterative method}, the simplest version of a
 
 \subsection{The Gauss-Seidel Method}
 
-An alternative relaxation method, known as the \emph{Gauss-Seidel method}, exists where
-points at which the potential has already been updated by the algorithm as it loops
-through the grid, namely $\phi_{j-1,k}$ and $\phi_{j,k-1}$ in our notation, are used in
-the iteration scheme, as shown:
+As the grid is iterated through and relaxation is applied, points at which the potential has
+already been updated---namely $\phi_{j-1,k}$ and $\phi_{j,k-1}$ in our notation---are
+presumably more accurate to the correct solution than points that have not been updated.
+An alternative relaxation method, known as the \emph{Gauss-Seidel method}, takes use of
+this idea and defines an iterative scheme given by:
 %
 \be
 \phi_{j,k,n+1}= \frac{1}{4}(\phi_{j-1,k,n+1}+\phi_{j+1,k,n}+\phi_{j,k-1,n+1}+\phi_{j,k+1,n})
@@ -404,7 +498,7 @@ potential at each grid point to be stored, thus reducing computation time.
 
 \subsection{Successive Over-Relaxation}
 
-Neither the Jacobi iterative method or the Gauss-Seidel method utilise the value
+Neither the Jacobi iterative method nor the Gauss-Seidel method utilise the value
 of the potential at the current point in the previous iteration, in our notation
 $\phi_{j,k,n}$. It can be shown that using this point, and defining a
 \emph{relaxation parameter}, $1<s<2$, one can define the following iterative algorithm:
@@ -413,11 +507,16 @@ $\phi_{j,k,n}$. It can be shown that using this point, and defining a
 \phi_{j,k,n+1}= (1-s)\phi_{j,k,n}+\frac{s}{4}(\phi_{j-1,k,n+1}+\phi_{j+1,k,n}+\phi_{j,k-1,n+1}+\phi_{j,k+1,n})
 \ee
 %
-which is a more convergent numerical method. This technique is known as successive
-over-relaxation.
+where the optimum value for $s$ for an $n \times n$ square grid is
+\be
+s_{opt} = \frac{2}{1+\sin(\frac{\pi}{n})} \approx \frac{2}{1+\frac{\pi}{n}}
+\ee
+
+This is a more convergent numerical method than those previously and is called 
+\emph{successive over-relaxation}.
 
 %add fergus
-%input{sor.tex}
+%\input{sor.tex}
 
 \subsection{Checkerboard (Red-Black) Updating}
 
@@ -425,60 +524,113 @@ In each of the previous methods, the value of the potential is calculated from, 
 its previous value at the current point and the current or previous values of the
 potential at the four neighbouring points. Noting this, let us denote $\phi_{j,k}$ as
 \emph{odd} if $j+k$ is odd, and even otherwise. Then the potential at each even point
-solely depends on the potential at odd points (and its previous value). One could then,
-in principle, iterate through the grid of points at which we approximate the potential,
+solely depends on the potential at odd points, and vice-versa. One could then, in
+principle, iterate through the grid of points at which the potential is approximated,
 and update all the odd points, and then re-iterate through the grid, updating all the
 even points using the value of the potential at the newly updated odd points. Such an
 iterative scheme exists, and is known as \emph{Checkerboard (Red-Black) Updating}, for
-obvious reasons. It can be shown to be a more convergent method than those outlined
-previously, and successive over-relaxation can easily be implemented within the scheme.
+obvious reasons. The method essentially reduces a system of $N$ linear equations into
+two coupled systems of $\frac{N}{2}$ linear equations that can be solved separately.
+
+The method can be shown to be a more convergent method than those outlined previously,
+and successive over-relaxation can easily be implemented within the scheme.
 Figure~\ref{fig:checker} shows an illustration of the algorithm.
 
 \begin{figure}[h!]
 \begin{center}
-\begin{tikzpicture}
-\draw[fill=red] (0,0) circle (0.2cm) node[below] {$\phi_{j+1,k-1}$}; 
-\draw[fill=black] (2,0) circle (0.2cm) node[below] {$\phi_{j+1,k}$}; 
-\draw[fill=red] (4,0) circle (0.2cm) node[below] {$\phi_{j+1,k+1}$};
-\draw[fill=black] (0,2) circle (0.2cm) node[below] {$\phi_{j,k-1}$};
-\draw[fill=red] (2,2) circle (0.2cm) node[below] {$\phi_{j,k}$};
-\draw[fill=black] (4,2) circle (0.2cm) node[below] {$\phi_{j,k+1}$};
-\draw[fill=red] (0,4) circle (0.2cm) node[below] {$\phi_{j-1,k-1}$};
-\draw[fill=black] (2,4) circle (0.2cm) node[below] {$\phi_{j-1,k}$};
-\draw[fill=red] (4,4) circle (0.2cm) node[below] {$\phi_{j-1,k+1}$};
-\end{tikzpicture}
+	\begin{tikzpicture}
+	\draw[fill=red] (0,0) circle (0.2cm) node[below] {$\phi_{j+1,k-1,n}$}; 
+	\draw[fill=black] (2,0) circle (0.2cm) node[below] {$\phi_{j+1,k,n}$}; 
+	\draw[fill=red] (4,0) circle (0.2cm) node[below] {$\phi_{j+1,k+1,n}$};
+	\draw[fill=black] (0,2) circle (0.2cm) node[below] {$\phi_{j,k-1,n}$};
+	\draw[fill=red] (2,2) circle (0.2cm) node[below] {$\phi_{j,k,n}$};
+	\draw[fill=black] (4,2) circle (0.2cm) node[below] {$\phi_{j,k+1,n}$};
+	\draw[fill=red] (0,4) circle (0.2cm) node[below] {$\phi_{j-1,k-1,n}$};
+	\draw[fill=black] (2,4) circle (0.2cm) node[below] {$\phi_{j-1,k,n}$};
+	\draw[fill=red] (4,4) circle (0.2cm) node[below] {$\phi_{j-1,k+1,n}$};
+	\end{tikzpicture}
 \end{center}
 \caption{An illustration of checkerboard updating. The black points are updated first,
-and then red points are calculated from the newly updated black points.}
+and then red points are updated using the newly updated black points.}
 \label{fig:checker}
 \end{figure}
+
+Another advantage of this method is that due to the independent nature of the red and
+black points, it lends itself particularly well to the introduction of parallel 
+computing, which can reduce computation time even more, particularly for larger grid
+sizes.
 
 %add stephen
 %\input{checker.tex}
 
-%add fergus' section
 \subsection{Nine-point Stenciling}
 \input{nine_p.tex}
 
 \subsection{Comparison of methods}
 
-This is the scheme we shall use to numerically approximate the electrostatic potential
-in different . 
+To decide which relaxation method was best to implement in the software package,
+each method was coded into C++ and ran to solve Laplace's equation for System One.
+The resulting numerical approximations can be seen in Figure~\ref{fig:comparison}.
 
-%start of section
-%section is still under work
+%fig:comparison
+
+As there is very little graphical difference between each method, more quantitative
+comparison methods were emplyed, namely the relative convergence and error---as
+compared to the analytical solution---of each method, and their variance with
+iterations, was studied. Also studied was the CPU time for the method. The results
+are summarised in Figure~\ref{fig:stats}.
+
+\begin{figure}
+\centering
+\begin{subfigure}{0.8\textwidth}
+	\includegraphics[scale=0.8]{rel_convergence.pdf}
+	\caption{Average relative convergence, between successive approximations for the potential of each method, versus number of iterations}
+	\label{fig:conv}
+\end{subfigure}
+
+\begin{subfigure}{0.8\textwidth}
+	\includegraphics[scale=0.8]{rel_error.pdf}
+	\caption{Average relative error of each method, as compared to the analytical solution, versus number of iterations}
+	\label{fig:err}
+\end{subfigure}
+
+\begin{subfigure}{0.8\textwidth}
+	\includegraphics[scale=0.8]{time.pdf}
+	\caption{CPU time taken by each method versus number of iterations}
+	\label{fig:time}
+\end{subfigure}
+\caption{Summary of the method comparison statistics}
+\label{fig:stats}
+\end{figure}
+
+The following conclusions were drawn from the data:
+%
+\begin{itemize}
+\item the addition of successive over-relaxation causes drastic increase in convergence
+\item average relative error essentially converges for all methods
+\item CPU time is not an important factor
+\end{itemize}
+
+%maybe include plot of completion time vs desired convergence
+
+Hence, Checkerboard Updating with successive over-relaxation shall be employed
+in the genereal software package, since it converges in the least iterations,
+and hence least time, but to the same accuracy as the other methods.
+
 \section{Software Package \emph{estatics} for general electrostatic systems}
 
-We developed a general software package in C++ to solve and plot the potential and
+A general software package in C++ was developed to solve and plot the potential and
 electric field for an arbitrary electrostatic system. It accepts input of a coloured
-bitmap, where the colours represent different potentials, and returns plots of the
-resultant electrostatic potential and electric field.
+bitmap, where the colours represent different constant potentials, converts this into
+an array of values and applies checkerboard updating with successive over-relaxation
+to this array until it is deemed to have converged. The package then returns plots of the
+resultant electrostatic potential, equipotential lines and electric field.
 
 Figure~\ref{fig:flowchart} shows a flowchart representing the algorithm employed.
 
 \begin{figure}[htbp!]
 \begin{center}
-\begin{tikzpicture}[node distance=2cm]
+\begin{tikzpicture}[node distance=1.8cm]
 
 \node (start) [startstop] {start};
 \node (in1) [io, below of=start] {input of bitmap and potentials};
@@ -506,56 +658,41 @@ Figure~\ref{fig:flowchart} shows a flowchart representing the algorithm employed
 \label{fig:flowchart}
 \end{figure}
 
-%adds fergus' section
 \subsection{Bitmaps}
 \input{bitmap.tex}
 
-%fergus
-\subsection{Convergence}
-%\input{convergence.tex}
-
-%stephen
 \subsection{Data Handling}
 %\input{data.tex}
 
-%adds stephen's section, uncomment and compile
+\subsection{Convergence}
+\input{convergence.tex}
+
 \subsection{Boolean Masks and Locking}
 %\input{boolean.tex}
 
 \subsection{Timing and CPU usage}
 
-%adds lassi's section, uncomment and compile
+\subsection{Parallel Processing}
+%\input{parallel.tex}
+
 \subsection{Output and Plotting}
 \input{plotting.tex}
 
-%adds lassi's section on results for different systems
-\subsection{Results}
+\section{Results}
 %\input{results.tex}
-Figure~\ref{fig:numerical} shows the numerical approximation to the potential,
-and Figure~\ref{fig:field} shows the electric field around the cylinder.
 
-\begin{figure}
-\centering
-\begin{subfigure}[b]{0.7\textwidth}
-	\includegraphics[width=\textwidth]{potentialA.pdf}
-	\caption{electrostatic potential}
-	\label{fig:numerical}
-\end{subfigure}
-
-\begin{subfigure}[b]{0.7\textwidth}
-	\includegraphics[width=\textwidth]{fieldA.pdf}
-	\caption{electric field}
-	\label{fig:field}
-\end{subfigure}
-\caption{Numerical approximations for electrostatic potential and electric field with
-$V=1$, $R=15$ on $100\times100$ grid for $10000$ iterations}
-\end{figure}
-
-%start of section
 \section{Conclusion}
 
 \subsection{Further Work}
 Fast Fourier transforms
+
+Time-varying potentials
+
+Multigrid methods.
+
+Poisson's equation ($\rho \neq 0$).
+
+Time evolution i.e. time dependency (heat equation).
 
 %include BibTex bibliography
 \bibliography{report}
@@ -563,7 +700,7 @@ Fast Fourier transforms
 %start of appendix
 \appendix
 \section{Appendices}
-\subsection{Algorithm for System A}
+\subsection{Algorithm for System One}
 To numerically approximate the electrostatic potential for System 1 via the 
 relaxation method the following rudimentary algorithm was developed.
 
@@ -612,4 +749,4 @@ relaxation method the following rudimentary algorithm was developed.
 \end{algorithmic}
 \end{algorithm}
 
-\end{document} %end of document
+\end{document}
