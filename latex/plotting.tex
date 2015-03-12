@@ -1,7 +1,7 @@
 % plotting.tex - to be inserted into the the main report.tex file
 
 \section{Outputting and plotting the results} % explain what the output files look like and how they are plotted
-The final matrix contains the numerical value of the electric potential at each point in the grid as a number of type \emph{double}. The program outputs the value of each point along the y-direction corresponding to an x-value, then moves on to the next x-value and repeats the process. The program writes the value of the potential at each point to a file in the format shown in table \ref{table:potential_data}.
+The final array contains the numerical value of the electric potential at each point in the grid as a number of type \emph{double}. The program outputs the value of each point along the y-direction corresponding to an x-value, then moves on to the next x-value and repeats the process. The program writes the value of the potential at each point to a file in the format shown in table \ref{table:potential_data}.
 
 After all y values have been outputted for an x value, the final row is followed by an empty row before the next x value is started. This is done to allow gnuplot to plot three dimensional data. This file is used to plot the potential as a heatmap-styled plot, an example of which can be seen in figure \ref{fig:potentialplot}.
 
@@ -59,7 +59,7 @@ Another output file is also produced to allow the plotting of the electric field
     }
 \end{table}
 
-Again, empty lines are inserted before a change in x-values to make operating gnuplot easier. The data can then be plotted as a vector field in, for example, gnuplot. By setting some functions in gnuplot, one can make the vectors in the field of uniform size (to improve readability) and indicate the magnitude of the vector by colour. An example of such a plot can be seen in figure \ref{fig:vectorfieldplot}.
+Again, empty lines are inserted before a change in x-values to make operating gnuplot easier. The data can then be plotted as a vector field in gnuplot using "plot \ldots with vectors". By setting some functions in gnuplot, one can make the vectors in the field of uniform size (to improve readability) and indicate the magnitude of the vector by colour. An example of such a plot can be seen in figure \ref{fig:vectorfieldplot}.
 
 \begin{figure}[h!]
     \centering
