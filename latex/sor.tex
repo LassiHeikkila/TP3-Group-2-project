@@ -1,4 +1,3 @@
-\subsection{Successive Over-Relaxation}
 Solving the Laplace equation using the finite difference method can be written in the form of a one dimensional linear equation by replacing:
 \be
 i = j(K+1) + k
@@ -6,15 +5,15 @@ i = j(K+1) + k
 The solution of all the points on the grid is a system of linear equations which can be represented in matrix form as:
 \be
 \label{matrixform}
-\boldmath A \cdot \phi = b
+\boldsymbol{A} \cdot \boldsymbol{\phi} = \boldsymbol{b}
 \ee
 Where the values of the potential are $\boldsymbol{\phi}$ and $\boldsymbol{A}$ is a "tridiagonal with fringes" matrix. This matrix can be split into matrices $\boldsymbol{L + D + U}$, where $\boldsymbol{L}$ is the lower triangle, $\boldsymbol{D}$ is the diagonal elements  and $\boldsymbol{U}$ is the upper triangle of matrix $\boldsymbol{A}$. Equation \ref{matrixform} then becomes:
 \be
-\boldsymbol{(L + D + U) \cdot \phi = b}
+(\boldsymbol{L} + \boldsymbol{D} + \boldsymbol{U}) \cdot \boldsymbol{\phi} = \boldsymbol{b}
 \ee
 This is then multiplied by a constant $s$ - the relaxation parameter - where $s > 1$. By also knowing  the potential on the left hand side, $\boldsymbol{\phi^{n}}$ is numerically solved using the potential determined from the previous iteration, $\boldsymbol{\phi^{n-1}}$ the expression becomes:
 \be
-\boldsymbol{\phi^{n} = (D + sL)^{-1}(b - (sU + (s-1)D) \cdot \phi^{n-1})}
+\boldsymbol{\phi}^{n} = (\boldsymbol{D} + s\boldsymbol{L})^{-1}(b - (s\boldsymbol{U} + (s-1)\boldsymbol{D}) \cdot \boldsymbol{\phi}^{n-1})
 \ee
 This is in the form of $\boldsymbol{\phi^{n} = B\phi^{n-1} + b}$ where $\boldsymbol{B}$ is the matrix $\boldsymbol{(D + sL)^{-1}(sU + (s-1)D)}$. The solutions to $\phi^{n}$ converge to their true values faster with lower $\boldsymbol{B}$. Therefore the relaxation parameter is chosen to minimise $\boldsymbol{||(D + sL)^{-1}(sU + (s-1)D)}||$. In two dimensional iterative form the successive over-relaxation method for the Laplace equation becomes:
 \be
