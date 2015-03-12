@@ -1,12 +1,20 @@
-The previous expression for the Laplace equation to find the potential of point $(x,y)$ using points $(x,y+h)$, $(x,y-h)$, $(x-1,h)$ and $(x+h,y)$ can be expanded to include the points $(x+h,y+h)$, $(x+h,y-h)$, $(x-h,y+h)$ and $(x-h,y-h)$. This is done by incorporating the Taylor expansion for the new points with the previous expression. The Laplace equation becomes:
-
-\begin{align*}
-\nabla ^2 \phi = \frac{4(\phi_{i+1,j} + \phi_{i-1,j} + \phi_{i,j-1} + \phi_{i,j+1})}{6h^2}
-\end{align*}
-\begin{align*}
-+ \frac{\phi_{i+1,j-1} + \phi_{i+1,j+1} + \phi_{i-1,j-1} + \phi_{i-1,j+1}}{6h^2}
-\end{align*}
+The previous expression for the Laplace equation to find the potential of point $(x,y)$
+using points $(x,y+h)$, $(x,y-h)$, $(x-h,y)$ and $(x+h,y)$ can be expanded to
+include the points $(x+h,y+h)$, $(x+h,y-h)$, $(x-h,y+h)$ and $(x-h,y-h)$. This is
+done by incorporating the Taylor expansion for the new points with the
+previous expression. The Laplace equation becomes:
+%
 \begin{align}
-- \frac{20\phi_{i,j})}{6h^2} - \frac{h^2(\phi_{xxxx} + 2 \phi_{xxyy} + \phi_{yyyy})}{6} - O(h^4)
+\nabla ^2 \phi &= \frac{4(\phi_{i+1,j} + \phi_{i-1,j} + \phi_{i,j-1} + \phi_{i,j+1})}{6h^2} \nonumber \\
+&+ \frac{\phi_{i+1,j-1} + \phi_{i+1,j+1} + \phi_{i-1,j-1} + \phi_{i-1,j+1}}{6h^2} \nonumber \\
+&- \frac{20\phi_{i,j}}{6h^2} - \frac{h^2(\phi_{xxxx} + 2 \phi_{xxyy} + \phi_{yyyy})}{6} - O(h^4)
 \end{align}
-The truncation error associated with the expression is second order. However, the terms inside the bracket $(\phi_{xxxx} + 2 \phi_{xxyy} + \phi_{yyyy})$ is equal to the Laplacian of the Laplacian of the potential $\nabla^2 (\nabla ^2 \phi)$. For the case for the Laplace equation, $\nabla ^2 \phi = 0$ and therefore the second order term in the expression is reduced to zero and the truncation error becomes fourth order. This allows the nine-point stencil to be more accurate with less iterations than the five-point stencil. However, the larger calculations have a computational cost and increases the time spent on each iteration.
+
+The truncation error associated with the expression is second order. However, the terms
+inside the bracket $(\phi_{xxxx} + 2 \phi_{xxyy} + \phi_{yyyy})$ is equal to the
+Laplacian of the Laplacian of the potential $\nabla^2 (\nabla ^2 \phi)$. For the case
+for the Laplace equation, $\nabla ^2 \phi = 0$ and therefore the second order term in
+the expression is reduced to zero and the truncation error becomes fourth order. This
+allows the nine-point stencil to be more accurate with less iterations than the
+five-point stencil. However, the larger calculations have a computational cost and
+increases the time spent on each iteration.
