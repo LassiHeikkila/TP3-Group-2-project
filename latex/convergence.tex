@@ -17,3 +17,9 @@ The magnitude of the difference of the potential between successive iterations a
 \epsilon_{rel \; i,j}^{n} = |\tilde{\phi}^{n} - \tilde{\phi}^{n-1}|
 \end{align}
 This value is used in the program to limit the number of iterations the numerical process undertakes and also is used to 'lock' converged points to reduce calculations per iteration.
+\subsection{Convergence Limit}
+The successive over-relaxation method does not have an easily quantifiable error. The truncation error from the finite difference approximation is found by calculating higher derivatives than the solution requires and therefore requires substantially more computing to determine. Within the program, the precision of the numerical solution is analysed as an indicator of accuracy. The relative error is found for every point on the potential grid to determine the convergence of the system.
+\\
+The number of iterations the program carries out for a system can be made dependent on the convergence; the system can be iterated over until all the points meet a desired relative error $\epsilon$. This desired relative error is taken from the command line arguments and is a value typically between $10^{-3}$ and $10^{-12}$. When every points relative error has fallen below the desired relative error, $\epsilon_{rel} < \epsilon$, the system is said to be converged. 
+\\
+The successive over-relaxation method iterates within a while loop. This while loop is conditioned so that it loops through the potential grid with the successive over-relaxation method until the 'convergence count' is equal to the number of points on the grid (number of pixels of the image). The convergence count is set to zero at the start of each iteration, and it is incremented by one for every point that has a relative error less than the desired relative error.
