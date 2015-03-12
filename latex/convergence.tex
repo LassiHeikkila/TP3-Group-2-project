@@ -1,19 +1,19 @@
 The successive over-relaxation method does not have an easily quantifiable error. The truncation error from the finite difference approximation is found by calculating higher derivatives than the solution requires and therefore requires substantially more computing to determine. Instead the precision of our results are analysed.
 \\
 The precision is related to how close a numerically determined value is from the true value it is converging to. If a numerical process determines a value $\tilde{x}$ on iteration $n$ which is converging to $x$, then:
-\begin{align}
+\begin{align*}
 \lim_{n \rightarrow \infty}\tilde{x} = x                     
-\end{align}
+\end{align*}
 As the true value $x$ is constant, if the expression is differentiated with respect to the number of iterations, the rate of change of the determined value $\tilde{x}$ over iterations tends towards zero:
-\begin{align}
+\begin{align*}
 \lim_{n \rightarrow \infty}\frac{d\tilde{x}}{dn} = \lim_{n \rightarrow \infty} (\tilde{x}^{n} - \tilde{x}^{n-1}) = 0                     
-\end{align}
+\end{align*}
 The magnitude of the difference of determined values $\tilde{x}$ between successive iterations is then related to how close the value is to the true value $x$. The closer the value is to zero, the more precise the value.
 \subsection{Absolute Convergence}
 The magnitude of the difference of the potential between successive iterations at some point is referred to as absolute convergence $\epsilon_{abs}$ of that point:
-\begin{align}
+\begin{align*}
 \epsilon_{abs \; i,j}^{n} = |\tilde{\phi}^{n} - \tilde{\phi}^{n-1}|
-\end{align}
+\end{align*}
 This value is used in the program to limit the number of iterations the numerical process undertakes and also is used to 'lock' converged points to reduce calculations per iteration.
 \subsection{Convergence Limit}
 Within the program, the precision of the numerical solution is analysed as an indicator of accuracy. The absolute convergence is found for every point on the potential grid to determine the convergence of the system.
