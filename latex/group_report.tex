@@ -221,10 +221,10 @@ the cylinder.
 \begin{figure}[h!]
 \begin{center}
 \begin{tikzpicture}
-\draw (0,0) node[below] {$x = -d$} -- (0,6) node[above] {$\phi = V$}; 
-\draw (10,0) node[below] {$x = d$} -- (10,6) node[above] {$\phi = -V$}; 
-\draw (5,3) circle (1cm) node[below] {$\phi=0$};
-\draw[dashed] (5,3) -- (5.6,3.8) node[pos=0.5,above left] {$R$};
+\draw (0,0) node[below] {$x = -d$} -- (0,4.8) node[above] {$\phi = V$}; 
+\draw (8,0) node[below] {$x = d$} -- (8,4.8) node[above] {$\phi = -V$}; 
+\draw (4,2.4) circle (1cm) node[below] {$\phi=0$};
+\draw[dashed] (4,2.4) -- (4.6,3.2) node[pos=0.5,above left] {$R$};
 \end{tikzpicture}
 \end{center}
 \caption{Cross-sectional diagram of System One}
@@ -239,11 +239,11 @@ in Figure~\ref{fig:sys two}.
 \begin{figure}[h!]
 \begin{center}
 \begin{tikzpicture}
-\draw (0,0) -- (12,0) node[right] {$\phi = V$}; 
-\draw (0,5) -- (12,5) node[pos=0.25, above] {GND} node[pos=0.5, above] {GND} node[pos=0.75,above] {GND}; 
-\draw (2.5,5) rectangle (3.5,4.75);
-\draw (5.5,5) rectangle (6.5,4.75);
-\draw (8.5,5) rectangle (9.5,4.75);
+\draw (0,0) -- (9.6,0) node[right] {$\phi = V$}; 
+\draw (0,4) -- (9.6,4) node[pos=0.25, above, font=\footnotesize] {GND} node[pos=0.5, above, font=\footnotesize] {GND} node[pos=0.75,above, font=\footnotesize] {GND}; 
+\draw (2,4) rectangle (2.8,3.8);
+\draw (4.4,4) rectangle (5.2,3.8);
+\draw (6.8,4) rectangle (7.6,3.8);
 \end{tikzpicture}
 \end{center}
 \caption{Cross-sectional diagram of System Two}
@@ -633,37 +633,7 @@ to this array until each grid point is deemed to have converged. The package the
 returns plots of the resultant electrostatic potential, equipotential lines and electric
 field.
 
-Figure~\ref{fig:flowchart} shows a flowchart of the software.
-
-\begin{figure}[htbp!]
-\begin{center}
-\begin{tikzpicture}[node distance=1.8cm]
-
-\node (start) [startstop] {start};
-\node (in1) [io, below of=start] {input of bitmap and potentials};
-\node (pro1) [process, below of=in1] {convert bitmap to matrix};
-\node (pro2) [process, below of=pro1] {apply relaxation to matrix};
-\node (dec1) [decision, below of=pro2, yshift=-1.5cm] {check convergence};
-\node (inv) [inner sep=0, minimum size=0, right of=dec1, xshift=2cm] {}; % invisible node
-\node (pro3) [process, below of=dec1, yshift=-1.5cm] {find electric field};
-\node (out1) [io, below of=pro3] {plot field and potential};
-\node (stop) [startstop, below of=out1] {stop};
-
-\draw [arrow] (start) -- (in1);
-\draw [arrow] (in1) -- (pro1);
-\draw [arrow] (pro1) -- (pro2);
-\draw [arrow] (pro2) -- (dec1);
-\draw [arrow] (dec1) -- node[left] {convergent} (pro3);
-\draw (dec1) -- (inv);
-\draw [arrow] (inv) |- node[pos=0.25, right] {non-convergent} (pro2);
-\draw [arrow] (pro3) -- (out1);
-\draw [arrow] (out1) -- (stop);
-
-\end{tikzpicture}
-\end{center}
-\caption{Flowchart of steps in software package}
-\label{fig:flowchart}
-\end{figure}
+Appendix~\ref{app:flowchart} shows a flowchart of the software.
 
 \subsection{Bitmaps}
 \input{bitmap.tex}
@@ -755,5 +725,37 @@ relaxation method the following rudimentary algorithm was developed.
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
+
+\section{Flowchart for System}
+\label{app:flowchart}
+\begin{figure}[htbp!]
+\begin{center}
+\begin{tikzpicture}[node distance=1.8cm]
+
+\node (start) [startstop] {start};
+\node (in1) [io, below of=start] {input of bitmap and potentials};
+\node (pro1) [process, below of=in1] {convert bitmap to matrix};
+\node (pro2) [process, below of=pro1] {apply relaxation to matrix};
+\node (dec1) [decision, below of=pro2, yshift=-1.5cm] {check convergence};
+\node (inv) [inner sep=0, minimum size=0, right of=dec1, xshift=2cm] {}; % invisible node
+\node (pro3) [process, below of=dec1, yshift=-1.5cm] {find electric field};
+\node (out1) [io, below of=pro3] {plot field and potential};
+\node (stop) [startstop, below of=out1] {stop};
+
+\draw [arrow] (start) -- (in1);
+\draw [arrow] (in1) -- (pro1);
+\draw [arrow] (pro1) -- (pro2);
+\draw [arrow] (pro2) -- (dec1);
+\draw [arrow] (dec1) -- node[left] {convergent} (pro3);
+\draw (dec1) -- (inv);
+\draw [arrow] (inv) |- node[pos=0.25, right] {non-convergent} (pro2);
+\draw [arrow] (pro3) -- (out1);
+\draw [arrow] (out1) -- (stop);
+
+\end{tikzpicture}
+\end{center}
+\caption{Flowchart of steps in software package}
+\label{fig:flowchart}
+\end{figure}
 
 \end{document}
