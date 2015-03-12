@@ -49,7 +49,8 @@
     showspaces=false,
     showstringspaces=false,
     showtabs=false,
-    tabsize=2
+    tabsize=2,
+    language=C++
 }
 
 %set style of listing to that defined above
@@ -108,7 +109,7 @@ convergence of each of them. We then conclude that the method of
 \emph{Checkerboard Updating with successive over-relaxation} is best.
 
 We then discuss the design, implementation and operation of a software package we have
-developed, \emph{estatics}, which is capable of solving Laplace's equation for arbitrary
+developed, \lstinline|eStatics|, which is capable of solving Laplace's equation for arbitrary
 constant boundary conditions, using the chosen relaxation method. We then present the
 output of the package for different electrostatic systems, and propose opportunities
 for further work.
@@ -503,25 +504,6 @@ method, and it also has the added bonus of not requiring the previous value of t
 potential at each grid point to be stored, thus reducing computation time.
 
 \subsection{Successive Over-Relaxation}
-
-Neither the Jacobi iterative method nor the Gauss-Seidel method utilise the value
-of the potential at the current point in the previous iteration, in our notation
-$\phi_{j,k,n}$. It can be shown that using this point, and defining a
-\emph{relaxation parameter}, $1<s<2$, one can define the following iterative algorithm:
-%
-\be
-\phi_{j,k,n+1}= (1-s)\phi_{j,k,n}+\frac{s}{4}(\phi_{j-1,k,n+1}+\phi_{j+1,k,n}+\phi_{j,k-1,n+1}+\phi_{j,k+1,n})
-\ee
-%
-where the optimum value for $s$ for an $n \times n$ square grid is
-\be
-s_{opt} = \frac{2}{1+\sin(\frac{\pi}{n})} \approx \frac{2}{1+\frac{\pi}{n}}
-\ee
-
-This is a more convergent numerical method than those previously and is called 
-\emph{successive over-relaxation}.
-
-%add fergus
 %\input{sor.tex}
 
 \subsection{Checkerboard (Red-Black) Updating}
@@ -565,9 +547,6 @@ Another advantage of this method is that due to the independent nature of the re
 black points, it lends itself particularly well to the introduction of parallel 
 computing, which can reduce computation time even more, particularly for larger grid
 sizes.
-
-%add stephen
-%\input{checker.tex}
 
 \subsection{Nine-point Stenciling}
 \input{nine_p.tex}
@@ -623,7 +602,7 @@ Hence, Checkerboard Updating with successive over-relaxation was chosen to be us
 in the genereal software package, since it converges in the least iterations,
 and hence least time, but to the same accuracy as the other methods.
 
-\section{Software Package \emph{estatics} for general electrostatic systems}
+\section{Software Package \emph{eStatics} for general electrostatic systems}
 
 A general software package in C++ was developed to solve and plot the potential and
 electric field for an arbitrary electrostatic system. It accepts input of a coloured
@@ -639,18 +618,19 @@ Appendix~\ref{app:flowchart} shows a flowchart of the software.
 \input{bitmap.tex}
 
 \subsection{Data Handling}
-%\input{data.tex}
+\input{data.tex}
+
+\subsection{Boolean Masks and Locking}
+\label{sec:mask}
+\input{boolean.tex}
 
 \subsection{Convergence}
 \input{convergence.tex}
 
-\subsection{Boolean Masks and Locking}
-%\input{boolean.tex}
-
 \subsection{Timing and CPU usage}
 
 \subsection{Parallel Processing}
-%\input{parallel.tex}
+\input{parallel.tex}
 
 \subsection{Output and Plotting}
 \input{plotting.tex}
@@ -661,15 +641,14 @@ Appendix~\ref{app:flowchart} shows a flowchart of the software.
 \section{Conclusion}
 
 \subsection{Further Work}
-Fast Fourier transforms
-
-Time-varying potentials
-
-Multigrid methods.
-
-Poisson's equation ($\rho \neq 0$).
-
-Time evolution i.e. time dependency (heat equation).
+\begin{itemize}
+\item Fast Fourier transforms
+\item Adaptive step-sizing
+\item Time-varying potentials
+\item Multigrid methods
+\item Poisson's equation ($\rho \neq 0$).
+\item Time evolution i.e. time dependency (heat equation).
+\end{itemize}
 
 %include BibTex bibliography
 \bibliography{report}
