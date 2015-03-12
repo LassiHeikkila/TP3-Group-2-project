@@ -75,13 +75,14 @@
 \newcommand{\be}{\begin{equation}}
 \newcommand{\ee}{\end{equation}}
 
-%redefine columns for tabular
+%redefine columns for tabularx
 \newcolumntype{Y}{>{\centering \arraybackslash}X}
 
 \begin{document}
 
-\title{On numerical approximations to solutions of Laplace's equation for different electrostatic configurations}
-\author{S. Brown, F. Hayes, L. Heikkil{\"a}, D. Richardson\\
+\title{On numerical approximations to solutions of Laplace's equation for different
+electrostatic configurations}
+\author{S. Brown, F. Hayes, L. Heikkil{\"a}, D. Richardson,\\
 	School of Physics and Astronomy,\\
 	University of Glasgow,\\
 	Glasgow, United Kingdom}
@@ -95,19 +96,22 @@ conducting objects is modelled and studied. Finite difference methods, namely
 relaxation methods, are employed to solve the Laplace equation numerically,
 to find the approximate form of the electrostatic potential, and hence the electric
 field, present in various electrostatic systems.
-We explicitly focus on two such systems: the case of a long perfectly conducting
-cylinder centred between two infinite planes at potential $+V$ and $-V$; and the
-case of a silicon detector---a system composed of two silicon wafers with segmented
-doped implants at ground potential on one side and a uniform doped implant on the
-other side, held at a potential $+V$.
-We compare the analytical solution of the first system to its approximate numerical
-solution for different relaxation methods, examine the relative error and relative
-convergence of each method, and conclude that the method of 
-\emph{Checkerboard Updating with Successive over-relaxation} is best.
 
-We then create a software package, \emph{estatics}, capable of solving Laplace's
-equation for arbitrary constant boundary conditions using the chosen method, and
-present the output of the package for different electrostatic systems.
+We explicitly focus on two such systems: first, the case of a long perfectly conducting
+cylinder centred between two infinite planes at potential $+V$ and $-V$; and secondly 
+the case of a silicon detector---a system composed of two silicon wafers with segmented
+doped implants at ground potential on one side and a uniform doped implant on the
+other side, held at a potential $+V$. We present the analytical solution of the first
+system. We then compare this solution to the approximate numerical solution produced
+by five different relaxation methods, and examine the relative error and relative
+convergence of each of them. We then conclude that the method of 
+\emph{Checkerboard Updating with successive over-relaxation} is best.
+
+We then discuss the design, implementation and operation of a software package we have
+developed, \emph{estatics}, which is capable of solving Laplace's equation for arbitrary
+constant boundary conditions, using the chosen relaxation method. We then present the
+output of the package for different electrostatic systems, and propose opportunities
+for further work.
 
 \end{abstract}
 
@@ -122,9 +126,9 @@ present the output of the package for different electrostatic systems.
 \subsection{Laplace's Equation}
 
 The Laplace equation, named after mathematician and physicist Pierre-Simon de Laplace,
-is a second-order partial differential equation that can be used to describe steady-state
-distributions of heat, fluids and potential. It states that the divergence of the
-gradient of a function, $\phi$ say, is zero. Symbolically:
+is a linear second-order partial differential equation that can be used to describe
+steady-state distributions of heat, fluids and potential. It states that the divergence
+of the gradient of a function, $\phi$ say, is zero. Symbolically:
 %
 \be
 \nabla ^2 \phi = 0
@@ -149,18 +153,18 @@ $\phi_{xx}+\phi_{yy}=0$ & $\phi_{rr}+\frac{1}{r}\phi_r+\frac{1}{r^2}\phi_{\theta
 The Laplace equation shall now be derived in the context of electromagnetism.
 
 \subsubsection{Derivation of Laplace equation in Electomagentism}
-We begin by considering the two Maxwell equations that describe the electric field.
+We begin by considering the two Maxwell equations that describe the electric field,
+\textbf{E}.
 
 Gauss' Law may used to express the relation between the \emph{divergence} of the
-electric field, represented by \textbf{E}, and the \emph{charge density} $\rho$,
-where $\epsilon_0$ is the \emph{permittivity of free space}:
+electric field, and the \emph{charge density} $\rho$,
 %
 \be
 \nabla \cdot \bm{E} = \frac{\rho}{\epsilon_0}
 \ee
 %
-Alternatively (c.f. the Divergence Theorem), it can be expressed in its
-integral form, as:
+where $\epsilon_0$ is the \emph{permittivity of free space}. Alternatively (c.f.
+\emph{the Divergence Theorem}), it can be expressed in its integral form, as:
 %
 \be
 \oint \limits_S \bm{E} \cdot d\bm{A} = \frac{Q}{\epsilon_0}
@@ -168,7 +172,7 @@ integral form, as:
 %
 where the integral is taken over a closed surface, $S$, and $Q$ is the enclosed charge.
 In the absence of charge, as is the case in free space outside a conductor, this
-reduces to the statement the electric field is \emph{solenoidal}
+reduces to the statement that the electric field is \emph{solenoidal}
 ($\nabla \cdot \bm{E}=0$).
 
 One can also relate the \emph{curl} of the electric field to the time
@@ -196,17 +200,16 @@ One then has \emph{Laplace's equation}:
 \nabla^2 \phi = 0
 \ee
 
-This is a second-order partial differential equation that can be solved, given some
-well-posed boundary conditions, to find the electrostatic potential and hence electric
-field for some physical system. This, in turn, can be used to find the equations of
-motion of test particles within the system, via the Lorentz force law.
+This is a linear second-order partial differential equation that can be solved, given
+some well-posed boundary conditions, to find the electrostatic potential and hence
+electric field for some physical system. This, in turn, can be used to find the
+equations of motion of test particles within the system, via the Lorentz force law.
 
 The following analysis occurs in the context of electromagnetism but is easily
 generalised to other areas of physics were the Laplace equation occurs, for example,
 fluid dynamics, heat conduction and astronomy.
 
 \subsection{Description of Physical Systems}
-\subsubsection{System One}
 
 Suppose one has a perfectly uniform electric field between two infinite planes
 at potentials $V$ and $-V$, and they are a distance $2d$ apart. Suppose one then
@@ -227,8 +230,6 @@ the cylinder.
 \caption{Cross-sectional diagram of System One}
 \label{fig:sys one}
 \end{figure}
-
-\subsubsection{System Two}
 
 The second system considered was a silicon detector---a system consisting of two
 silicon wafers, one segmented with doped implants at ground potential and the other,
@@ -299,10 +300,10 @@ f(r)=\alpha_k r^k + \beta_k r^{-k}
 g(\theta)= \gamma_k \sin(k\theta)+\delta_k \cos(k\theta)
 \ee
 
-For consistency, we expect periodicity of $g$, namely that $g(\theta)=g(\theta + 2\pi)$,
-so that $k$ can only take integer values. Hence, by the principle of superposition and
-the linearity of differentiation, the general solution to the Laplace equation in
-polar co-ordinates is:
+For consistency, we expect $g$ to be single-valued and periodic, namely that
+$g(\theta)=g(\theta + 2\pi)$, so that $k$ can only take integer values. Hence, by
+the principle of superposition and the linearity of the Laplace equation, its general
+solution in polar co-ordinates is a sum of such terms:
 %
 \be
 \phi(r,\theta)
@@ -311,7 +312,10 @@ polar co-ordinates is:
 \ee
 
 For a particular solution to the system considered here one must impose boundary
-conditions, specifically we use \emph{Dirichlet boundary conditions}.
+conditions. Specifically, we use \emph{Dirichlet boundary conditions}, where the value
+of the solution at each boudnary is specified. One could also use
+\emph{Von Neumann boundary conditions} where the derivative at each boundary is
+specified. 
 
 By considering the geometry of the system, we expect a solution that is symmetric
 about $\theta=0$. This directly implies that $\gamma = 0$ and $\gamma_n=0$, $\forall n$
@@ -324,9 +328,10 @@ $\alpha$ and $\alpha_n$ are both zero. We now have:
 \ee
 %
 where the $\beta$'s have absorbed other constants. In particular, as
-$r \rightarrow \infty$, we expect the potential to be linearly decreasing between the
-plates. Mathematically, we require $\phi=-\frac{V}{d}x=-\frac{V}{d}r\cos(\theta)$ in
-polar co-ordinates. Since the infinite sum vanishes at infinity, we have that
+$r \rightarrow \infty$, that is as the influence of the cylinder becomes negligible,
+we expect the potential to be linearly decreasing between the plates. Mathematically,
+we require $\phi=-\frac{V}{d}x=-\frac{V}{d}r\cos(\theta)$ in polar co-ordinates.
+Since the infinite sum vanishes at infinity, we have that
 $\beta=-\frac{V}{d}r\cos(\theta)$.
 
 We now have that
@@ -362,12 +367,12 @@ $R=15$, $d=50$}
 \section{Numerical Methods}
 \subsection{Finite Difference Methods}
 
-System One is a very idealised system, that is not practically reasonable, for example
-one cannot use charged planes that are infinite in extent. For real-world systems
+System One is a very idealised system that is not practically reasonable, for example
+charged planes that are infinite in extent do not exist. For real-world systems
 it is difficult, and often impossible, to express boundary conditions in a manner that
 is algebraically utilisable and is thus impossible to find a particular analytical
-solution to Laplace's equation for arbitrary, non-trivial, boundary conditions. These
-solutions must be numerically approximated.
+solution to Laplace's equation for arbitrary, non-trivial, boundary conditions. Solutions
+for these systems must be numerically approximated.
 
 To numerically approximate the solution to a differential equation it is
 necessary to approximate the derivative of a function. The usual method employed to
@@ -397,6 +402,7 @@ Similarly, to approximate the second derivative of a function, one writes
 \ee
 
 \subsection{Discretisation of Laplace's Equation}
+
 To numerically solve the Laplace equation it must be expressed in a discrete form.
 We define a rectangular region on which to discretise Laplace's equation, given by:
 %
@@ -439,8 +445,8 @@ boundary points at which Dirichlet boundary conditions are imposed.}
 \label{fig:grid}
 \end{figure}
 
-To be easily expressible numerically, the Laplace equation in
-two-dimensional Cartesian co-ordinates is discretised:
+For simplicity, the Laplace equation in two-dimensional Cartesian co-ordinates is
+discretised:
 % 
 \be 
 \frac{\partial^2 \phi}{\partial x^2}+\frac{\partial^2 \phi}{\partial y^2} = 0
@@ -482,17 +488,17 @@ This is known as \emph{Jacobi's iterative method}, the simplest version of a
 
 \subsection{The Gauss-Seidel Method}
 
-As the grid is iterated through and relaxation is applied, points at which the potential has
-already been updated---namely $\phi_{j-1,k}$ and $\phi_{j,k-1}$ in our notation---are
+As the grid is iterated through and relaxation is applied, points at which the potential
+has already been updated---namely $\phi_{j-1,k}$ and $\phi_{j,k-1}$ in our notation---are
 presumably more accurate to the correct solution than points that have not been updated.
 An alternative relaxation method, known as the \emph{Gauss-Seidel method}, takes use of
-this idea and defines an iterative scheme given by:
+this supposition and defines an iterative scheme given by:
 %
 \be
 \phi_{j,k,n+1}= \frac{1}{4}(\phi_{j-1,k,n+1}+\phi_{j+1,k,n}+\phi_{j,k-1,n+1}+\phi_{j,k+1,n})
 \ee
 
-It can be shown that this method actually converges faster than Jacobi's iterative
+It can be shown that this method converges faster than Jacobi's iterative
 method, and it also has the added bonus of not requiring the previous value of the 
 potential at each grid point to be stored, thus reducing computation time.
 
@@ -528,9 +534,9 @@ solely depends on the potential at odd points, and vice-versa. One could then, i
 principle, iterate through the grid of points at which the potential is approximated,
 and update all the odd points, and then re-iterate through the grid, updating all the
 even points using the value of the potential at the newly updated odd points. Such an
-iterative scheme exists, and is known as \emph{Checkerboard (Red-Black) Updating}, for
-obvious reasons. The method essentially reduces a system of $N$ linear equations into
-two coupled systems of $\frac{N}{2}$ linear equations that can be solved separately.
+iterative scheme exists, and is known as \emph{Checkerboard (Red-Black) Updating}. The
+method essentially reduces a system of $N$ linear equations into two coupled systems
+of $\frac{N}{2}$ linear equations that can be solved separately.
 
 The method can be shown to be a more convergent method than those outlined previously,
 and successive over-relaxation can easily be implemented within the scheme.
@@ -576,8 +582,8 @@ The resulting numerical approximations can be seen in Figure~\ref{fig:comparison
 
 As there is very little graphical difference between each method, more quantitative
 comparison methods were emplyed, namely the relative convergence and error---as
-compared to the analytical solution---of each method, and their variance with
-iterations, was studied. Also studied was the CPU time for the method. The results
+compared to the analytical solution---of each method, and their dependence on number
+of iterations, was studied. The CPU time for each method was also studied. The results
 are summarised in Figure~\ref{fig:stats}.
 
 \begin{figure}
@@ -606,14 +612,14 @@ are summarised in Figure~\ref{fig:stats}.
 The following conclusions were drawn from the data:
 %
 \begin{itemize}
-\item the addition of successive over-relaxation causes drastic increase in convergence
-\item average relative error essentially converges for all methods
-\item CPU time is not an important factor
+\item the addition of successive over-relaxation causes drastic increase in convergence;
+\item average relative error essentially converges for all methods;
+\item CPU time is not an important factor.
 \end{itemize}
 
 %maybe include plot of completion time vs desired convergence
 
-Hence, Checkerboard Updating with successive over-relaxation shall be employed
+Hence, Checkerboard Updating with successive over-relaxation was chosen to be used
 in the genereal software package, since it converges in the least iterations,
 and hence least time, but to the same accuracy as the other methods.
 
@@ -623,10 +629,11 @@ A general software package in C++ was developed to solve and plot the potential 
 electric field for an arbitrary electrostatic system. It accepts input of a coloured
 bitmap, where the colours represent different constant potentials, converts this into
 an array of values and applies checkerboard updating with successive over-relaxation
-to this array until it is deemed to have converged. The package then returns plots of the
-resultant electrostatic potential, equipotential lines and electric field.
+to this array until each grid point is deemed to have converged. The package then
+returns plots of the resultant electrostatic potential, equipotential lines and electric
+field.
 
-Figure~\ref{fig:flowchart} shows a flowchart representing the algorithm employed.
+Figure~\ref{fig:flowchart} shows a flowchart of the software.
 
 \begin{figure}[htbp!]
 \begin{center}
