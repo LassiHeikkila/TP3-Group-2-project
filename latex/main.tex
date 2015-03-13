@@ -1,7 +1,7 @@
-%main.tex
+%group_report.tex
 
 %specify class of document
-\documentclass[12pt, a4paper]{article}
+\documentclass[11pt, a4paper]{article}
 
 %specify packages used 
 \usepackage{microtype}		       %use package for minor typographical adjustments
@@ -25,6 +25,8 @@
 
 %set graphics path
 \graphicspath{{/home/danmfr/p3t/laplace/images/}}
+% change to this for final upload:
+% \graphicspath{{images/}}
 
 %define colours for code listings
 \definecolor{codegreen}{rgb}{0,0.6,0}
@@ -109,10 +111,10 @@ convergence of each of them. We then conclude that the method of
 \emph{Checkerboard Updating with successive over-relaxation} is best.
 
 We then discuss the design, implementation and operation of a software package we have
-developed, \lstinline|eStatics|, which is capable of solving Laplace's equation for arbitrary
-constant boundary conditions, using the chosen relaxation method. We then present the
-output of the package for different electrostatic systems, and propose opportunities
-for further work.
+developed, \lstinline|eStatics|, which is capable of solving Laplace's equation for
+arbitrary constant boundary conditions, using the chosen relaxation method. We then
+present the output of the package for different electrostatic systems, and propose
+opportunities for further work.
 
 \end{abstract}
 
@@ -128,7 +130,7 @@ for further work.
 
 The Laplace equation, named after mathematician and physicist Pierre-Simon de Laplace,
 is a linear second-order partial differential equation that can be used to describe
-steady-state distributions of heat, fluids and potential. It states that the divergence
+steady-state distributions of heat, fluids and potential~\cite{mm}. It states that the divergence
 of the gradient of a function, $\phi$ say, is zero. Symbolically:
 %
 \be
@@ -154,8 +156,8 @@ $\phi_{xx}+\phi_{yy}=0$ & $\phi_{rr}+\frac{1}{r}\phi_r+\frac{1}{r^2}\phi_{\theta
 The Laplace equation shall now be derived in the context of electromagnetism.
 
 \subsubsection{Derivation of Laplace equation in Electomagentism}
-We begin by considering the two Maxwell equations that describe the electric field,
-\textbf{E}.
+We begin by considering the two Maxwell equations~\cite{em} that describe the electric
+field, \textbf{E}.
 
 Gauss' Law may used to express the relation between the \emph{divergence} of the
 electric field, and the \emph{charge density} $\rho$,
@@ -176,7 +178,7 @@ In the absence of charge, as is the case in free space outside a conductor, this
 reduces to the statement that the electric field is \emph{solenoidal}
 ($\nabla \cdot \bm{E}=0$).
 
-One can also relate the \emph{curl} of the electric field to the time
+One can also deduce the \emph{curl} of the electric field from the time
 derivative of the magnetic field, denoted \textbf{B}, by the Maxwell-Faraday equation:
 %
 \be
@@ -206,7 +208,7 @@ some well-posed boundary conditions, to find the electrostatic potential and hen
 electric field for some physical system. This, in turn, can be used to find the
 equations of motion of test particles within the system, via the Lorentz force law.
 
-The following analysis occurs in the context of electromagnetism but is easily
+The following analysis occurs in the context of electromagnetism but can be easily
 generalised to other areas of physics were the Laplace equation occurs, for example,
 fluid dynamics, heat conduction and astronomy.
 
@@ -272,7 +274,7 @@ Laplace's equation in plane polar co-ordinates is:
 = 0
 \ee
 
-We employ separation of variables and posit a solution of the form
+We employ separation of variables and posit a separable solution of the form
 $\phi = f(r)g(\theta)$ for two unknown functions $f$ and $g$. Upon substitution,
 one finds that:
 %
@@ -314,9 +316,7 @@ solution in polar co-ordinates is a sum of such terms:
 
 For a particular solution to the system considered here one must impose boundary
 conditions. Specifically, we use \emph{Dirichlet boundary conditions}, where the value
-of the solution at each boundary is specified. One could also use
-\emph{Von Neumann boundary conditions} where the derivative at each boundary is
-specified. 
+of the solution at each boundary is specified.
 
 By considering the geometry of the system, we expect a solution that is symmetric
 about $\theta=0$. This directly implies that $\gamma = 0$ and $\gamma_n=0$, $\forall n$
@@ -373,7 +373,7 @@ charged planes that are infinite in extent do not exist. For real-world systems
 it is difficult, and often impossible, to express boundary conditions in a manner that
 is algebraically utilisable and is thus impossible to find a particular analytical
 solution to Laplace's equation for arbitrary, non-trivial, boundary conditions. Solutions
-for these systems must be numerically approximated.
+for these types of systems must be numerically approximated.
 
 To numerically approximate the solution to a differential equation it is
 necessary to approximate the derivative of a function. The usual method employed to
@@ -392,7 +392,8 @@ definition of the derivative and write
 %
 where $f(t+\Delta t)$ and $f(t)$ are two values of $f$, evaluated at two points
 a distance $\Delta t$ apart, and $\Delta t$ is assumed to be small enough that
-the approximation is good. This is known as the \emph{forward difference approximation}.
+the approximation is good. This is known as the
+\emph{forward difference approximation}~\cite{nr}.
 
 Similarly, to approximate the second derivative of a function, one writes
 %
@@ -405,7 +406,8 @@ Similarly, to approximate the second derivative of a function, one writes
 \subsection{Discretisation of Laplace's Equation}
 
 To numerically solve the Laplace equation it must be expressed in a discrete form.
-We define a rectangular region on which to discretise Laplace's equation, given by:
+We define a rectangular region, of dimension $a\times b$, on which to discretise
+Laplace's equation, given by:
 %
 \be
 \{(x,y)|\:0<x<a, 0<y<b\}
@@ -463,9 +465,9 @@ one can now approximate Eqn.~\ref{eq:laplace} as:
 %
 where $j$ and $k$ index the $x$ and $y$ directions respectively.
 
-For a unique spacing $\Delta=\Delta x=\Delta y$ in both $x$ and $y$ directions this
-reduces to the statement that the value of the potential at a specific point is the
-average of the value of the potential at the four surrounding points: 
+For a unique spacing $\Delta=\Delta x=\Delta y$ this reduces to the statement that
+the value of the potential at a specific point is the average of the value of the
+potential at the four surrounding points: 
 %
 \be
 \phi_{j,k}= \frac{1}{4}(\phi_{j-1,k}+\phi_{j+1,k}+\phi_{j,k-1}+\phi_{j,k+1})
@@ -504,13 +506,13 @@ method, and it also has the added bonus of not requiring the previous value of t
 potential at each grid point to be stored, thus reducing computation time.
 
 \subsection{Successive Over-Relaxation}
-%\input{sor.tex}
+\input{sor.tex}
 
 \subsection{Checkerboard (Red-Black) Updating}
 
 In each of the previous methods, the value of the potential is calculated from, at most,
 its previous value at the current point and the current or previous values of the
-potential at the four neighbouring points. Noting this, let us denote $\phi_{j,k}$ as
+potential at the four neighbouring points. Noting this, let $\phi_{j,k}$ be denoted as
 \emph{odd} if $j+k$ is odd, and even otherwise. Then the potential at each even point
 solely depends on the potential at odd points, and vice-versa. One could then, in
 principle, iterate through the grid of points at which the potential is approximated,
@@ -560,10 +562,12 @@ The resulting numerical approximations can be seen in Figure~\ref{fig:comparison
 %fig:comparison
 
 As there is very little graphical difference between each method, more quantitative
-comparison methods were emplyed, namely the relative convergence and error---as
+comparison methods were employed, namely the relative convergence and error---as
 compared to the analytical solution---of each method, and their dependence on number
 of iterations, was studied. The CPU time for each method was also studied. The results
 are summarised in Figure~\ref{fig:stats}.
+
+%mention how these stats are calculated?
 
 \begin{figure}
 \centering
@@ -620,14 +624,12 @@ Appendix~\ref{app:flowchart} shows a flowchart of the software.
 \subsection{Data Handling}
 \input{data.tex}
 
-\subsection{Boolean Masks and Locking}
+\subsection{Element Protection}
 \label{sec:mask}
 \input{boolean.tex}
 
 \subsection{Convergence}
 \input{convergence.tex}
-
-\subsection{Timing and CPU usage}
 
 \subsection{Parallel Processing}
 \input{parallel.tex}
@@ -639,30 +641,43 @@ Appendix~\ref{app:flowchart} shows a flowchart of the software.
 %\input{results.tex}
 
 \section{Conclusion}
+In conclusion, the Laplace equation was presented and derived in the context of
+electromagnetism. Its general analytical solution in plane polar co-ordinates was
+deduced, as well as a particular analytical solution for the case of a grounded
+cylinder between two charged planes.
 
-\subsection{Further Work}
-\begin{itemize}
-\item Fast Fourier transforms
-\item Adaptive step-sizing
-\item Time-varying potentials
-\item Multigrid methods
-\item Poisson's equation ($\rho \neq 0$).
-\item Time evolution i.e. time dependency (heat equation).
-\end{itemize}
+Finite difference methods were introduced and their necessity discussed, and the
+Laplace equation was discretised. Five different examples of relaxation methods were
+presented and compared, \emph{vis-\`{a}-vis} their relative error and convergence, and
+the optimal method was shown to be Checkerboard updating with successive over-relaxation.
+
+A software package \lstinline|eStatics| developed by the authors, capable of solving
+Laplace's equation for arbitrary constant boundary conditions, was described in detail,
+and example output of the package for different boundary conditions were shown.
+
+Several improvements could have been made to the software. Adaptive step-sizing could
+have been implemented in regions of quickly changing potential. Additionally, the
+introduction of non-constant boundary conditions---in space or time---could have been
+examined. The software could be generalised to be able to solve Laplace's equation given
+only von Neumann boundary conditions, where the normal component of the gradient of the
+potential is specified at each boundary. 
+
+Further work is proposed in the use of alternative numerical methods in the
+numerical approximations of Laplace's equation, namely fast Fourier transforms,
+multigrid methods and nine-point stenciling. Additionally, the numerical approximations
+to the solutions of Poisson's equation could be studied.
 
 %include BibTex bibliography
-\bibliography{report}
+\bibliography{main}
 
 %start of appendix
 \appendix
 \section{Appendices}
-\subsection{Algorithm for System One}
-To numerically approximate the electrostatic potential for System 1 via the 
-relaxation method the following rudimentary algorithm was developed.
+\subsection{Algorithm for Software Package}
 
 \begin{algorithm}
 \begin{algorithmic}[1]
-\Procedure{The Relaxation Method}{}
+\Procedure{The Jacobi iterative method}{}
 \State declare variables:
 \State $V \gets$ potential on plates
 \State $\delta \gets$ position step-size
@@ -696,8 +711,8 @@ relaxation method the following rudimentary algorithm was developed.
 \State find electric field:
 \For {$j=1$ to $ny-1$}
    \For {$k=1$ to $nx-1$}
-      \State $(Ex)_{j, k} \gets -\left(u_{j,k+1}-u_{j,k}\right)/\delta$
-      \State $(Ey)_{j,k} \gets -\left(u_{j+1,1}-u_{j,k}\right)/\delta$
+      \State $(Ex)_{j, k} \gets -\left(u_{j,k+1}-u_{j,k-1}\right)/2\delta$
+      \State $(Ey)_{j,k} \gets -\left(u_{j+1,1}-u_{j-1,k}\right)/2\delta$
    \EndFor
 \EndFor
 \State plot potential and field
@@ -705,7 +720,7 @@ relaxation method the following rudimentary algorithm was developed.
 \end{algorithmic}
 \end{algorithm}
 
-\section{Flowchart for System}
+\subsection{Flowchart for System}
 \label{app:flowchart}
 \begin{figure}[htbp!]
 \begin{center}
