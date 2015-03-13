@@ -12,7 +12,7 @@
 		
 			Hardware concurrency refers to the number of logic cores present in a given system and determines how many threads can be run concurrently, with one thread typically being able to run at any one time per core. This unless hyper-threading - an Intel technology which assigns two logic cores to each physical processor core - is enabled. The \lstinline|eStatics| package begins by checking this value using \lstinline|std::thread::hardware_concurrency()|, which returns an integer value. This check allows the program to automatically scale to any arbitrary system, including support for hyper-threading and thus allowing maximum utilisation of parallel processing.
 		
-		\susubbsection{Thread Pool Pattern}
+		\subsubsection{Thread Pool Pattern}
 		
 			To overcome the previously mentioned overheads involved in creating and deleting threads, a thread pool pattern was used. In this pattern, a pool of `worker threads' are created - with \lstinline|eStatics| creating one thread per available core - and linked to a queue of assigned tasks. The threads then work on this queue until it is empty, when they remain idle and wait for new tasks. When the pool is out of scope - that is, when the function that created it ends - it is safely deleted. This means that each thread is created and deleted only once, greatly reducing the time-cost when compared to creating and destroying threads on an \textit{ad hoc} basis.
 			
