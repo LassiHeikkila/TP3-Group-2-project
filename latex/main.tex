@@ -138,9 +138,9 @@ is zero. Symbolically:
 where $\nabla^2$ is called the \emph{Laplacian operator}. The study of solutions to
 this equation is known as \emph{potential theory}.
 
-The exact form of the equation is dependent upon the co-ordinate system in which one
-considers it. In two dimensions, where subscripts denote partial differentiation with
-respect to that variable:
+The exact form of the equation is dependent upon the co-ordinate system in
+which it is considered. In two dimensions, where subscripts denote partial
+differentiation with respect to that variable:
 
 \begin{center}
 \begin{tabularx}{0.6\textwidth}{|Y|Y|}
@@ -153,7 +153,7 @@ $\phi_{xx}+\phi_{yy}=0$ & $\phi_{rr}+\frac{1}{r}\phi_r+\frac{1}{r^2}\phi_{\theta
 
 The Laplace equation shall now be derived in the context of electromagnetism.
 
-\subsubsection{Derivation of Laplace equation in Electomagentism}
+\subsubsection{Derivation of Laplace's Equation in Electromagnetism}
 Consider the two Maxwell equations~\cite{em} that describe the electric field,
 \textbf{E}: Gauss' Law and Faraday's Law.
 
@@ -261,8 +261,8 @@ as System Two, that do not have analytical solutions.
 First, the three-dimensional problem can be reduced entirely to two
 dimensions due to the translation symmetry of the system along the length of the
 cylinder. So, consider a cross-section of the system and introduce a polar
-co-ordinate system, with origin centred on the centre of the cylinder, as this permits
-one to exploit the rotational symmetry of the system.
+co-ordinate system, with origin centred on the centre of the cylinder, as this
+allows the rotational symmetry of the system to be exploited.
 
 Laplace's equation in plane polar co-ordinates is: 
 %
@@ -392,7 +392,7 @@ where $f(t+\Delta t)$ and $f(t)$ are two values of $f$, evaluated at two points
 a distance $\Delta t$ apart, and $\Delta t$ is assumed to be small enough that
 the approximation is good. This is known as the \emph{forward difference approximation}
 and has a truncation error $\sim \frac{\Delta t}{2}$.
-Alternatively, one can employ the \emph{central difference approximation}:
+Alternatively, there is the \emph{central difference approximation}:
 $\frac{df}{dt}\approx \frac{f(t+\Delta t) - f(t-\Delta t)}{2 \Delta t}$, which has
 truncation error $\sim \frac{\Delta t^2}{6}$.
 
@@ -493,8 +493,8 @@ solely depends on the potential at odd points, and vice-versa. In principle, the
 the grid of points at which the potential is approximated could be iterated through,
 and all the odd points updated, and then re-iterated through, updating all the
 even points using the value of the potential at the newly updated odd points. Such an
-iterative scheme exists, and is known as \emph{Checkerboard (Red-Black) Updating}~\cite{wallach}. The
-method essentially reduces a system of $N$ linear equations into two coupled systems
+iterative scheme exists, and is known as \emph{Checkerboard (Red-Black) Updating}~\cite{wallach}.
+The method essentially reduces a system of $N$ linear equations into two coupled systems
 of $\frac{N}{2}$ linear equations that can be solved separately.
 
 The method can be shown to be a more convergent method than those outlined previously,
@@ -527,7 +527,7 @@ sizes.
 
 For a discussion of the implementation of these methods in C++, see~\cite{nr}.
 
-\subsection{Comparison of methods}
+\subsection{Comparison of Methods}
 
 To decide which relaxation method was best to implement in the software package,
 each method was coded into C++ and ran to solve Laplace's equation for System One.
@@ -548,7 +548,7 @@ Hence, Checkerboard Updating with successive over-relaxation was chosen to be us
 in the genereal software package, since it converges in the least iterations,
 and hence least time, but to the same accuracy as the other methods.
 
-\section{Software Package \emph{eStatics} for general electrostatic systems}
+\section{Software Package \emph{eStatics} for General Electrostatic Systems}
 
 A general software package in C++ was developed to solve and plot the potential and
 electric field for an arbitrary electrostatic system. It accepts input of a coloured
@@ -616,6 +616,8 @@ to the solutions of Poisson's equation could be studied.
 %start of appendix
 \appendix
 \section{Appendices}
+
+\subsection{More on the Successive Over-Relaxation Method}
 
 \subsection{Method Comparison}
 \label{app:compare}
@@ -726,5 +728,8 @@ Figure~\ref{fig:stats} show the statistics for each method.
 \caption{Flowchart of steps in software package}
 \label{fig:flowchart}
 \end{figure}
+
+\subsection{System Images as Bitmaps}
+\label{app:bitmaps}
 
 \end{document}
