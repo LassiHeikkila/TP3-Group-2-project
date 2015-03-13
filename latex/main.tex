@@ -1,32 +1,30 @@
-%group_report.tex
+% main.tex
 
 %specify class of document
 \documentclass[11pt, a4paper]{article}
 
 %specify packages used 
-\usepackage{microtype}		       %use package for minor typographical adjustments
-\usepackage{graphicx} 		       %use package for diagram 
-\usepackage{listings}                  %use package for c++ code in appendix
-\usepackage{color}                     %use package for code listings
-\usepackage[utf8]{inputenc}            %use package for colours in code
-\usepackage{amsmath}                   %use package for various math symbols
-\usepackage{amsfonts}                  %use package for number sets
-\usepackage{bm}			       %use package for bolds in math mode
-\usepackage{hyperref}                  %use package for hyperlinks
-\usepackage{algpseudocode}             %use package for pseudocode
-\usepackage{algorithm}                 %use package for pseudocode
-\usepackage{fullpage}                  %use package for full page size
-\usepackage{tikz}		       %use package for diagram drawings
-\usepackage{caption}		       %use package for multiple figures
-\usepackage{subcaption}                %use package for multiple figures
-\usepackage{tabularx}		       %use package for tables
-\usepackage{array}                     %use package for centering table contents
-%\usepackage{url}                       %use package to display urls properly
+\usepackage{microtype}		       		%use package for minor typographical adjustments
+\usepackage{graphicx} 		       		%use package for diagram 
+\usepackage{listings}                  		%use package for c++ code in appendix
+\usepackage{color}                     		%use package for code listings
+\usepackage[utf8]{inputenc}            		%use package for colours in code
+\usepackage{amsmath}                   		%use package for various math symbols
+\usepackage{amsfonts}                  		%use package for number sets
+\usepackage{bm}			       		%use package for bolds in math mode
+\usepackage{hyperref}                  		%use package for hyperlinks
+\usepackage{algpseudocode}             		%use package for pseudocode
+\usepackage{algorithm}                 		%use package for pseudocode
+\usepackage{fullpage}                  		%use package for full page size
+\usepackage{tikz}		       		%use package for diagram drawings
+\usepackage[justification=centering]{caption}   %use package for multiple figures
+\usepackage{subcaption}                		%use package for multiple figures
+\usepackage{tabularx}		      		%use package for tables
+\usepackage{array}                     		%use package for centering table contents
+%\usepackage{url}                       	 %use package to display urls properly
 
 %set graphics path
-\graphicspath{{/home/danmfr/p3t/laplace/images/}}
-% change to this for final upload:
-% \graphicspath{{images/}}
+\graphicspath{{images/}}
 
 %define colours for code listings
 \definecolor{codegreen}{rgb}{0,0.6,0}
@@ -105,16 +103,16 @@ cylinder centred between two infinite planes at potential $+V$ and $-V$; and sec
 the case of a silicon detector---a system composed of two silicon wafers with segmented
 doped implants at ground potential on one side and a uniform doped implant on the
 other side, held at a potential $+V$. We present the analytical solution of the first
-system. We then compare this solution to the approximate numerical solution produced
+system. This solution is then compared to the approximate numerical solution produced
 by five different relaxation methods, and examine the relative error and relative
 convergence of each of them. We then conclude that the method of 
 \emph{Checkerboard Updating with successive over-relaxation} is best.
 
-We then discuss the design, implementation and operation of a software package we have
-developed, \lstinline|eStatics|, which is capable of solving Laplace's equation for
-arbitrary constant boundary conditions, using the chosen relaxation method. We then
-present the output of the package for different electrostatic systems, and propose
-opportunities for further work.
+The design, implementation and operation of a software package we have
+developed, named \lstinline|eStatics|---which is capable of solving
+Laplace's equation for arbitrary constant boundary conditions---is discussed.
+Output of the package is presented for different electrostatic systems, and
+opportunities for further work are proposed.
 
 \end{abstract}
 
@@ -128,11 +126,10 @@ opportunities for further work.
 \section{Introduction}
 \subsection{Laplace's Equation}
 
-The Laplace equation, named after mathematician and physicist Pierre-Simon de Laplace,
-is a linear second-order partial differential equation that can be used to describe
-steady-state distributions of heat, fluids and potential where there are no sources. It
-states that the divergence of the gradient of a function, $\phi$ say, is zero.
-Symbolically:
+The Laplace equation is a linear second-order partial differential equation that can be
+used to describe steady-state distributions of heat, fluids and potential where there
+are no sources. It states that the divergence of the gradient of a function, $\phi$ say,
+is zero. Symbolically:
 %
 \be
 \nabla ^2 \phi = 0
@@ -157,8 +154,8 @@ $\phi_{xx}+\phi_{yy}=0$ & $\phi_{rr}+\frac{1}{r}\phi_r+\frac{1}{r^2}\phi_{\theta
 The Laplace equation shall now be derived in the context of electromagnetism.
 
 \subsubsection{Derivation of Laplace equation in Electomagentism}
-We begin by considering the two Maxwell equations~\cite{em} that describe the electric
-field, \textbf{E}.
+Consider the two Maxwell equations~\cite{em} that describe the electric field,
+\textbf{E}: Gauss' Law and Faraday's Law.
 
 Gauss' Law may used to express the relation between the \emph{divergence} of the
 electric field, and the \emph{charge density} $\rho$,
@@ -179,8 +176,8 @@ In the absence of charge, as is the case in free space outside a conductor, this
 reduces to the statement that the electric field is \emph{solenoidal}
 ($\nabla \cdot \bm{E}=0$).
 
-One can also deduce the \emph{curl} of the electric field from the time
-derivative of the magnetic field, denoted \textbf{B}, by the Maxwell-Faraday equation:
+The Maxwell-Faraday equation expresses the relation between the \emph{curl} of the
+electric field and the time derivative of the magnetic field, denoted \textbf{B}:
 %
 \be
 \nabla \times \bm{E} = - \frac{\partial \bm{B}}{\partial t}
@@ -196,9 +193,7 @@ the gradient of some scalar potential, $\phi$ say. Mathematically:
 \ee
 %
 where the negative sign is convention. This scalar potential is called the
-\emph{electrostatic potential}.
-
-One then has \emph{Laplace's equation}:
+\emph{electrostatic potential}. This results in \emph{Laplace's equation}:
 %
 \be
 \nabla^2 \phi = 0
@@ -218,12 +213,11 @@ containing no matter. See pp.679 of~\cite{mm}.
 
 \subsection{Description of Physical Systems}
 
-Suppose one has a perfectly uniform electric field between two infinite planes
-at potentials $V$ and $-V$, and they are a distance $2d$ apart. Suppose one then
-places an infinitely long perfectly conducting cylinder, of radius $R$, into the centre
-of the field, at ground potential, as in Figure~\ref{fig:sys one}. We wish to find the
-resulting form of the electrostatic potential, and hence the electric field, surrounding
-the cylinder.
+Consider a perfectly uniform electric field between two infinite planes at potentials
+$V$ and $-V$, a distance $2d$ apart, with an infinitely long perfectly conducting
+cylinder, of radius $R$, placed into the centre of the field, at ground potential,
+as in Figure~\ref{fig:sys one}. The resulting form of the electrostatic potential,
+and hence the electric field, surrounding the cylinder, can be analytically deduced.
 
 \begin{figure}[h!]
 \begin{center}
@@ -241,7 +235,7 @@ the cylinder.
 The second system considered was a silicon detector---a system consisting of two
 silicon wafers, one segmented with doped implants at ground potential and the other,
 referred to as the backplane, uniformly doped, held at a potential $+V$, as shown
-in Figure~\ref{fig:sys two}.
+in Figure~\ref{fig:sys two}. 
 
 \begin{figure}[h!]
 \begin{center}
@@ -257,16 +251,16 @@ in Figure~\ref{fig:sys two}.
 \label{fig:sys two}
 \end{figure}
 
-System One can be solved analytically, as will be shown in the subsequent section. We
-shall use this solution to compare the accuracy of different numerical methods in solving
-System One, and decide which method is best suited to solve more complex systems, such
+System One can be solved analytically, as will be shown in the subsequent section. This
+solution shall be used to compare the accuracy of different numerical methods in solving
+System One, and to decide which method is best suited to solve more complex systems, such
 as System Two, that do not have analytical solutions.
 
 \subsection{Analytical Solution of System One}
 
-First, one realises that the three-dimensional problem can be reduced entirely to two
+First, the three-dimensional problem can be reduced entirely to two
 dimensions due to the translation symmetry of the system along the length of the
-cylinder. So, we consider a cross-section of the system and introduce a polar
+cylinder. So, consider a cross-section of the system and introduce a polar
 co-ordinate system, with origin centred on the centre of the cylinder, as this permits
 one to exploit the rotational symmetry of the system.
 
@@ -278,9 +272,8 @@ Laplace's equation in plane polar co-ordinates is:
 = 0
 \ee
 
-We employ separation of variables and posit a separable solution of the form
-$\phi = f(r)g(\theta)$ for two unknown functions $f$ and $g$. Upon substitution,
-one finds that:
+Propose a separable solution of the form $\phi = f(r)g(\theta)$ for two unknown
+functions $f$ and $g$. Upon substitution:
 %
 \be
 \frac{r}{f(r)}\frac{d}{dr}(r \frac{df(r)}{dr}) =- \frac{1}{g(\theta)}\frac{d^2 g(\theta)}{d\theta^2}
@@ -288,9 +281,8 @@ one finds that:
 
 Since the left-hand side is solely a function of $r$---and the right-hand side of
 $\theta$---they both must be constant if the relation is to hold for arbitrary values
-of $r$ and $\theta$. Then---with some foreknowledge---one sets this constant equal
-to $k^2$, for some constant $k\in\mathbb{R}$. This gives two second-order ordinary
-differential equations:
+of $r$ and $\theta$. Then set this constant equal to $k^2$, for some constant
+$k\in\mathbb{R}$. This gives two second-order ordinary differential equations:
 %
 \be
 r\frac{d}{dr}(r \frac{df(r)}{dr}) = k^2 f(r) \qquad
@@ -307,7 +299,7 @@ f(r)=\alpha_k r^k + \beta_k r^{-k}
 g(\theta)= \gamma_k \sin(k\theta)+\delta_k \cos(k\theta)
 \ee
 
-For consistency, we expect $g$ to be single-valued and periodic, namely that
+For consistency, $g$ is expected to be single-valued and periodic, namely that
 $g(\theta)=g(\theta + 2\pi)$, so that $k$ can only take integer values. Hence, by
 the principle of superposition, the general solution of Laplace's equation in polar
 co-ordinates is a sum of such terms:
@@ -321,15 +313,15 @@ co-ordinates is a sum of such terms:
 where negative values of $n$ are omitted as they are included in the terms for positive
 $n$. See pp. 725-727 of~\cite{mm}. 
 
-For a particular solution to the system considered here one must impose boundary
-conditions. Specifically, we use \emph{Dirichlet boundary conditions}, where the value
+For a particular solution to the system considered here boundary conditions must be
+imposed. Specifically, \emph{Dirichlet boundary conditions} are used, where the value
 of the solution at each boundary is specified.
 
-By considering the geometry of the system, we expect a solution that is symmetric
-about $\theta=0$. This directly implies that $\gamma = 0$ and $\gamma_n=0$, $\forall n$
+By considering the geometry of the system, a solution that is symmetric about $\theta=0$
+is expected. This directly implies that $\gamma = 0$ and $\gamma_n=0$, $\forall n$
 as $\sin(\theta)$ and $\theta$ are both anti-symmetric (or odd) about the origin.
 Additionally, the potential is finite as $r \rightarrow \infty$, which implies that
-$\alpha$ and $\alpha_n$ are both zero. We now have:
+$\alpha$ and $\alpha_n$ are both zero. This gives:
 %
 \be
 \phi(r,\theta)=\beta + \sum_{n=1}^{\infty}(\frac{\beta_n}{r^n} \cos(n\theta))
@@ -337,19 +329,18 @@ $\alpha$ and $\alpha_n$ are both zero. We now have:
 %
 where the $\beta$'s have absorbed other constants. In particular, as
 $r \rightarrow \infty$, that is as the influence of the cylinder becomes negligible,
-we expect the potential to be linearly decreasing between the plates. Mathematically,
-we require $\phi=-\frac{V}{d}x=-\frac{V}{d}r\cos(\theta)$ in polar co-ordinates.
-Since the infinite sum vanishes at infinity, we have that
-$\beta=-\frac{V}{d}r\cos(\theta)$.
+the potential is expected to be linearly decreasing between the plates. Hence,
+mathematically, $\phi=-\frac{V}{d}x=-\frac{V}{d}r\cos(\theta)$ in polar co-ordinates.
+Since the infinite sum vanishes at infinity, $\beta=-\frac{V}{d}r\cos(\theta)$.
 
-We now have that
+Thus
 %
 \be
 \phi(r,\theta)=-\frac{V}{d}r\cos(\theta) + \sum_{n=1}^{\infty}(\frac{\beta_n}{r^n} \cos(n\theta))
               =(\frac{\beta_1}{r}-\frac{V}{d}r)\cos(\theta) + \sum_{n=2}^{\infty}(\frac{\beta_n}{r^n} \cos(n\theta))
 \ee
 
-We expect continuity of the potential at the surface of the cylinder:
+The potential is expected to be continuous at the surface of the cylinder:
 $\phi(r=R,\theta)=0$, so that $\beta_1=\frac{VR^2}{d}$ and $\beta_{n \geq 2}=0$,
 since the set $\{\cos(n\theta)\}$ are linearly independent functions.
 
@@ -389,9 +380,9 @@ differencing to step the function from one value to the next in small
 increments of some variable. The smaller the increment used, the more accurate
 the approximation, but the longer and more computationally intensive the process.
 
-Suppose one wishes to approximate the first derivative of a function $f(t)$, say,
-with respect to the variable $t$. The simplest way to do this is to discretise the
-definition of the derivative and write
+To approximate the first derivative of a function $f(t)$, say, with respect to the
+variable $t$. The simplest way to do this is to discretise the definition of the
+derivative and write
 %
 \be
 \frac{df}{dt} = \lim_{\Delta t \to 0} \frac{f(t+\Delta t) - f(t)}{\Delta t} \approx \frac{f(t+\Delta t) - f(t)}{\Delta t}
@@ -405,7 +396,7 @@ Alternatively, one can employ the \emph{central difference approximation}:
 $\frac{df}{dt}\approx \frac{f(t+\Delta t) - f(t-\Delta t)}{2 \Delta t}$, which has
 truncation error $\sim \frac{\Delta t^2}{6}$.
 
-Similarly, to approximate the second derivative of a function, one writes
+Similarly, to approximate the second derivative of a function:
 %
 \be
 \frac{d^2 f}{dt^2} \approx \frac{f'(t) - f'(t-h)}{\Delta t} \\
@@ -419,7 +410,7 @@ fuller discussion.
 \subsection{Discretisation of Laplace's Equation}
 
 To numerically solve the Laplace equation it must be expressed in a discrete form.
-We define a rectangular region, of dimension $a\times b$, on which to discretise
+Define a rectangular region, of dimension $a\times b$, on which to discretise
 Laplace's equation, given by:
 %
 \be
@@ -427,39 +418,9 @@ Laplace's equation, given by:
 \ee
 %
 and create a grid of points at which to evaluate the potential of spacial separation
-$\Delta x$ in the $x$ direction, and $\Delta y$ in the $y$ direction (see
-Figure~\ref{fig:grid}).
-
-\begin{figure}
-\centering
-\begin{tikzpicture}
-
-\foreach \x in {0,...,10}
-{
-\draw[fill=black] (0.5*\x,0) circle (0.1cm);
-\draw[fill=black] (0.5*\x,5) circle (0.1cm);
-}
-
-\foreach \y in {0,...,10}
-{
-\draw[fill=black] (0,0.5*\y) circle (0.1cm);
-\draw[fill=black] (5,0.5*\y) circle (0.1cm);
-}
-
-\foreach \x in {1,...,9}
-\foreach \y in {1,...,9}
-{
-\draw[fill=white] (0.5*\x,0.5*\y) circle (0.1cm);
-}
-\fill (0,0) node[below left, font=\footnotesize] {$(x_0,y_0)$};
-\fill (2.5,0) node[below, font=\footnotesize, yshift = -0.2cm] {$x_j=j\Delta x$};
-\fill (5,2.5) node[right, font=\footnotesize, xshift = 0.2cm] {$y_k=k\Delta y$};
-\end{tikzpicture}
-\caption{A pictorial representation of the grid on which the potential is approximated.
-White points denote interior points that change value; black points denote constant
-boundary points at which Dirichlet boundary conditions are imposed.}
-\label{fig:grid}
-\end{figure}
+$\Delta x$ in the $x$ direction, and $\Delta y$ in the $y$ direction. The grid is
+compose of interior points that change value; and exterior points on which constant
+Dirichlet boundary conditions are imposed.
 
 For simplicity, the Laplace equation in two-dimensional Cartesian co-ordinates is
 discretised:
@@ -470,7 +431,7 @@ discretised:
 \ee 
 
 Writing the value of the potential at position $(x_j,y_k)$ on the grid as $\phi_{j,k}$,
-one can now approximate Eqn.~\ref{eq:laplace} as:
+Eqn.~\ref{eq:laplace} can be discretised as:
 % 
 \be
 \frac{\phi_{j+1,k}-2\phi_{j,k}+\phi_{j-1,k}}{\Delta x^2} = - \frac{\phi_{j,k+1}-2\phi_{j,k}+\phi_{j,k-1}}{\Delta y^2}
@@ -490,10 +451,10 @@ potential at the four surrounding points:
 
 \subsection{Jacobi's Iterative Method}
 
-Suppose one has some initial guess of the value of the potential at all points on the
-grid, $\phi_{j,k,0}$, say. One evaluates Eqn~\ref{eq:relax} at all points on the grid
-simultaneously and generates a new better approximation for the potential,
-$\phi_{j,k,1}$. Iterating this process $n$ times, one has
+Using some initial guess for the value of the potential at all points on the
+grid, $\phi_{j,k,0}$, say, Eqn~\ref{eq:relax} can be evaluated simultaneously at all
+points on the grid to generate a new better approximation for the potential,
+$\phi_{j,k,1}$. Iterating this process $n$ times gives:
 %
 \be
 \phi_{j,k,n+1}= \frac{1}{4}(\phi_{j-1,k,n}+\phi_{j+1,k,n}+\phi_{j,k-1,n}+\phi_{j,k+1,n})
@@ -506,8 +467,8 @@ This is known as \emph{Jacobi's iterative method}, the simplest version of a
 \subsection{The Gauss-Seidel Method}
 
 As the grid is iterated through and relaxation is applied, points at which the potential
-has already been updated---namely $\phi_{j-1,k}$ and $\phi_{j,k-1}$ in our notation---are
-presumably more accurate to the correct solution than points that have not been updated.
+has already been updated---namely $\phi_{j-1,k}$ and $\phi_{j,k-1}$---are presumably
+more accurate to the correct solution than points that have not been updated.
 An alternative relaxation method, known as the \emph{Gauss-Seidel method}, takes use of
 this supposition and defines an iterative scheme given by:
 %
@@ -516,7 +477,7 @@ this supposition and defines an iterative scheme given by:
 \ee
 
 It can be shown that this method converges faster than Jacobi's iterative
-method, and it also has the added bonus of not requiring the previous value of the 
+method, and it also has the advantage of not requiring the previous value of the 
 potential at each grid point to be stored, thus reducing computation time.
 
 \subsection{Successive Over-Relaxation}
@@ -528,9 +489,9 @@ In each of the previous methods, the value of the potential is calculated from, 
 its previous value at the current point and the current or previous values of the
 potential at the four neighbouring points. Noting this, let $\phi_{j,k}$ be denoted as
 \emph{odd} if $j+k$ is odd, and even otherwise. Then the potential at each even point
-solely depends on the potential at odd points, and vice-versa. One could then, in
-principle, iterate through the grid of points at which the potential is approximated,
-and update all the odd points, and then re-iterate through the grid, updating all the
+solely depends on the potential at odd points, and vice-versa. In principle, then,
+the grid of points at which the potential is approximated could be iterated through,
+and all the odd points updated, and then re-iterated through, updating all the
 even points using the value of the potential at the newly updated odd points. Such an
 iterative scheme exists, and is known as \emph{Checkerboard (Red-Black) Updating}. The
 method essentially reduces a system of $N$ linear equations into two coupled systems
@@ -564,59 +525,24 @@ black points, it lends itself particularly well to the introduction of parallel
 computing, which can reduce computation time even more, particularly for larger grid
 sizes.
 
-\subsection{Nine-point Stenciling}
-\input{nine_p.tex}
-
 For a discussion of the implementation of these methods in C++, see~\cite{nr}.
 
 \subsection{Comparison of methods}
 
 To decide which relaxation method was best to implement in the software package,
 each method was coded into C++ and ran to solve Laplace's equation for System One.
-The resulting numerical approximations can be seen in Figure~\ref{fig:comparison}.
-
-%fig:comparison
+Each method works and the resulting numerical approximations can be seen in
+Appendix~\ref{app:comparison}.
 
 As there is very little graphical difference between each method, more quantitative
 comparison methods were employed, namely the relative convergence and error---as
 compared to the analytical solution---of each method, and their dependence on number
 of iterations, was studied. The CPU time for each method was also studied. The results
-are summarised in Figure~\ref{fig:stats}.
+are also summarised in Appendix~\ref{app:compare}.
 
-%mention how these stats are calculated?
-
-\begin{figure}
-\centering
-\begin{subfigure}{0.8\textwidth}
-	\includegraphics[scale=0.8]{rel_convergence.pdf}
-	\caption{Average relative convergence, between successive approximations for the potential of each method, versus number of iterations}
-	\label{fig:conv}
-\end{subfigure}
-
-\begin{subfigure}{0.8\textwidth}
-	\includegraphics[scale=0.8]{rel_error.pdf}
-	\caption{Average relative error of each method, as compared to the analytical solution, versus number of iterations}
-	\label{fig:err}
-\end{subfigure}
-
-\begin{subfigure}{0.8\textwidth}
-	\includegraphics[scale=0.8]{time.pdf}
-	\caption{CPU time taken by each method versus number of iterations}
-	\label{fig:time}
-\end{subfigure}
-\caption{Summary of the method comparison statistics}
-\label{fig:stats}
-\end{figure}
-
-The following conclusions were drawn from the data:
-%
-\begin{itemize}
-\item the addition of successive over-relaxation causes drastic increase in convergence;
-\item average relative error essentially converges for all methods;
-\item CPU time is not an important factor.
-\end{itemize}
-
-%maybe include plot of completion time vs desired convergence
+The following conclusions were drawn from the data: the addition of successive
+over-relaxation causes drastic increase in convergence; average relative error
+essentially converges for all methods; and CPU time is not an important factor.
 
 Hence, Checkerboard Updating with successive over-relaxation was chosen to be used
 in the genereal software package, since it converges in the least iterations,
@@ -667,16 +593,17 @@ Laplace equation was discretised. Five different examples of relaxation methods 
 presented and compared, \emph{vis-\`{a}-vis} their relative error and convergence, and
 the optimal method was shown to be Checkerboard updating with successive over-relaxation.
 
-A software package \lstinline|eStatics| developed by the authors, capable of solving
-Laplace's equation for arbitrary constant boundary conditions, was described in detail,
-and example output of the package for different boundary conditions were shown.
+A software package, \lstinline|eStatics|, capable of solving Laplace's equation for
+arbitrary constant boundary conditions, was described, and example output of the
+package for different boundary conditions were shown.
 
-Several improvements could have been made to the software. Adaptive step-sizing could
-have been implemented in regions of quickly changing potential. Additionally, the
-introduction of non-constant boundary conditions---in space or time---could have been
-examined. The software could be generalised to be able to solve Laplace's equation given
-only von Neumann boundary conditions, where the normal component of the gradient of the
-potential is specified at each boundary. 
+Several improvements could have been made to the software: adaptive step-sizing could
+have been implemented in regions of quickly changing potential; the software could be
+made able to solve systems with more than four different potentials; and constant boundary
+conditions that vary with position could have been examined. The software could be
+generalised to be able to solve Laplace's equation given only von Neumann boundary
+conditions, where the normal component of the gradient of the potential is specified
+at each boundary. 
 
 Further work is proposed in the use of alternative numerical methods in the
 numerical approximations of Laplace's equation, namely fast Fourier transforms,
@@ -689,6 +616,38 @@ to the solutions of Poisson's equation could be studied.
 %start of appendix
 \appendix
 \section{Appendices}
+
+\subsection{Method Comparison}
+\label{app:compare}
+Figure~\ref{fig:compare} show the numerical approximation for the potential for each
+method.
+
+
+Figure~\ref{fig:stats} show the statistics for each method.
+
+\begin{figure}
+\centering 
+\begin{subfigure}{0.8\textwidth}
+	\includegraphics[scale=0.8]{rel_convergence.pdf}
+	\caption{Average relative convergence, between successive approximations for the potential of each method, versus number of iterations}
+	\label{fig:conv}
+\end{subfigure}
+
+\begin{subfigure}{0.8\textwidth}
+	\includegraphics[scale=0.8]{rel_error.pdf}
+	\caption{Average relative error of each method, as compared to the analytical solution, versus number of iterations}
+	\label{fig:err}
+\end{subfigure}
+
+\begin{subfigure}{0.8\textwidth}
+	\includegraphics[scale=0.8]{time.pdf}
+	\caption{CPU time taken by each method versus number of iterations}
+	\label{fig:time}
+\end{subfigure}
+\caption{Summary of the method comparison statistics}
+\label{fig:stats}
+\end{figure}
+
 \subsection{Algorithm for Software Package}
 
 \begin{algorithm}
