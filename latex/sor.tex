@@ -1,11 +1,22 @@
-Like the Gauss-Seidel method, the successive over-relaxation method uses two points from the previous iteration and the two updates points. It also utilizes the point $\phi_{i,j,n-1}$, and applies over-relaxation by using a constant $s$ known as the relaxation parameter.
+Like the Gauss-Seidel method, the successive over-relaxation method uses two
+points from the previous iteration and the two updated points. It also
+utilises the point $\phi_{i,j,n-1}$, and applies over-relaxation by using a
+constant $s$ known as the relaxation parameter.
+%
 \be
 \phi_{j,k,n+1}=(1-s)\phi_{j,k,n}+\frac{s}{4}(\phi_{j-1,k,n+1}+\phi_{j+1,k,n}+\phi_{j,k-1,n+1}+\phi_{j,k+1,n})
 \ee
-The optimum value for the relaxation parameter can not be easily determined arithmetically but the value is always within $1<s<2$ for a converging system. The optimal value for a square grid (see ~ \cite{sor}) can be approximated using :
+
+The optimum value for the relaxation parameter cannot be easily determined
+arithmetically but to allow the system to converge, the value is always
+within $s\in[1,2]$. The optimal value for a square grid (see~\cite{sor})
+can be approximated using:
+%
 \be
  s_{opt} = \frac{2}{1+\sin(\frac{\pi}{n})} \approx \frac{2}{1+\frac{\pi}{n}}
 \ee
-For an $n \times n$ square grid.
+%
+for an $n \times n$ square grid.
 
-The method reduces iterations by a considerable amount depending on the value of the relaxation parameter used.
+The method reduces iterations by a considerable amount depending on the value
+of the relaxation parameter used.
