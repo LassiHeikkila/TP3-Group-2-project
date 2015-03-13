@@ -130,8 +130,9 @@ opportunities for further work.
 
 The Laplace equation, named after mathematician and physicist Pierre-Simon de Laplace,
 is a linear second-order partial differential equation that can be used to describe
-steady-state distributions of heat, fluids and potential~\cite{mm}. It states that the divergence
-of the gradient of a function, $\phi$ say, is zero. Symbolically:
+steady-state distributions of heat, fluids and potential where there are no sources. It
+states that the divergence of the gradient of a function, $\phi$ say, is zero.
+Symbolically:
 %
 \be
 \nabla ^2 \phi = 0
@@ -208,9 +209,12 @@ some well-posed boundary conditions, to find the electrostatic potential and hen
 electric field for some physical system. This, in turn, can be used to find the
 equations of motion of test particles within the system, via the Lorentz force law.
 
-The following analysis occurs in the context of electromagnetism but can be easily
+The following analysis occurs in the context of electromagnetism, where the equation
+describes the electrostatic potential in a a charge-free region, but can be easily
 generalised to other areas of physics were the Laplace equation occurs, for example,
-fluid dynamics, heat conduction and astronomy.
+fluid dynamics, where it describes the flow of an incompressible fluid with no sources
+or sinks; to astronomy, where it describes the gravitational potential in a region
+containing no matter. See pp.679 of~\cite{mm}.
 
 \subsection{Description of Physical Systems}
 
@@ -284,8 +288,8 @@ one finds that:
 
 Since the left-hand side is solely a function of $r$---and the right-hand side of
 $\theta$---they both must be constant if the relation is to hold for arbitrary values
-of $r$ and $\theta$. Then---with some foreknowledge---one sets this constant equal to
-$k^2$, for some constant $k\in\mathbb{R}$. This gives two second-order ordinary
+of $r$ and $\theta$. Then---with some foreknowledge---one sets this constant equal
+to $k^2$, for some constant $k\in\mathbb{R}$. This gives two second-order ordinary
 differential equations:
 %
 \be
@@ -305,14 +309,17 @@ g(\theta)= \gamma_k \sin(k\theta)+\delta_k \cos(k\theta)
 
 For consistency, we expect $g$ to be single-valued and periodic, namely that
 $g(\theta)=g(\theta + 2\pi)$, so that $k$ can only take integer values. Hence, by
-the principle of superposition and the linearity of the Laplace equation, its general
-solution in polar co-ordinates is a sum of such terms:
+the principle of superposition, the general solution of Laplace's equation in polar
+co-ordinates is a sum of such terms:
 %
 \be
 \phi(r,\theta)
 = f(r)g(\theta)
 = (\alpha \ln(r) + \beta)(\gamma\theta + \delta) + \sum_{n=1}^{\infty}(\alpha_n r^n+\beta_n r^{-n})(\gamma_n \sin(n\theta) + \delta_n \cos(n\theta))
 \ee
+%
+where negative values of $n$ are omitted as they are included in the terms for positive
+$n$. See pp. 725-727 of~\cite{mm}. 
 
 For a particular solution to the system considered here one must impose boundary
 conditions. Specifically, we use \emph{Dirichlet boundary conditions}, where the value
@@ -392,8 +399,11 @@ definition of the derivative and write
 %
 where $f(t+\Delta t)$ and $f(t)$ are two values of $f$, evaluated at two points
 a distance $\Delta t$ apart, and $\Delta t$ is assumed to be small enough that
-the approximation is good. This is known as the
-\emph{forward difference approximation}~\cite{nr}.
+the approximation is good. This is known as the \emph{forward difference approximation}
+and has a truncation error $\sim \frac{\Delta t}{2}$.
+Alternatively, one can employ the \emph{central difference approximation}:
+$\frac{df}{dt}\approx \frac{f(t+\Delta t) - f(t-\Delta t)}{2 \Delta t}$, which has
+truncation error $\sim \frac{\Delta t^2}{6}$.
 
 Similarly, to approximate the second derivative of a function, one writes
 %
@@ -402,6 +412,9 @@ Similarly, to approximate the second derivative of a function, one writes
 = \frac{\frac{f(t +\Delta t) - f(t)}{\Delta t} - \frac{f(t) - f(t -\Delta t)}{\Delta t}}{\Delta t} \\
 = \frac{f(t +\Delta t) - 2f(t) + f(t-\Delta t)}{\Delta t ^2}
 \ee
+%
+This has truncation error $\sim \frac{\Delta t^2}{2}$. See pp. 1019 of~\cite{mm} for a
+fuller discussion.
 
 \subsection{Discretisation of Laplace's Equation}
 
@@ -463,7 +476,8 @@ one can now approximate Eqn.~\ref{eq:laplace} as:
 \frac{\phi_{j+1,k}-2\phi_{j,k}+\phi_{j-1,k}}{\Delta x^2} = - \frac{\phi_{j,k+1}-2\phi_{j,k}+\phi_{j,k-1}}{\Delta y^2}
 \ee
 %
-where $j$ and $k$ index the $x$ and $y$ directions respectively.
+where $j$ and $k$ index the $x$ and $y$ directions respectively. See pp. 1031
+of~\cite{mm}.
 
 For a unique spacing $\Delta=\Delta x=\Delta y$ this reduces to the statement that
 the value of the potential at a specific point is the average of the value of the
@@ -552,6 +566,8 @@ sizes.
 
 \subsection{Nine-point Stenciling}
 \input{nine_p.tex}
+
+For a discussion of the implementation of these methods in C++, see~\cite{nr}.
 
 \subsection{Comparison of methods}
 
