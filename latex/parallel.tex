@@ -1,8 +1,8 @@
-	Parallel processing, whereby a calculation or task is split into sections - or threads - which can be run concurrently, can allow significant increases in solving speed. There are, however, issues that must be taken into account. Primary among these are `race conditions' - where concurrent tasks require access to the same memory location, and if timing is not right one or more thread can return incorrect data, and the overheads of multi-threading. The overheads involved are mainly due to the fact that the creation and deletion of threads takes time. A discussion of how these problems were dealt with follows.
+	Parallel processing, whereby a calculation or task is split into sections --- or threads --- which can be run concurrently, can allow significant increases in solving speed. There are, however, issues that must be taken into account. Primary among these are `race conditions' --- where concurrent tasks require access to the same memory location, and if timing is not right one or more thread can return incorrect data --- and the overheads of multi-threading. The overheads involved are mainly due to the fact that the creation and deletion of threads takes time. A discussion of how these problems were dealt with follows.
 		
 		\subsubsection{Checkerboard Updating: Parallelisability}
 		
-		As has been mentioned previously, the utilisation of Checkerboard - or Red/Black - updating lends itself to parallel computing. This is due to the independence of same-coloured elements making the process thread-safe~\cite{wallach}. That is 
+		As has been mentioned previously, the utilisation of Checkerboard --- or Red/Black --- updating lends itself to parallel computing. This is due to the independence of same-coloured elements making the process thread-safe~\cite{wallach}. That is 
 		\[
 		S_m \cap S_n = \emptyset, \ \ \ \forall \  m, n \in \mathbb{N} \text{ where } m \neq n,
 		\]
@@ -10,25 +10,25 @@
 		
 		\subsubsection{Hardware Concurrency}
 		
-			Hardware concurrency refers to the number of logic cores present in a given system and determines how many threads can be run concurrently, with one thread typically being able to run at any one time per core. This unless hyper-threading - an Intel technology which assigns two logic cores to each physical processor core - is enabled. The \lstinline|eStatics| package begins by checking this value using \lstinline|std::thread::hardware_concurrency()|, which returns an integer value. This check allows the program to automatically scale to any arbitrary system, including support for hyper-threading and thus allowing maximum utilisation of parallel processing.
+			Hardware concurrency refers to the number of logic cores present in a given system and determines how many threads can be run concurrently, with one thread typically being able to run at any one time per core. This is unless hyper-threading --- an Intel technology which assigns two logic cores to each physical processor core --- is enabled. The \lstinline|eStatics| package begins by checking this value using \lstinline|std::thread::hardware_concurrency()|, which returns an integer value. This check allows the program to automatically scale to any arbitrary system, including support for hyper-threading and thus allowing maximum utilisation of parallel processing.
 		
 		\subsubsection{Thread Pool Pattern}
 		
-			To overcome the previously mentioned overheads involved in creating and deleting threads, a thread pool pattern was used. In this pattern, a pool of `worker threads' are created - with \lstinline|eStatics| creating one thread per available core - and linked to a queue of assigned tasks. The threads then work on this queue until it is empty, when they remain idle and wait for new tasks. When the pool is out of scope - that is, when the function that created it ends - it is safely deleted. This means that each thread is created and deleted only once, greatly reducing the time-cost when compared to creating and destroying threads on an \textit{ad hoc} basis.
+			To overcome the previously mentioned overheads involved in creating and deleting threads, a thread pool pattern was used. In this pattern, a pool of `worker threads' are created --- with \lstinline|eStatics| creating one thread per available core --- and linked to a queue of assigned tasks. The threads then work on this queue until it is empty, when they remain idle and wait for new tasks. When the pool is out of scope --- that is, when the function that created it ends --- it is safely deleted. This means that each thread is created and deleted only once, greatly reducing the time-cost when compared to creating and destroying threads on an \textit{ad hoc} basis.
 			
-			The thread pool in this case has, as mentioned, one thread per core. Each thread is assigned a starting column on the grid, starting at column zero and incrementing by one until the thread concurrency limit is reached. These threads then each solve their respective column and jump forward in columns by the number of threads - effectively leapfrogging each other - until the end of the array is reached. Upon reaching the end of the array, that thread will complete its task and idle until assigned new work.
+			The thread pool in this case has, as mentioned, one thread per core. Each thread is assigned a starting column on the grid, starting at column zero and incrementing by one until the thread concurrency limit is reached. These threads then each solve their respective column and jump forward in columns by the number of threads --- effectively leapfrogging each other --- until the end of the array is reached. Upon reaching the end of the array, that thread will complete its task and idle until assigned new work.
 			
 		\subsubsection{Thread Synchronisation}
 		
 			The final hurdle to overcome in utilising parallel processing in the software package is thread synchronisation, which is vital in avoiding race conditions. Although all same-coloured elements are independent of one another, they are entirely dependant on the surrounding elements of a different colour. As such, if the solver starts to run through black elements before the red elements are complete there is a very real risk of incorrect data being returned.
 			
-			This can be overcome by implementing a loop which checks the value of some `queue length' variable, which is incremented by one for each task added to the queue and decremented by one for each completed task. The loop can be defined such that it breaks if and only if the queue is empty - where the variable would equal zero. In this case, \lstinline|pool_name.wait()| is included in the \lstinline|boost::threadpool| library.
+			This can be overcome by implementing a loop which checks the value of some `queue length' variable, which is incremented by one for each task added to the queue and decremented by one for each completed task. The loop can be defined such that it breaks if and only if the queue is empty --- where the variable would equal zero. In this case, \lstinline|pool_name.wait()| is included in the \lstinline|boost::threadpool| library.
 			
 			This function is used after assigning tasks to the queue, for example when all red subsets have been assigned. The function is then called, and causes the program to wait until all red threads are complete before continuing on to assign black elements to the queue. The function is called again after this, and waits until all black threads have completed their work. This constitutes one full iteration of the grid.
 	
 		\subsubsection{Limitations: Amdahl's Law}
 		
-			Although - given sufficient care in design - parallel processing does allow significant gains in terms of solving speed, it also has limitations. Notably, the maximum increase in speed that can be delivered by splitting a calculation into $N$ concurrent sub-calculations is not linear and is described by Amdahl's Law. This can be stated as
+			Although --- given sufficient care in design --- parallel processing does allow significant gains in terms of solving speed, it also has limitations. Notably, the maximum increase in speed that can be delivered by splitting a calculation into $N$ concurrent sub-calculations is not linear and is described by Amdahl's Law. This can be stated as
 			\[
 				S(N) = \frac{1}{(1-P) + \frac{P}{N}},
 			\]
