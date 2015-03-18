@@ -22,7 +22,7 @@ int mem_measure()
 
 	while (fgets(line,128,mem) != NULL)
 	{
-		if (strncmp(line,"VmSize:",7) == 0)
+		if (strncmp(line,"VmHWM:",6) == 0)
 		{
 			result = parseline(line);
 			break;
