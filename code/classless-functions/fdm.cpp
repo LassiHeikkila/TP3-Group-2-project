@@ -131,7 +131,7 @@ array_data * fdm(char* image, double* potentials, double rel_par, int iterations
 
 		if (count % 200 == 0)
 		{
-			cout << "\rIteration " << count / 2 << "." << std::flush;
+			cout << "\rIteration: " << count / 2 << ", Convergence count: " << convcount << "." << std::flush;
 
 			if (convcount > prev_convcount)
 			{
