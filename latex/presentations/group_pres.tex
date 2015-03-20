@@ -11,7 +11,7 @@
 \usepackage{tikz}                      %use package for diagram drawings
 \usepackage{algpseudocode}             %use package for pseudocode
 \usepackage{algorithm}                 %use package for pseudocode
-\usepackage{caption}                   %use package for multiple figures
+\usepackage[justification=centering]{caption}                   %use package for multiple figures
 \usepackage{subcaption}                %use package for multiple figures
 \usepackage{color}                     %use package for code listings
 \usepackage{listings}                  %use package for c++ code in appendix
@@ -70,7 +70,7 @@
 \graphicspath{{/home/danmfr/p3t/laplace/images/}}
 
 \title{$3^{rd}$ Year Theoretical Physics Group Project}
-\subtitle{On numerical approximations to solutions of Laplace's equation for different boundary conditions}
+\subtitle{On numerical solutions to Laplace's equation for different boundary conditions}
 \author{S. Brown, F. Hayes, L. Heikkil{\"a}, D. Richardson\\
         School of Physics and Astronomy,\\
         University of Glasgow,\\
@@ -99,10 +99,25 @@
 \section{Overview}
 \begin{frame}{Overview}
 Aims:
+\begin{itemize}
+\item introduce and derive the Laplace equation and list its uses
+ \begin{itemize}
+ \item start with general solution, find a particular solution
+ \end{itemize}
+\item introduce finite difference methods and discuss their necessity
+\item introduce and describe software package 
+ \begin{itemize}
+ \item present results and analysis of software package
+ \end{itemize}
+\end{itemize}
 
-This discussion of the Laplace equation occurs within the framework of EM but can
+This discussion of the Laplace equation occurs within EM but can
 be generalised to other physical phenomena where the equation occurs:
-thermodynamics, fluid mechanics, astronomy.
+\begin{itemize}
+\item thermodynamics,
+\item fluid mechanics,
+\item astronomy.
+\end{itemize}
 \end{frame}
 
 \section{Introduction}
@@ -134,33 +149,17 @@ This is Laplace's equation.
 \begin{figure}
 \centering
 \begin{subfigure}[b]{0.45\textwidth}
-	\begin{tikzpicture}
-	\draw (0,0) -- (0,2.5) node[above, font=\footnotesize] {$\phi = V$}; 
-	\draw (4.2,0) -- (4.2,2.5) node[above, font=\footnotesize] {$\phi = -V$}; 
-	\draw (2.1,1.25) circle (0.5cm) node[below, font=\footnotesize, yshift=-0.4cm] {GND};
-	\draw[dashed] (2.1,1.25) -- (2.5,1.55) node[pos=0.2, above, font=\footnotesize] {$R$};
-	\end{tikzpicture}
+	\centerline{\includegraphics[scale=0.4, trim = 0cm 1cm 0cm 0cm, clip=true]{sysA.pdf}}
 	\caption{System A}
 \end{subfigure}
 \hfill
 \begin{subfigure}[b]{0.45\textwidth}
-	\begin{tikzpicture}
-	\draw (0,0) -- (4,0) node[right, font=\footnotesize] {$\phi = V$}; 
-	\draw (0,2.5) -- (4,2.5) node[pos=0.25, above, font=\footnotesize] {GND} node[pos=0.5, above, font=\footnotesize] {GND} node[pos=0.75,above, font=\footnotesize] {GND};
-	\draw (0.8,2.5) rectangle (1.2,2.375);
-	\draw (1.8,2.5) rectangle (2.2,2.375);
-	\draw (2.8,2.5) rectangle (3.2,2.375);
-	\end{tikzpicture}
+	\centerline{\includegraphics[scale=0.4, trim = 0cm 1cm 0cm 0cm, clip=true]{sysC.pdf}}
 	\caption{System C}
 \end{subfigure}
 \caption{Cross-sectional diagram of two electrostatic systems}
 \end{figure}
 
-System A can be solved analytically
-\begin{itemize}
-\item use it to find best method to numerically solve more complex systems like C, that
-do not have analytical solutions.
-\end{itemize}
 \end{frame}
 
 \subsection{Analytical Solution of System A}
@@ -177,39 +176,37 @@ do not have analytical solutions.
 	\caption{System A}
 \end{figure}
 
-To exploit the symmetry of the system we find the general solution of $\nabla^2 \phi=0$
+Exploit the symmetry of the system by finding the general solution of $\nabla^2 \phi=0$
 in plane polar co-ordinates: 
 %
 \be
-\frac{1}{r}\frac{\partial}{\partial r}(r \frac{\partial \phi}{\partial r}) + \frac{1}{r^2}\frac{\partial ^2 \phi}{\partial \theta^2} = 0 
+\frac{1}{r}\frac{\partial}{\partial r}\left(r \frac{\partial \phi}{\partial r}\right) + \frac{1}{r^2}\frac{\partial ^2 \phi}{\partial \theta^2} = 0 
 \ee
 
-Separate variables, $\phi(r,\theta)=f(r)g(\theta)$, say.
-
-Substitution gives
+Separate variables, $\phi(r,\theta)=f(r)g(\theta)$. Substitution gives
 %
 \be
-\frac{r}{f(r)}\frac{d}{dr}(r \frac{df(r)}{dr}) =- \frac{1}{g(\theta)}\frac{d^2 g(\theta)}{d \theta^2}
+\frac{r}{f(r)}\frac{d}{dr}\left(r \frac{df(r)}{dr}\right) =- \frac{1}{g(\theta)}\frac{d^2 g(\theta)}{d \theta^2}
 \ee
 
 \end{frame}
 
 \begin{frame}{General Analytical Solution cont.}
-We had that supposing $\phi(r,\theta)=f(r)g(\theta)$ gave:
+We had that:
 %
 \be
-\frac{r}{f(r)}\frac{d}{dr}(r \frac{df(r)}{dr}) =- \frac{1}{g(\theta)}\frac{d^2 g(\theta)}{d \theta^2}
+\frac{r}{f(r)}\frac{d}{dr}\left(r \frac{df(r)}{dr}\right) =- \frac{1}{g(\theta)}\frac{d^2 g(\theta)}{d \theta^2}
 \ee
 %
 Left-hand side is solely a function of $r$; right-hand side of $\theta$ 
 \begin{itemize}
-\item both sides must be constant, so set equal to $k^2$ say, for some $k \in \mathbb{R}$.
+\item both sides must be constant, $k^2$ say, for some $k \in \mathbb{R}$.
 \end{itemize}
 
 Produces pair of second-order ODEs:
 %
 \be
-r\frac{d}{dr}(r \frac{df(r)}{dr}) = k^2 f(r) \quad \frac{d^2 g(\theta)}{d\theta^2} = -k^2 g(\theta)
+r\frac{d}{dr}\left(r \frac{df(r)}{dr}\right) = k^2 f(r) \quad \frac{d^2 g(\theta)}{d\theta^2} = -k^2 g(\theta)
 \ee
 
 \end{frame}
@@ -227,7 +224,7 @@ f(r)=\alpha_k r^k +\beta_k r^{-k} \quad \text{and} \quad g(\theta) = \gamma_k \s
 \ee
 \end{itemize}
 
-Expect $g$: $g(\theta+2\pi)=g(\theta)$ to be single-valued so that $k \in \mathbb{Z}$.
+Expect $g$ to be single-valued: $g(\theta+2\pi)=g(\theta) \implies k \in \mathbb{Z}$.
 
 Principle of superposition gives general solution of Laplace's equation in polar
 co-ordinates:
@@ -290,7 +287,7 @@ Then,
 or,
 %
 \be
-\phi(r, \theta) = (\frac{\beta_1}{r}-\frac{Vr}{d})\cos(\theta) + \sum_{n=2}^{\infty} \frac{\beta_n}{r^n} \cos(n\theta)
+\phi(r, \theta) = \left(\frac{\beta_1}{r}-\frac{Vr}{d}\right)\cos(\theta) + \sum_{n=2}^{\infty} \frac{\beta_n}{r^n} \cos(n\theta)
 \ee
 
 \end{frame}
@@ -299,7 +296,7 @@ or,
 We have
 %
 \be
-\phi(r, \theta) = (\frac{\beta_1}{r}-\frac{Vr}{d})\cos(\theta) + \sum_{n=2}^{\infty} \frac{\beta_n}{r^n} \cos(n\theta)
+\phi(r, \theta) = \left(\frac{\beta_1}{r}-\frac{Vr}{d}\right)\cos(\theta) + \sum_{n=2}^{\infty} \frac{\beta_n}{r^n} \cos(n\theta)
 \ee
 
 Expect continuity of $\phi$ at the surface of the cylinder:
@@ -314,7 +311,7 @@ since the set $\{\cos(n \theta)\}$ are linearly independent functions.
 Final solution is:
 %
 \be
-\phi(r, \theta) = \frac{V}{d}(\frac{R^2}{r}-r)\cos(\theta)
+\phi(r, \theta) = \frac{V}{d}\left(\frac{R^2}{r}-r\right)\cos(\theta)
 \ee
 for $r>R$ and $0$ otherwise.
 
@@ -325,25 +322,21 @@ for $r>R$ and $0$ otherwise.
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[scale=0.8]{analytic.pdf}
-\caption{Analytic solution with $V=1$, $R=15$}
+\caption{Analytic solution with $V=1$, $R=15$, $d=50$}
 \end{center}
 \end{figure}
 
 \end{frame}
 
 \section{Numerical Methods}
-\begin{frame}{Necessity of numerical methods}
-System A is a very idealised system, that is not realisable in the real world
-\begin{itemize}
-\item plates cannot be infinite in extent
-\end{itemize}
+\begin{frame}{Necessity of Numerical Methods}
+Analytically solvable systems are few and far-between.
 
-For real world systems is it difficult, and often impossible, to express boundary
-conditions in a manner that is algebraically usable, and thus impossible to find a
-particular analytical solution to Laplace's equation.
-\begin{itemize}
-\item One must solve Laplace's equation numerically.
-\end{itemize}
+In general, it is difficult, and often impossible, to express systems mathematically
+in terms of algebraically utilisable boundary conditions and impose these conditions
+on general solutions of Laplace's equation in given co-ordinates.
+
+Solutions to these types of systems must be numerically approximated.
 
 One such way is Finite Difference Methods.
 \end{frame}
@@ -374,10 +367,10 @@ We can then approximate the second derivative similarly:
 Define a region on which to discretise Laplace equation, 
 %
 \be
-\{(x,y)|\:0<x<L,0<y<D\}
+\Omega = \{(x,y)|\:0<x<L,0<y<D\}
 \ee
 
-Create a grid of points at which to solve the equation:
+Create a grid of points in $\Omega$ at which to solve the equation:
 
 \begin{figure}
 \centering
@@ -411,15 +404,13 @@ are interior points that change; black points are boundary points that remain co
 \end{frame}
 
 \begin{frame}{Discretisation of Laplace's equation}
-We write the value of $\phi$ at position $(x_j,y_k)$ on the grid as $\phi_{j,k}$.
+Write $\phi(x,y)$ at $(x_j,y_k)$ as $\phi_{j,k}$.
 
 Hence, Laplace's eqaution is discretised as
 %
 \be
 \frac{\phi_{j+1,k}-2\phi_{j,k}+\phi_{j-1,k}}{\Delta x^2} + \frac{\phi_{j,k+1}-2\phi_{j,k}+\phi_{j,k-1}}{\Delta y^2}=0
 \ee
-%
-where $j$ and $k$ index the $x$ and $y$ directions.
 
 For unique separation $\Delta = \Delta x = \Delta y$, $\phi_{j,k}$ is the average of the
 surrounding points:
@@ -433,6 +424,16 @@ surrounding points:
 \section{Software}
 
 \begin{frame}{Software Package}
+
+Require software package capable of solving Laplace’s equation for different boundary
+conditions. Developed \texttt{estatics} in C\texttt{++} that:
+\begin{itemize}
+\item accepts input of a coloured bitmap, colours represent regions of different constant potentials
+\item converts to array of values depending on value assigned to each colour by the user
+\item applies relaxation to array until all points have converged
+\item outputs data files and plots of the resultant potential and electric field, and equipotential lines
+\end{itemize}
+
 \end{frame}
 
 \begin{frame}{Flowchart}
@@ -444,16 +445,55 @@ surrounding points:
 \end{frame}
 
 \subsection{Input}
-\begin{frame}{Bitmaps}
+
+\begin{frame}{Bitmap Boundary Conditions}
+
+\begin{itemize}
+\item Bitmap image files are used to input the boundary conditions.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.4\textwidth]{bitmapA.pdf}
+\caption{System A graphically represented as a BMP file.}
+\end{figure}
+
+\item Different colours represent different areas of constant potential.
+\item The white pixels are areas of unsolved potential.
+
+\end{itemize}
+
 \end{frame}
 
 \begin{frame}{Boolean Mask}
+
+The locations of the boundary conditions and their potential are mapped on to two matrices.
+
+\begin{itemize}
+\item A matrix of potentials to be relaxed
+\item A matrix of boolean values which stores the location of boundary values.
+\end{itemize}
+
+The boolean mask stores the location of:
+\begin{itemize} 
+\item boundary values as \lstinline|true|
+\item other points to be iterated as \lstinline|false|.
+\end{itemize}
+When relaxation is applied to the matrix of potentials, values that are \lstinline|true|
+are ignored, thus reducing computation time and preventing boundary decay.
+
 \end{frame}
 
 \subsection{Process}
 
-\begin{frame}{Successive Over-relaxation}
-Can define an iterative scheme which uses $\phi_{j,k,n}$:
+\begin{frame}{Relaxation Methods}
+Examined convergence of: 
+\begin{itemize}
+\item Jacobi iterative method,
+\item Gauss-Seidel method,
+\item successive over-relaxation.
+\end{itemize}
+
+Best was successive over-relaxation:
 %
 \be
 \phi_{j,k,n+1}= (1-s)\phi_{j,k,n}+\frac{s}{4}(\phi_{j-1,k,n+1}+\phi_{j+1,k,n}+\phi_{j,k-1,n+1}+\phi_{j,k+1,n})
@@ -461,19 +501,13 @@ Can define an iterative scheme which uses $\phi_{j,k,n}$:
 %
 where $1<s<2$ is the \emph{relaxation parameter}.
 
-Optimum relaxation parameter, for an $n\times n$ square grid, is:
-\be
-s = \frac{2}{1+\sin(\frac{\pi}{n})} \approx \frac{2}{1+\frac{\pi}{n}}
-\ee
-
-This is a more convergent numerical method than those previous, and is called 
-\emph{successive over-relaxation}.
 \end{frame}
 
 \begin{frame}{Checkerboard (Red-Black) Updating}
-Algorithm:
+
+Denote $\phi_{j,k}$ as \emph{odd} if $j+k$ is odd, and even otherwise. Then:
+
 \begin{itemize}
-\item denote $\phi_{j,k}$ as \emph{odd} if $j+k$ is odd, and even otherwise.
 \item iterate through the grid
  \begin{itemize}
  \item update $\phi$ at each odd point (only depends on even points)
@@ -488,13 +522,7 @@ This is \emph{Checkerboard (Red-Black) Updating}
 \begin{itemize}
 \item separates system of $N$ linear equations into two coupled systems of
 $\frac{N}{2}$ linear equations.
-\end{itemize}
-
-Advantages:
-\begin{itemize}
-\item more convergent method than those outlined previously
-\item can have successive over-relaxation added
-\item employ parallel processing
+\item can have successive over-relaxation and parallel processing added
 \end{itemize}
 
 \end{frame}
@@ -516,7 +544,6 @@ Advantages:
 \end{center}
 \caption{An illustration of checkerboard updating. The black points are updated first,
 and then red points are calculated from the newly updated black points.}
-\label{fig:checker}
 \end{figure}
 
 \end{frame}
@@ -538,7 +565,6 @@ and then red points are calculated from the newly updated black points.}
 \end{center}
 \caption{An illustration of checkerboard updating. The black points are updated first,
 and then red points are calculated from the newly updated black points.}
-\label{fig:checker}
 \end{figure}
 
 \end{frame}
@@ -560,14 +586,13 @@ and then red points are calculated from the newly updated black points.}
 \end{center}
 \caption{An illustration of checkerboard updating. The black points are updated first,
 and then red points are calculated from the newly updated black points.}
-\label{fig:checker}
 \end{figure}
 
 \end{frame}
 
 \begin{frame}{Parallel Processing}
 
-\begin{figure}[h!]
+\begin{figure}
 \begin{center}
 \begin{tikzpicture}
 \foreach \x in {0,...,10}
@@ -586,21 +611,135 @@ and then red points are calculated from the newly updated black points.}
  }
 }
 
+\foreach \x in {1,3,5,7,9}
+{
+ \foreach \y in {1,3,5,7,9}
+ {
+  \draw[fill=black] (0.4*\x,0.4*\y) circle (0.1cm);
+ }
+}
+
+\draw[thick,->] (0,4.4) -- (0,4.15);
+\draw[thick,->] (0.4,4.4) -- (0.4,4.15);
+
 \end{tikzpicture}
 \end{center}
-\caption{An illustration of checkerboard updating. The black points are updated first,
-and then red points are calculated from the newly updated black points.}
-\label{fig:checker}
+\caption{An illustration of parallel processing. The black points in each and every
+column are updated first, and then the red points in each and every column are
+calculated from the newly updated black points.}
 \end{figure}
 
 \end{frame}
 
-\begin{frame}{Convergence Locking}
-If a point is deemed to converge, i.e. the absolute difference between the previous
-and current potential is less than a certain desired convergence, it is set to a
-boundary in the boolean mask and ignored during a pass over the grid.
+\begin{frame}{Parallel Processing cont.}
 
-When every point is locked the program is stopped, and results outputted.
+\begin{figure}
+\begin{center}
+\begin{tikzpicture}
+\foreach \x in {0,...,10}
+{
+ \foreach \y in {0,...,10}
+ {
+  \draw[fill=red] (0.4*\x,0.4*\y) circle (0.1cm);
+ }
+}
+
+\foreach \x in {0,...,5}
+{
+ \foreach \y in {0,...,5}
+ {
+  \draw[fill=black] (0.8*\x,0.8*\y) circle (0.1cm);
+ }
+}
+
+\foreach \x in {1,3,5,7,9}
+{
+ \foreach \y in {1,3,5,7,9}
+ {
+  \draw[fill=black] (0.4*\x,0.4*\y) circle (0.1cm);
+ }
+}
+
+\draw[thick,->](0.4,4.4) -- (0.4,4.15);
+\draw[thick,->] (0.8,4.4) -- (0.8,4.15);
+
+\end{tikzpicture}
+\end{center}
+\caption{An illustration of parallel processing. The black points in each and every
+column are updated first, and then the red points in each and every column are
+calculated from the newly updated black points.}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Parallel Processing cont.}
+
+\begin{figure}
+\begin{center}
+\begin{tikzpicture}
+\foreach \x in {0,...,10}
+{
+ \foreach \y in {0,...,10}
+ {
+  \draw[fill=red] (0.4*\x,0.4*\y) circle (0.1cm);
+ }
+}
+
+\foreach \x in {0,...,5}
+{
+ \foreach \y in {0,...,5}
+ {
+  \draw[fill=black] (0.8*\x,0.8*\y) circle (0.1cm);
+ }
+}
+
+\foreach \x in {1,3,5,7,9}
+{
+ \foreach \y in {1,3,5,7,9}
+ {
+  \draw[fill=black] (0.4*\x,0.4*\y) circle (0.1cm);
+ }
+}
+
+\draw[thick,->] (0.8,4.4) -- (0.8,4.15);
+\draw[thick,->] (1.2,4.4) -- (1.2,4.15);
+
+\end{tikzpicture}
+\end{center}
+\caption{An illustration of parallel processing. The black points in each and every
+column are updated first, and then the red points in each and every column are
+calculated from the newly updated black points.}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Convergence Limit}
+
+The relaxation is terminated when every point is deemed to converge:
+\begin{itemize}
+\item Absolute convergence of each point is the difference between the potential of a
+      point over successive iterations.
+\item The system is iterated over until the absolute convergence of each point reduces below a desired value.
+\item Converged point are treated as boundaries in the boolean mask and ignored during a pass over the grid.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Convergence Lock}
+
+Converged points are 'locked' and treated like a boundary condition to reduce
+calculations per iteration.
+
+\begin{figure}
+ \centering
+ \centerline{\includegraphics[width=0.5\textwidth]{lockvnolock.pdf}}
+ \caption{The same system is solved with the lock on (red line) and the lock off (green line).}
+\end{figure}
+
+\begin{itemize}
+\item The lock needs to be conditioned to not lock points too early.
+\end{itemize}
+
 \end{frame}
 
 \begin{frame}{Convergence Locking Cont.}
@@ -621,13 +760,15 @@ When every point is locked the program is stopped, and results outputted.
 }
 
 \foreach \x in {1,...,9}
-\foreach \y in {1,...,9}
 {
-\draw[fill=white] (0.4*\x,0.4*\y) circle (0.1cm);
+ \foreach \y in {1,...,9}
+ {
+ \draw[fill=white] (0.4*\x,0.4*\y) circle (0.1cm);
+ }
 }
+
 \end{tikzpicture}
-\caption{Diagram of grid on which we approximate the potential $\phi$. White points
-are interior points that change; black points are boundary points that remain constant.}
+\caption{Illustration of convergence locking. As relaxation is applied more points converge and are locked.}
 \end{figure}
 
 \end{frame}
@@ -654,13 +795,26 @@ are interior points that change; black points are boundary points that remain co
 }
 
 \foreach \x in {2,...,8}
-\foreach \y in {2,...,8}
 {
-\draw[fill=white] (0.4*\x,0.4*\y) circle (0.1cm);
+ \foreach \y in {2,...,8}
+ {
+ \draw[fill=white] (0.4*\x,0.4*\y) circle (0.1cm);
+ }
 }
+
+%add random (un)converged points, increment of 0.4
+\draw[fill=black] (3.2,1.6) circle (0.1cm);
+\draw[fill=black] (0.8,2.4) circle (0.1cm);
+\draw[fill=black] (2,0.8) circle (0.1cm);
+\draw[fill=black] (3.2,0.8) circle (0.1cm);
+
+\draw[fill=white] (1.2,0.4) circle (0.1cm);
+\draw[fill=white] (2.8,0.4) circle (0.1cm);
+\draw[fill=white] (0.4,2) circle (0.1cm);
+\draw[fill=white] (3.6,2.8) circle (0.1cm);
+
 \end{tikzpicture}
-\caption{Diagram of grid on which we approximate the potential $\phi$. White points
-are interior points that change; black points are boundary points that remain constant.}
+\caption{Illustration of convergence locking. As relaxation is applied more points converge and are locked.}
 \end{figure}
 
 \end{frame}
@@ -691,13 +845,26 @@ are interior points that change; black points are boundary points that remain co
 }
 
 \foreach \x in {3,...,7}
-\foreach \y in {3,...,7}
 {
-\draw[fill=white] (0.4*\x,0.4*\y) circle (0.1cm);
+ \foreach \y in {3,...,7}
+ {
+ \draw[fill=white] (0.4*\x,0.4*\y) circle (0.1cm);
+ }
 }
+
+%add random (un)converged points, increment of 0.4
+\draw[fill=black] (2.4,2.8) circle (0.1cm);
+\draw[fill=black] (1.6,3.2) circle (0.1cm);
+\draw[fill=black] (2,1.2) circle (0.1cm);
+\draw[fill=black] (2.8,2.8) circle (0.1cm);
+
+\draw[fill=white] (2.8,0.8) circle (0.1cm);
+\draw[fill=white] (1.2,3.2) circle (0.1cm);
+\draw[fill=white] (0.8,1.2) circle (0.1cm);
+\draw[fill=white] (3.2,2) circle (0.1cm);
+
 \end{tikzpicture}
-\caption{Diagram of grid on which we approximate the potential $\phi$. White points
-are interior points that change; black points are boundary points that remain constant.}
+\caption{Illustration of convergence locking. As relaxation is applied more points converge and are locked.}
 \end{figure}
 
 \end{frame}
@@ -732,13 +899,22 @@ are interior points that change; black points are boundary points that remain co
 }
 
 \foreach \x in {4,...,6}
-\foreach \y in {4,...,6}
 {
-\draw[fill=white] (0.4*\x,0.4*\y) circle (0.1cm);
+ \foreach \y in {4,...,6}
+ {
+ \draw[fill=white] (0.4*\x,0.4*\y) circle (0.1cm);
+ }
 }
+
+%add random (un)converged points, increment of 0.4
+\draw[fill=black] (2.4,1.6) circle (0.1cm);
+\draw[fill=black] (1.6,2) circle (0.1cm);
+
+\draw[fill=white] (2.8,1.6) circle (0.1cm);
+\draw[fill=white] (1.2,2.8) circle (0.1cm);
+
 \end{tikzpicture}
-\caption{Diagram of grid on which we approximate the potential $\phi$. White points
-are interior points that change; black points are boundary points that remain constant.}
+\caption{Illustration of convergence locking. As relaxation is applied more points converge and are locked.}
 \end{figure}
 
 \end{frame}
@@ -759,8 +935,7 @@ are interior points that change; black points are boundary points that remain co
 \draw[fill=white] (2,2) circle (0.1cm);
 
 \end{tikzpicture}
-\caption{Diagram of grid on which we approximate the potential $\phi$. White points
-are interior points that change; black points are boundary points that remain constant.}
+\caption{Illustration of convergence locking. As relaxation is applied more points converge and are locked.}
 \end{figure}
 
 \end{frame}
@@ -778,8 +953,7 @@ are interior points that change; black points are boundary points that remain co
  }
 }
 \end{tikzpicture}
-\caption{Diagram of grid on which we approximate the potential $\phi$. White points
-are interior points that change; black points are boundary points that remain constant.}
+\caption{Illustration of convergence locking. As relaxation is applied more points converge and are locked.}
 \end{figure}
 
 \end{frame}
@@ -798,7 +972,7 @@ are interior points that change; black points are boundary points that remain co
 \begin{frame}{Conclusion}
 Further Work:
 \begin{itemize}
-\item Poisson's equation
+\item Other elliptic PDEs e.g. Poisson's equation
 \item Boundary conditions that vary with position
 \end{itemize}
 
